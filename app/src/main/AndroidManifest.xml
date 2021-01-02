@@ -18,11 +18,16 @@
         <activity android:name=".SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".Service.GetMasterSettings"
+        <service android:name=".Service.GetMasterSettingsService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.GetAccountsService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.GetProductService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.GetTransactionSetting"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
