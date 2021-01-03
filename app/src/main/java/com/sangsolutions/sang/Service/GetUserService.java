@@ -8,16 +8,16 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.sangsolutions.sang.Adapter.Accounts.Accounts;
 import com.sangsolutions.sang.Adapter.Products.Products;
+import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -27,60 +27,61 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class GetProductService extends JobService {
+public class GetUserService extends JobService {
 
     DatabaseHelper helper;
     JobParameters params;
-    Products products;
+    User user;
+
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
-        GetProducts();
+        GetUsers();
         AndroidNetworking.initialize(this);
         return true;
     }
 
-    private void GetProducts() {
-
-        AndroidNetworking.get("http://"+new Tools().getIP(GetProductService.this) + URLs.GetProducts)
+    private void GetUsers() {
+        AndroidNetworking.get("http://185.151.4.167/Vansales/api/Data/Get_User")
                 .setPriority(Priority.MEDIUM)
                 .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
+                .getAsJSONArray(new JSONArrayRequestListener() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("responseProduct",response.toString());
-                        loadProductData(response);
+                    public void onResponse(JSONArray response) {
+                        Log.d("responseUser",response.toString());
+                        loadUserData(response);
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        Log.d("response",anError.toString());
+                        Log.d("responseUser",anError.toString());
+
                     }
                 });
+
     }
 
-    private void loadProductData(JSONObject response) {
+    private void loadUserData(JSONArray response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    JSONArray jsonArray = new JSONArray(response.getString("Data"));
+                    JSONArray jsonArray = new JSONArray(response.toString());
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        products=new Products(
-                                jsonObject.getString(Products.S_CODE),
-                                jsonObject.getString(Products.S_NAME),
-                                jsonObject.getString(Products.S_ALT_NAME),
-                                jsonObject.getInt(Products.I_ID));
-                        if(helper.checkProductsById(jsonObject.getString(Products.I_ID))){
-                            if(helper.checkAllDataProducts(products)){
-                                Log.d("success","products Updated successfully "+i+" "+jsonArray.length());
+                        user=new User(
+                                jsonObject.getInt(User.I_ID),
+                                jsonObject.getString(User.S_LOGIN_NAME),
+                                jsonObject.getString(User.S_PASSWORD));
+                        if(helper.checkUserById(jsonObject.getString(User.I_ID))){
+                            if(helper.checkAllDataUser(user)){
+                                Log.d("success","User Updated successfully "+i);
                             }
                         }
-                        else if( helper.insertProducts(products)){
-                            Log.d("success","products added successfully "+i+"  "+jsonArray.length());
+                        else if( helper.insertUser(user)){
+                            Log.d("success","User added successfully "+i);
                         }
 
                         if(i+1==jsonArray.length()){

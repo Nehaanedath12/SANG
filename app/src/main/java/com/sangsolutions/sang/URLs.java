@@ -7,4 +7,5 @@ public class URLs {
     public static final String GetAccounts=domain+"GetAccounts";
     public static final String GetProducts=domain+"Getproducts";
     public static final String GetTransSettings=domain+"GetTransSettings";
+    public static String GetUser="";
 }

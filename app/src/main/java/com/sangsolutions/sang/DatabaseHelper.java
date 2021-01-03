@@ -12,6 +12,7 @@ import com.sangsolutions.sang.Adapter.Accounts.Accounts;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
+import com.sangsolutions.sang.Adapter.User;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -22,7 +23,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_ACCOUNTS = "t1_accounts";
     private static final String TABLE_PRODUCT = "t1_product";
     private static final String TABLE_TRANSACTION_SETTING = "t1_transactionSetting";
+    private static final String TABLE_USER = "t1_user";
+    private static  final String TABLE_CURRENT_LOGIN = "t1_currentLogin";
 
+    private static  final String IID = "iId";
+    private static  final String USER_ID = "user_Id";
+
+
+    private static final String CREATE_TABLE_USER=" create table if not exists " + TABLE_USER + " (" +
+            "" + User.I_ID + " INTEGER DEFAULT 0, " +
+            "" + User.S_LOGIN_NAME  + " TEXT(50) DEFAULT null , " +
+            "" + User.S_PASSWORD  +  " TEXT(50) DEFAULT null  "+ ");";
+
+    private static final String CREATE_TABLE_CURRENT_LOGIN = "create table if not exists  " + TABLE_CURRENT_LOGIN + " (" +
+            "" + IID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "" + USER_ID + " TEXT(20) DEFAULT null  " +
+            ")";
 
 
     private static final String CREATE_TABLE_MASTER_SETTINGS=" create table if not exists " + TABLE_MASTER_SETTINGS + " (" +
@@ -48,6 +64,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + TransSetting.B_MANDATORY + " TEXT(50) DEFAULT null , " +
             "" + TransSetting.B_VISIBLE +  " TEXT(50) DEFAULT null  "+ ");";
 
+
     private SQLiteDatabase db;
 
     public DatabaseHelper(@Nullable Context context) {
@@ -62,6 +79,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_ACCOUNTS);
         db.execSQL(CREATE_TABLE_PRODUCT);
         db.execSQL(CREATE_TRANSACTION_SETTING);
+        db.execSQL(CREATE_TABLE_USER);
+        db.execSQL(CREATE_TABLE_CURRENT_LOGIN);
     }
 
     @Override
@@ -201,5 +220,73 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         status=db.update(TABLE_TRANSACTION_SETTING,cv,TransSetting.I_DOC_TYPE+" =? and "+TransSetting.I_TAG_ID+"=?",
                 new String[]{String.valueOf(transSetting.getiDocType()),String.valueOf(transSetting.getiDocType())});
         return status!=-1;
+    }
+
+    public boolean insertUser(User user) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(User.I_ID,user.getiId());
+        cv.put(User.S_LOGIN_NAME,user.getsLoginName());
+        cv.put(User.S_PASSWORD,user.getsPassword());
+        float status = db.insert(TABLE_USER, null, cv);
+        return status != -1;
+    }
+
+    public boolean checkUserById(String id) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select  * from "+TABLE_USER+
+                " where "+User.I_ID+"="+id,null);
+        return cursor.getCount() > 0;
+    }
+
+    public boolean checkAllDataUser(User user) {
+        this.db=getReadableDatabase();
+        float status = 0;
+        ContentValues cv=new ContentValues();
+        cv.put(User.I_ID,user.getiId());
+        cv.put(User.S_LOGIN_NAME,user.getsLoginName());
+        cv.put(User.S_PASSWORD,user.getsPassword());
+        status=db.update(TABLE_USER,cv,user.I_ID+" =? ",new String[]{String.valueOf(user.getiId())});
+        return status!=-1;
+    }
+
+    public boolean GetUser() {
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + TABLE_USER, null);
+        return cursor.moveToFirst();
+    }
+
+
+    public boolean loginUser(User u) {
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + TABLE_USER + " where " + User.S_LOGIN_NAME + "='" + u.getsLoginName() + "' and " + User.S_PASSWORD + "='" + u.getsPassword() + "'", null);
+        if (cursor.getCount() > 0) {
+            cursor.close();
+            return true;
+        } else {
+            cursor.close();
+            return false;
+        }
+    }
+
+    public boolean InsertCurrentLoginUser(User u) {
+        this.db=getReadableDatabase();
+        this.db=getWritableDatabase();
+        Cursor cursor=db.rawQuery(" select "+User.I_ID+ " from "+TABLE_USER+ " where "+User.S_LOGIN_NAME+"= '"+
+                u.getsLoginName()+"' and "+User.S_PASSWORD+"= '"+u.getsPassword()+"'",null);
+        cursor.moveToFirst();
+        String userId=cursor.getString(cursor.getColumnIndex(User.I_ID));
+
+        ContentValues cv=new ContentValues();
+        cv.put(USER_ID,userId);
+        long status=db.insert(TABLE_CURRENT_LOGIN,null,cv);
+        return status !=-1;
+    }
+
+    public boolean GetLoginStatus() {
+
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + TABLE_CURRENT_LOGIN + "", null);
+        return cursor.getCount() > 0;
     }
 }

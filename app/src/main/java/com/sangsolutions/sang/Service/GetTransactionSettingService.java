@@ -18,7 +18,6 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.DatabaseHelper;
-import com.sangsolutions.sang.Login;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
@@ -27,7 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class GetTransactionSetting extends JobService {
+public class GetTransactionSettingService extends JobService {
     DatabaseHelper helper;
     JobParameters params;
     TransSetting transSalePurchase;
@@ -40,13 +39,16 @@ public class GetTransactionSetting extends JobService {
         for (int i=1;i<=2;i++){
             GetTransSetting(String.valueOf(i));
         }
+
+//        GetTransSetting("1");
+//        GetTransSetting("2");
         return true;
     }
 
     private void GetTransSetting(String iDocType) {
         Log.d("iiiii",iDocType);
 
-        AndroidNetworking.get("http://"+new Tools().getIP(GetTransactionSetting.this) + URLs.GetTransSettings)
+        AndroidNetworking.get("http://"+new Tools().getIP(GetTransactionSettingService.this) + URLs.GetTransSettings)
                 .addQueryParameter("iDocType",iDocType)
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -93,8 +95,15 @@ public class GetTransactionSetting extends JobService {
                             Handler handler = new Handler(Looper.getMainLooper());
                             handler.post(new Runnable() {
                                 public void run() {
-                                    Toast.makeText(GetTransactionSetting.this, "sale_purchase Synced", Toast.LENGTH_SHORT).show();
+                                        try {
+                                        if( jsonObject.getInt(TransSetting.I_DOC_TYPE)==2){
+                                            Toast.makeText(GetTransactionSettingService.this, " Syncing completed", Toast.LENGTH_SHORT).show();
+                                            Log.d("successddddddddd","transSalePurchase added successfully ");
 
+                                        }
+                                        } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        }
                                 }
                             });
                         }

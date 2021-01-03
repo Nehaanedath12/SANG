@@ -85,7 +85,7 @@ public class GetMasterSettingsService extends JobService {
                             Handler handler = new Handler(Looper.getMainLooper());
                             handler.post(new Runnable() {
                                 public void run() {
-                                        Toast.makeText(GetMasterSettingsService.this, "Master Synced", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(GetMasterSettingsService.this, "Master Synced", Toast.LENGTH_SHORT).show();
 
                                 }
                             });

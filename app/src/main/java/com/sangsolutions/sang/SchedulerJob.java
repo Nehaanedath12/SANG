@@ -11,7 +11,8 @@ import androidx.annotation.RequiresApi;
 import com.sangsolutions.sang.Service.GetAccountsService;
 import com.sangsolutions.sang.Service.GetMasterSettingsService;
 import com.sangsolutions.sang.Service.GetProductService;
-import com.sangsolutions.sang.Service.GetTransactionSetting;
+import com.sangsolutions.sang.Service.GetTransactionSettingService;
+import com.sangsolutions.sang.Service.GetUserService;
 
 public class SchedulerJob {
 
@@ -61,10 +62,23 @@ public class SchedulerJob {
                     (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobInfo job = new JobInfo.Builder(
                     4,
-                    new ComponentName(context, GetTransactionSetting.class))
+                    new ComponentName(context, GetTransactionSettingService.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .build();
             assert js != null;
             js.schedule(job);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void SyncUser(Context context) {
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                5,
+                new ComponentName(context, GetUserService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        assert js != null;
+        js.schedule(job);
     }
 }
