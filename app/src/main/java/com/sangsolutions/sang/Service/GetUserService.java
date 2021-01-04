@@ -15,12 +15,9 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.User;
-import com.sangsolutions.sang.DatabaseHelper;
+import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
-import com.sangsolutions.sang.URLs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,7 +40,7 @@ public class GetUserService extends JobService {
     }
 
     private void GetUsers() {
-        AndroidNetworking.get("http://185.151.4.167/Vansales/api/Data/Get_User")
+        AndroidNetworking.get("http://"+new Tools().getIP(GetUserService.this)+"/Vansales/api/Data/Get_User")
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {

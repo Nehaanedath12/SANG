@@ -17,7 +17,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
-import com.sangsolutions.sang.DatabaseHelper;
+import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
@@ -46,7 +46,6 @@ public class GetTransactionSettingService extends JobService {
     }
 
     private void GetTransSetting(String iDocType) {
-        Log.d("iiiii",iDocType);
 
         AndroidNetworking.get("http://"+new Tools().getIP(GetTransactionSettingService.this) + URLs.GetTransSettings)
                 .addQueryParameter("iDocType",iDocType)
@@ -98,8 +97,6 @@ public class GetTransactionSettingService extends JobService {
                                         try {
                                         if( jsonObject.getInt(TransSetting.I_DOC_TYPE)==2){
                                             Toast.makeText(GetTransactionSettingService.this, " Syncing completed", Toast.LENGTH_SHORT).show();
-                                            Log.d("successddddddddd","transSalePurchase added successfully ");
-
                                         }
                                         } catch (JSONException e) {
                                         e.printStackTrace();

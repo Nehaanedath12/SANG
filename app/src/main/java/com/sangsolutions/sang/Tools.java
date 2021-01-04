@@ -2,6 +2,8 @@ package com.sangsolutions.sang;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Patterns;
 
@@ -30,6 +32,18 @@ public class Tools {
             editor.putString("IP",IP).apply();
         }
         return true;
+    }
+    public static boolean isConnected(Context context){
+        try {
+            ConnectivityManager cm =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            return activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 

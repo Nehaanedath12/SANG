@@ -1,4 +1,4 @@
-package com.sangsolutions.sang;
+package com.sangsolutions.sang.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -288,5 +288,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.db = getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from " + TABLE_CURRENT_LOGIN + "", null);
         return cursor.getCount() > 0;
+    }
+
+    public boolean deleteCurrentLogin() {
+        this.db = getWritableDatabase();
+        float status = db.delete(TABLE_CURRENT_LOGIN,null,null);
+        return status!=-1;
     }
 }

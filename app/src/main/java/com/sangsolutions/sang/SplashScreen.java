@@ -16,8 +16,15 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 try{
                     sleep(3000);
-                    startActivity(new Intent(getApplicationContext(),Login.class));
+
+                    if(!new Tools().getIP(SplashScreen.this).isEmpty()){
+                        startActivity(new Intent(getApplicationContext(),Login.class));
+                    }
+                    else {
+                        startActivity(new Intent(getApplicationContext(),SettingsActivity.class));
+                    }
                     finish();
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }

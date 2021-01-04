@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.sangsolutions.sang.Adapter.User;
+import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.databinding.ActivityLoginBinding;
 
 public class Login extends AppCompatActivity {
@@ -47,7 +48,7 @@ public class Login extends AppCompatActivity {
         });
 
         if (helper.GetLoginStatus()) {
-            startActivity(new Intent(Login.this, MainActivity.class));
+            startActivity(new Intent(Login.this, Home.class));
             finish();
             syncData();
         }
@@ -59,35 +60,32 @@ public class Login extends AppCompatActivity {
                 if(!binding.userName.getText().toString().isEmpty()){
                     if(!binding.password.getText().toString().isEmpty()){
 
-                        if(!new Tools().getIP(Login.this).isEmpty()){
+                        if(!new Tools().getIP(Login.this).isEmpty()) {
                             User u = new User();
                             u.setsLoginName(binding.userName.getText().toString().trim());
                             u.setsPassword(binding.password.getText().toString().trim());
 
-                            schedulerJob.SyncUser(Login.this);
-                            if(helper.GetUser()){
-                                syncData();
-                                if(helper.loginUser(u)){
-                                    if(helper.InsertCurrentLoginUser(u)){
-                                        startActivity(new Intent(Login.this,MainActivity.class));
-                                        finish();
+                                schedulerJob.SyncUser(Login.this);
+                                if (helper.GetUser()) {
+                                    syncData();
+                                    if (helper.loginUser(u)) {
+                                        if (helper.InsertCurrentLoginUser(u)) {
+                                            startActivity(new Intent(Login.this, Home.class));
+                                            finish();
 
+                                        } else {
+                                            Toast.makeText(Login.this, "An unexpected error occurred!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(Login.this, "enter correct username and password", Toast.LENGTH_SHORT).show();
                                     }
-                                    else {
-                                        Toast.makeText(Login.this, "An unexpected error occurred!", Toast.LENGTH_SHORT).show();
-                                    }
+                                } else {
+                                    Toast.makeText(Login.this, "Check your network or IP", Toast.LENGTH_SHORT).show();
                                 }
-                                else {
-                                    Toast.makeText(Login.this, "enter correct username and password", Toast.LENGTH_SHORT).show();
-                                }
+                            } else {
+                                Toast.makeText(Login.this, "Please enter IP Address", Toast.LENGTH_SHORT).show();
                             }
-                            else {
-                                Toast.makeText(Login.this, "Check your network or IP", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        else {
-                            Toast.makeText(Login.this, "Please enter IP Address", Toast.LENGTH_SHORT).show();
-                        }
+
                     }
                     else {
                         binding.password.setError("enter Password");
