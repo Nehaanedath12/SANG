@@ -21,6 +21,5 @@
     </style>
 
     <style name="Theme.SANG.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <style name="Theme.SANG.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

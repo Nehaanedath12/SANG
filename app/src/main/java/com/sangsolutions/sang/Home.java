@@ -35,9 +35,9 @@ import java.util.Set;
 public class Home extends AppCompatActivity {
     ActivityMainBinding binding;
     DatabaseHelper helper;
-    AppBarConfiguration appBarConfiguration;
     Toolbar toolbar;
     NavController navController;
+    AppBarConfiguration mAppBarConfiguration;
     NavigationView navigationView;
     DrawerLayout drawer;
 
@@ -66,31 +66,22 @@ public class Home extends AppCompatActivity {
         navController = Navigation.findNavController(this,R.id.nav_host_fragment);
 
 
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.homeFragment, R.id.salesPurchaseFragment, R.id.purchaseFragment).setDrawerLayout(drawer).build();
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+
 
         ActionBarDrawerToggle toggle=new ActionBarDrawerToggle(this,drawer,toolbar,
                 R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_dehaze);
 
-
-//        appBarConfiguration=new AppBarConfiguration.Builder(R.id.homeFragment,R.id.salesPurchaseFragment)
-//                .setDrawerLayout(binding.drawerLayout).build();
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-//        NavigationUI.setupWithNavController(binding.navView,navController);
 
         binding.logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logoutAlert();
-            }
-        });
-        binding.home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
             }
         });
 
@@ -100,31 +91,25 @@ public class Home extends AppCompatActivity {
 
                 if (navController.getCurrentDestination().getId() != R.id.homeFragment) {
                     navController.navigateUp();
-                    binding.title.setText("Home");
 
                 }
             }
         });
-
-
-
-        binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                NavDirections action;
-                switch(menuItem.getItemId()){
+                    binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                    NavDirections action;
+                    switch(menuItem.getItemId()){
 
                     case R.id.purchaseFragment:
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseFragment){
                             action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Purchase History").setIDocType(1);
-                            binding.title.setText("Purchase History");
                             navController.navigate(action);
                         }
                         else {
                             action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Purchase History").setIDocType(1);
                             navController.navigateUp();
-                            binding.title.setText("Purchase History");
                             navController.navigate(action);
                         }
                     }
@@ -133,13 +118,11 @@ public class Home extends AppCompatActivity {
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseFragment){
                             action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Sale History").setIDocType(2);
-                            binding.title.setText("Sale History");
                             navController.navigate(action);
                         }
                         else{
                             action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Sale History").setIDocType(2);
                             navController.navigateUp();
-                            binding.title.setText("Sale History");
                             navController.navigate(action);
                         }
                     }
@@ -149,7 +132,6 @@ public class Home extends AppCompatActivity {
                     {
                         if (navController.getCurrentDestination().getId() != R.id.homeFragment) {
                             navController.navigateUp();
-                            binding.title.setText("Home");
                         }
                     }
                         break;
@@ -164,25 +146,31 @@ public class Home extends AppCompatActivity {
         });
     }
 
-    private void logoutAlert() {
+                private void logoutAlert() {
 
-        AlertDialog.Builder builder=new AlertDialog.Builder(Home.this);
-        builder.setTitle("Logout!")
-                .setMessage("Do you want to Logout ?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(helper.deleteCurrentLogin()){
+                            AlertDialog.Builder builder=new AlertDialog.Builder(Home.this);
+                            builder.setTitle("Logout!")
+                            .setMessage("Do you want to Logout ?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            if(helper.deleteCurrentLogin()){
                             startActivity(new Intent(Home.this,Login.class));
                             finish();
+                            }
+                            }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            }
+                            }).create().show();
                         }
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
-    }
+//    @Override
+//    public boolean onSupportNavigateUp() {
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+//        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+//                || super.onSupportNavigateUp();
+//    }
 }

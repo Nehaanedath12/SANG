@@ -9,7 +9,7 @@
         android:id="@+id/homeFragment"
         android:name="com.sangsolutions.sang.Fragment.HomeFragment"
         tools:layout="@layout/fragment_home"
-        android:label="HomeFragment" >
+        android:label="Home" >
         <action
             android:id="@+id/action_homeFragment_to_salesPurchaseFragment"
             app:destination="@id/salesPurchaseFragment" />
@@ -18,7 +18,7 @@
         android:id="@+id/salesPurchaseFragment"
         tools:layout="@layout/fragment_sales_purchase"
         android:name="com.sangsolutions.sang.Fragment.SalesPurchaseFragment"
-        android:label="{tool_title}"
+        android:label="{toolTitle}"
         >
         <action
             android:id="@+id/action_salesPurchaseFragment_to_homeFragment"
@@ -28,7 +28,7 @@
             app:argType="integer"
             android:defaultValue="0" />
         <argument
-            android:name="tool_title"
+            android:name="toolTitle"
             app:argType="string" />
 
     </fragment>
