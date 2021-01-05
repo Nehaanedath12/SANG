@@ -16,12 +16,15 @@ import androidx.navigation.ui.NavigationUI;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
+import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
+import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
 import com.sangsolutions.sang.databinding.ActivityMainBinding;
 
 
@@ -33,15 +36,20 @@ public class Home extends AppCompatActivity {
     AppBarConfiguration mAppBarConfiguration;
     NavigationView navigationView;
     DrawerLayout drawer;
+    NavDirections action;
 
     @Override
     public void onBackPressed() {
         if(drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
         }
+        else if(navController.getCurrentDestination().getId()==R.id.sale_Purchase_Fragment){
+            backAlert();
+        }
         else {
             super.onBackPressed();
         }
+
     }
 
     @Override
@@ -65,10 +73,10 @@ public class Home extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
 
-        ActionBarDrawerToggle toggle=new ActionBarDrawerToggle(this,drawer,toolbar,
-                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+//        ActionBarDrawerToggle toggle=new ActionBarDrawerToggle(this,drawer,toolbar,
+//                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
 
 
         binding.logout.setOnClickListener(new View.OnClickListener() {
@@ -82,42 +90,43 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (navController.getCurrentDestination().getId() != R.id.homeFragment) {
-                    navController.navigateUp();
-
+                if (navController.getCurrentDestination().getId() == R.id.sale_Purchase_Fragment) {
+                    action=Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId() == R.id.salesPurchaseHistoryFragment){
+                    action= SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
+                    navController.navigate(action);
                 }
             }
         });
                     binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                    NavDirections action;
                     switch(menuItem.getItemId()){
 
                     case R.id.purchaseFragment:
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Purchase History").setIDocType(1);
-                            navController.navigate(action);
+                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
                         }
                         else {
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Purchase History").setIDocType(1);
+                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
                             navController.navigateUp();
-                            navController.navigate(action);
                         }
+                        navController.navigate(action);
                     }
                     break;
                     case R.id.salesPurchaseHistoryFragment:
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Sale History").setIDocType(2);
-                            navController.navigate(action);
+                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
                         }
                         else{
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Sale History").setIDocType(2);
+                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
                             navController.navigateUp();
-                            navController.navigate(action);
                         }
+                        navController.navigate(action);
                     }
                     break;
 
@@ -133,7 +142,6 @@ public class Home extends AppCompatActivity {
 
                 }
                 drawer.closeDrawer(GravityCompat.START);
-
                 return true;
             }
         });
@@ -160,10 +168,37 @@ public class Home extends AppCompatActivity {
                             }
                             }).create().show();
                         }
-//    @Override
-//    public boolean onSupportNavigateUp() {
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-//        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-//                || super.onSupportNavigateUp();
-//    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        Log.d("backk","backk");
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        if(navController.getCurrentDestination().getId()==R.id.sale_Purchase_Fragment){
+            backAlert();
+            return true;
+        }
+        else {
+            return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                    || super.onSupportNavigateUp();
+        }
+    }
+
+    private void backAlert() {
+        AlertDialog.Builder builder=new AlertDialog.Builder(Home.this);
+        builder.setTitle("Close!")
+                .setMessage("Do you want to close without saving ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        action= Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment();
+                        navController.navigate(action);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
+
+    }
 }

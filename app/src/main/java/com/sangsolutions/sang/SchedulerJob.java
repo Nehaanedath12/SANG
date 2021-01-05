@@ -5,11 +5,13 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
 import com.sangsolutions.sang.Service.GetAccountsService;
 import com.sangsolutions.sang.Service.GetMasterSettingsService;
+import com.sangsolutions.sang.Service.GetMasterTagDetails;
 import com.sangsolutions.sang.Service.GetProductService;
 import com.sangsolutions.sang.Service.GetTransactionSettingService;
 import com.sangsolutions.sang.Service.GetUserService;
@@ -80,5 +82,19 @@ public class SchedulerJob {
                 .build();
         assert js != null;
         js.schedule(job);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void syncMasterTagDetails(Context context) {
+        Log.d("homeFragment","homeFragmentS");
+            JobScheduler js =
+                    (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobInfo job = new JobInfo.Builder(
+                    6,
+                    new ComponentName(context, GetMasterTagDetails.class))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .build();
+            assert js != null;
+            js.schedule(job);
     }
 }

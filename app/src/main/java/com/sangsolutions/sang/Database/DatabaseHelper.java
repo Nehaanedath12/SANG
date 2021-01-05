@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import com.sangsolutions.sang.Adapter.Accounts.Accounts;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Adapter.Products.Products;
+import com.sangsolutions.sang.Adapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.User;
 
@@ -25,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_TRANSACTION_SETTING = "t1_transactionSetting";
     private static final String TABLE_USER = "t1_user";
     private static  final String TABLE_CURRENT_LOGIN = "t1_currentLogin";
+    private static  final String TABLE_TAG_DETAILS = "t1_tag_details";
 
     private static  final String IID = "iId";
     private static  final String USER_ID = "user_Id";
@@ -64,6 +66,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + TransSetting.B_MANDATORY + " TEXT(50) DEFAULT null , " +
             "" + TransSetting.B_VISIBLE +  " TEXT(50) DEFAULT null  "+ ");";
 
+    private static final String CREATE_TABLE_TAG_DETAILS =" create table if not exists " + TABLE_TAG_DETAILS + " (" +
+            "" + TagDetails.I_ID + " INTEGER DEFAULT 0, " +
+            "" + TagDetails.S_NAME + " TEXT(50) DEFAULT null , " +
+            "" + TagDetails.S_CODE + " TEXT(50) DEFAULT null , " +
+            "" + TagDetails.I_TYPE + " TEXT(50) DEFAULT null , " +
+            "" + TagDetails.S_ALT_NAME +  " TEXT(50) DEFAULT null  "+ ");";
+
 
     private SQLiteDatabase db;
 
@@ -81,6 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TRANSACTION_SETTING);
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_CURRENT_LOGIN);
+        db.execSQL(CREATE_TABLE_TAG_DETAILS);
     }
 
     @Override
@@ -293,6 +303,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean deleteCurrentLogin() {
         this.db = getWritableDatabase();
         float status = db.delete(TABLE_CURRENT_LOGIN,null,null);
+        return status!=-1;
+    }
+
+    public boolean insertMasterTag(TagDetails details) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(TagDetails.I_ID,details.getiId());
+        cv.put(TagDetails.S_NAME,details.getsName());
+        cv.put(TagDetails.S_CODE,details.getsCode());
+        cv.put(TagDetails.S_ALT_NAME,details.getsAltName());
+        cv.put(TagDetails.I_TYPE,details.getiType());
+        float status = db.insert(TABLE_TAG_DETAILS, null, cv);
+        return status != -1;
+    }
+
+    public boolean checkTagDetailsById(String id,String iType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select  * from "+TABLE_TAG_DETAILS+
+                " where "+TagDetails.I_ID+"="+id+ " and "+TagDetails.I_TYPE+"="+iType,null);
+        return cursor.getCount() > 0;
+    }
+
+    public boolean checkAllDataMasterTag(TagDetails details) {
+        this.db=getReadableDatabase();
+        this.db=getWritableDatabase();
+        float status;
+        ContentValues cv=new ContentValues();
+        cv.put(TagDetails.I_ID,details.getiId());
+        cv.put(TagDetails.S_NAME,details.getsName());
+        cv.put(TagDetails.S_CODE,details.getsCode());
+        cv.put(TagDetails.S_ALT_NAME,details.getsAltName());
+        cv.put(TagDetails.I_TYPE,details.getiType());
+        status=db.update(TABLE_TAG_DETAILS,cv,TagDetails.I_ID+" =? and "+TagDetails.I_TYPE+"=? ",new String[]{String.valueOf(details.getiId()),details.getiType()});
         return status!=-1;
     }
 }
