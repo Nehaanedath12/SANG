@@ -12,12 +12,12 @@
         android:label="Home" >
         <action
             android:id="@+id/action_homeFragment_to_salesPurchaseFragment"
-            app:destination="@id/salesPurchaseFragment" />
+            app:destination="@id/salesPurchaseHistoryFragment" />
     </fragment>
     <fragment
-        android:id="@+id/salesPurchaseFragment"
-        tools:layout="@layout/fragment_sales_purchase"
-        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseFragment"
+        android:id="@+id/salesPurchaseHistoryFragment"
+        tools:layout="@layout/fragment_sales_purchase_history"
+        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragment"
         android:label="{toolTitle}"
         >
         <action

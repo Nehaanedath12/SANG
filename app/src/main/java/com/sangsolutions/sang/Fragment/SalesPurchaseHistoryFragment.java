@@ -10,22 +10,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.sangsolutions.sang.databinding.FragmentSalesPurchaseBinding;
+import com.sangsolutions.sang.databinding.FragmentSalesPurchaseHistoryBinding;
 
-public class SalesPurchaseFragment extends Fragment {
-    FragmentSalesPurchaseBinding binding;
-//    SalesPurchaseFragmentArgs args;
+public class SalesPurchaseHistoryFragment extends Fragment {
+    FragmentSalesPurchaseHistoryBinding binding;
 
     int iDocType;
     String title;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding=FragmentSalesPurchaseBinding.inflate(getLayoutInflater());
+        binding=FragmentSalesPurchaseHistoryBinding.inflate(getLayoutInflater());
         View view=binding.getRoot();
 
-        iDocType = SalesPurchaseFragmentArgs.fromBundle(getArguments()).getIDocType();
-        title=SalesPurchaseFragmentArgs.fromBundle(getArguments()).getToolTitle();
+        iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
+        title=SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getToolTitle();
         if(iDocType==1) {
             binding.text.setText("Purchase");
         }
@@ -34,6 +33,8 @@ public class SalesPurchaseFragment extends Fragment {
         }
 
         Log.d("iDocType",iDocType+"");
+
+
 
 
         return view;

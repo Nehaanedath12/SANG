@@ -1,7 +1,6 @@
 package com.sangsolutions.sang;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,19 +16,13 @@ import androidx.navigation.ui.NavigationUI;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Switch;
-import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
-import com.sangsolutions.sang.Fragment.SalesPurchaseFragmentDirections;
 import com.sangsolutions.sang.databinding.ActivityMainBinding;
-
-import java.util.Set;
 
 
 public class Home extends AppCompatActivity {
@@ -67,7 +60,7 @@ public class Home extends AppCompatActivity {
 
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.homeFragment, R.id.salesPurchaseFragment, R.id.purchaseFragment).setDrawerLayout(drawer).build();
+                R.id.homeFragment, R.id.salesPurchaseHistoryFragment, R.id.purchaseFragment).setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
@@ -103,7 +96,7 @@ public class Home extends AppCompatActivity {
 
                     case R.id.purchaseFragment:
                     {
-                        if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseFragment){
+                        if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
                             action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Purchase History").setIDocType(1);
                             navController.navigate(action);
                         }
@@ -114,9 +107,9 @@ public class Home extends AppCompatActivity {
                         }
                     }
                     break;
-                    case R.id.salesPurchaseFragment:
+                    case R.id.salesPurchaseHistoryFragment:
                     {
-                        if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseFragment){
+                        if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
                             action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseFragment("Sale History").setIDocType(2);
                             navController.navigate(action);
                         }
