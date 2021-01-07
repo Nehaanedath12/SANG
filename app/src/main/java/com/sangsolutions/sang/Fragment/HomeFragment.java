@@ -25,14 +25,12 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.material.snackbar.Snackbar;
-import com.sangsolutions.sang.Adapter.TagDetails;
+import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.SchedulerJob;
-import com.sangsolutions.sang.Service.GetMasterTagDetails;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
-import com.sangsolutions.sang.databinding.ActivityMainBinding;
 import com.sangsolutions.sang.databinding.FragmentHomeBinding;
 
 import org.json.JSONArray;

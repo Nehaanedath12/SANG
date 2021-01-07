@@ -1,17 +1,19 @@
 package com.sangsolutions.sang.Database;
 
+import android.accounts.Account;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.sangsolutions.sang.Adapter.Accounts.Accounts;
+import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Adapter.Products.Products;
-import com.sangsolutions.sang.Adapter.TagDetails;
+import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.User;
 
@@ -49,10 +51,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + MasterSettings.S_ALT_NAME +  " TEXT(50) DEFAULT null  "+ ");";
 
     private static final String CREATE_TABLE_ACCOUNTS=" create table if not exists " + TABLE_ACCOUNTS + " (" +
-            "" + Accounts.I_ID + " INTEGER DEFAULT 0, " +
-            "" + Accounts.S_NAME + " TEXT(50) DEFAULT null , " +
-            "" + Accounts.S_CODE + " TEXT(50) DEFAULT null , " +
-            "" + Accounts.S_ALT_NAME +  " TEXT(50) DEFAULT null  "+ ");";
+            "" + Customer.I_ID + " INTEGER DEFAULT 0, " +
+            "" + Customer.S_NAME + " TEXT(50) DEFAULT null , " +
+            "" + Customer.S_CODE + " TEXT(50) DEFAULT null , " +
+            "" + Customer.S_ALT_NAME +  " TEXT(50) DEFAULT null  "+ ");";
 
     private static final String CREATE_TABLE_PRODUCT=" create table if not exists " + TABLE_PRODUCT + " (" +
             "" + Products.I_ID + " INTEGER DEFAULT 0, " +
@@ -63,6 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TRANSACTION_SETTING=" create table if not exists " + TABLE_TRANSACTION_SETTING + " (" +
             "" + TransSetting.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
             "" + TransSetting.I_TAG_ID + " INTEGER DEFAULT 0, " +
+            "" + TransSetting.I_TAG_POSITION + " INTEGER DEFAULT 0, " +
             "" + TransSetting.B_MANDATORY + " TEXT(50) DEFAULT null , " +
             "" + TransSetting.B_VISIBLE +  " TEXT(50) DEFAULT null  "+ ");";
 
@@ -119,34 +122,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean checkAllDataMaster(MasterSettings settings) {
         this.db=getReadableDatabase();
-        float status = 0;
+        float status;
         ContentValues cv=new ContentValues();
         cv.put(MasterSettings.I_ID,settings.getiId());
         cv.put(MasterSettings.S_NAME,settings.getsName());
         cv.put(MasterSettings.S_ALT_NAME,settings.getsAltName());
 
-//        Cursor cursor=db.rawQuery("select  * from "+TABLE_MASTER_SETTINGS+
-//                " where "+MasterSettings.I_ID+"="+settings.getiId()+" and "+MasterSettings.S_NAME+
-//                " = '"+settings.getsName()+"' and "+ MasterSettings.S_ALT_NAME+" = '"+settings.getsAltName()+"'",null);
-//        if(cursor.getCount()>0){
-//            return true;
-//        }
-//        else {
-//            if(cursor==null){
         status=db.update(TABLE_MASTER_SETTINGS,cv,MasterSettings.I_ID+" =? ",new String[]{String.valueOf(settings.getiId())});
 
-        //            }
-//        }
         return status!=-1;
     }
 
-    public boolean insertAccounts(Accounts accounts) {
+    public boolean insertAccounts(Customer customer) {
         this.db=getReadableDatabase();
         ContentValues cv=new ContentValues();
-        cv.put(Accounts.I_ID,accounts.getiId());
-        cv.put(Accounts.S_NAME,accounts.getsName());
-        cv.put(Accounts.S_CODE,accounts.getsCode());
-        cv.put(Accounts.S_ALT_NAME,accounts.getsAltName());
+        cv.put(Customer.I_ID, customer.getiId());
+        cv.put(Customer.S_NAME, customer.getsName());
+        cv.put(Customer.S_CODE, customer.getsCode());
+        cv.put(Customer.S_ALT_NAME, customer.getsAltName());
         float status = db.insert(TABLE_ACCOUNTS, null, cv);
         return status != -1;
     }
@@ -154,19 +147,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean checkAccountsById(String id) {
         this.db=getReadableDatabase();
         Cursor cursor=db.rawQuery("select  * from "+TABLE_ACCOUNTS+
-                " where "+Accounts.I_ID+"="+id,null);
+                " where "+ Customer.I_ID+"="+id,null);
         return cursor.getCount() > 0;
     }
 
-    public boolean checkAllDataAccounts(Accounts accounts) {
+    public boolean checkAllDataAccounts(Customer customer) {
         this.db=getReadableDatabase();
-        float status = 0;
+        float status;
         ContentValues cv=new ContentValues();
-        cv.put(Accounts.I_ID,accounts.getiId());
-        cv.put(Accounts.S_NAME,accounts.getsName());
-        cv.put(Accounts.S_ALT_NAME,accounts.getsAltName());
-        cv.put(Accounts.S_CODE,accounts.getsCode());
-        status=db.update(TABLE_ACCOUNTS,cv,Accounts.I_ID+" =? ",new String[]{String.valueOf(accounts.getiId())});
+        cv.put(Customer.I_ID, customer.getiId());
+        cv.put(Customer.S_NAME, customer.getsName());
+        cv.put(Customer.S_ALT_NAME, customer.getsAltName());
+        cv.put(Customer.S_CODE, customer.getsCode());
+        status=db.update(TABLE_ACCOUNTS,cv, Customer.I_ID+" =? ",new String[]{String.valueOf(customer.getiId())});
         return status!=-1;
 
     }
@@ -195,8 +188,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(Products.I_ID,products.getiId());
         cv.put(Products.S_NAME,products.getsName());
         cv.put(Products.S_ALT_NAME,products.getsAltName());
-        cv.put(Products.S_CODE,products.getsAltName());
-        status=db.update(TABLE_ACCOUNTS,cv,Products.I_ID+" =? ",new String[]{String.valueOf(products.getiId())});
+        cv.put(Products.S_CODE,products.getsCode());
+        status=db.update(TABLE_PRODUCT,cv,Products.I_ID+" =? ",new String[]{String.valueOf(products.getiId())});
         return status!=-1;
     }
 
@@ -206,8 +199,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues cv=new ContentValues();
         cv.put(TransSetting.I_DOC_TYPE,transSetting.getiDocType());
         cv.put(TransSetting.I_TAG_ID,transSetting.getiTagId());
-        cv.put(TransSetting.B_MANDATORY,transSetting.isbMandatory());
-        cv.put(TransSetting.B_VISIBLE,transSetting.isbVisible());
+        cv.put(TransSetting.B_MANDATORY,transSetting.getbMandatory());
+        cv.put(TransSetting.B_VISIBLE,transSetting.getbVisible());
+        cv.put(TransSetting.I_TAG_POSITION,transSetting.getiTagPosition());
         float status = db.insert(TABLE_TRANSACTION_SETTING, null, cv);
         return status != -1;
     }
@@ -225,10 +219,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues cv=new ContentValues();
         cv.put(TransSetting.I_DOC_TYPE,transSetting.getiDocType());
         cv.put(TransSetting.I_TAG_ID,transSetting.getiTagId());
-        cv.put(TransSetting.B_MANDATORY,transSetting.isbMandatory());
-        cv.put(TransSetting.B_VISIBLE,transSetting.isbVisible());
-        status=db.update(TABLE_TRANSACTION_SETTING,cv,TransSetting.I_DOC_TYPE+" =? and "+TransSetting.I_TAG_ID+"=?",
-                new String[]{String.valueOf(transSetting.getiDocType()),String.valueOf(transSetting.getiDocType())});
+        cv.put(TransSetting.B_MANDATORY,transSetting.getbMandatory());
+        cv.put(TransSetting.B_VISIBLE,transSetting.getbVisible());
+        cv.put(TransSetting.I_TAG_POSITION,transSetting.getiTagPosition());
+        status=db.update(TABLE_TRANSACTION_SETTING,cv,TransSetting.I_DOC_TYPE+" = " +
+                transSetting.getiDocType()+ " and "+TransSetting.I_TAG_ID+" = "+transSetting.getiTagId(),null);
         return status!=-1;
     }
 
@@ -251,12 +246,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean checkAllDataUser(User user) {
         this.db=getReadableDatabase();
-        float status = 0;
+        float status ;
         ContentValues cv=new ContentValues();
         cv.put(User.I_ID,user.getiId());
         cv.put(User.S_LOGIN_NAME,user.getsLoginName());
         cv.put(User.S_PASSWORD,user.getsPassword());
-        status=db.update(TABLE_USER,cv,user.I_ID+" =? ",new String[]{String.valueOf(user.getiId())});
+        status=db.update(TABLE_USER,cv,User.I_ID+" =? ",new String[]{String.valueOf(user.getiId())});
         return status!=-1;
     }
 
@@ -337,5 +332,76 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(TagDetails.I_TYPE,details.getiType());
         status=db.update(TABLE_TAG_DETAILS,cv,TagDetails.I_ID+" =? and "+TagDetails.I_TYPE+"=? ",new String[]{String.valueOf(details.getiId()),details.getiType()});
         return status!=-1;
+    }
+
+    public Cursor getCustomerbyKeyword(String s) {
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select distinct  "+ Customer.S_NAME+","+Customer.I_ID+","+
+                Customer.S_CODE+" from "+TABLE_ACCOUNTS+" where "+Customer.S_CODE
+                +" " + "like '"+s+"%' or "+Customer.S_NAME+" like '"+s+"%' limit 10",null);
+
+        if (cursor.moveToFirst()) {
+            return cursor;
+        } else {
+            return null;
+        }
+
+    }
+
+
+
+    public Cursor getTransSettings(int iDocType, int tagId) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+TransSetting.B_VISIBLE+","+TransSetting.I_TAG_POSITION+","+
+                TransSetting.B_MANDATORY+" from "+TABLE_TRANSACTION_SETTING+" where "+TransSetting.I_DOC_TYPE+"="+iDocType+" and "+
+                TransSetting.I_TAG_ID+"="+tagId,null);
+        if(cursor.getCount()>0){
+            return cursor;
+        }
+        else return null;
+    }
+
+    public Cursor getTagbyKeyword(String s, int iTag) {
+        String iTagS=String.valueOf(iTag);
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select iId , sCode,sName ,iType from  t1_tag_details " +
+                "  where (sCode like '"+s+"%'  or sName  like '"+s+"%' )  and iType='"+iTagS+"'", null);
+        if (cursor.moveToFirst()) {
+            return cursor;
+        } else {
+            return null;
+        }
+    }
+
+    public Cursor getTagNamebyId(int tagId) {
+        this.db = getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+MasterSettings.S_NAME+" from "+TABLE_MASTER_SETTINGS+
+                " where "+MasterSettings.I_ID+"="+tagId,null);
+        if(cursor.getCount()>0){
+            return cursor;
+        }
+        else return null;
+    }
+
+    public Cursor getProductDetailsByBarcode(String productBarCode) {
+        this.db = getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+Products.I_ID+","+Products.S_NAME+" from "+
+                TABLE_PRODUCT+" where "+Products.S_CODE+"='"+productBarCode+"'",null);
+        if(cursor.getCount()>0){
+            return cursor;
+        }else return null;
+    }
+
+    public Cursor getProductByKeyword(String productKeyword) {
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select distinct "+Products.S_NAME+","+Products.I_ID+","+
+                Products.S_CODE+" from "+TABLE_PRODUCT+" where "+Products.S_CODE
+                +" " + "like '"+productKeyword+"%' or "+Products.S_NAME+" like '"+productKeyword+"%' limit 10",null);
+
+        if (cursor.moveToFirst()) {
+            return cursor;
+        } else {
+            return null;
+        }
     }
 }

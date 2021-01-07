@@ -32,6 +32,12 @@ public class SalesPurchaseHistoryFragment extends Fragment {
         iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
 //        title=SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getToolTitle();
         Log.d("iDocType",iDocType+"");
+        if(iDocType==1){
+            binding.name.setText("Purchase");
+        }
+        else if(iDocType==2){
+            binding.name.setText("Sales");
+        }
 
         binding.fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override

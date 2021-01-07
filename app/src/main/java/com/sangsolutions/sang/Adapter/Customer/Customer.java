@@ -1,12 +1,30 @@
-package com.sangsolutions.sang.Adapter.Accounts;
+package com.sangsolutions.sang.Adapter.Customer;
 
-public class Accounts {
+public class Customer {
 
     String sCode,sName,sAltName;
     int iId;
 
+    public Customer() {
+    }
 
-    public Accounts(String sCode, String sName, String sAltName, int iId) {
+    public void setsCode(String sCode) {
+        this.sCode = sCode;
+    }
+
+    public void setsName(String sName) {
+        this.sName = sName;
+    }
+
+    public void setsAltName(String sAltName) {
+        this.sAltName = sAltName;
+    }
+
+    public void setiId(int iId) {
+        this.iId = iId;
+    }
+
+    public Customer(String sCode, String sName, String sAltName, int iId) {
         this.sCode = sCode;
         this.sName = sName;
         this.sAltName = sAltName;

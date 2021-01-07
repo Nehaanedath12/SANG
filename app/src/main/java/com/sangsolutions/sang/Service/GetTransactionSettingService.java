@@ -36,12 +36,9 @@ public class GetTransactionSettingService extends JobService {
         helper=new DatabaseHelper(this);
         this.params=params;
         AndroidNetworking.initialize(this);
-        for (int i=1;i<=2;i++){
-            GetTransSetting(String.valueOf(i));
-        }
 
-//        GetTransSetting("1");
-//        GetTransSetting("2");
+        GetTransSetting("1");
+        GetTransSetting("2");
         return true;
     }
 
@@ -54,7 +51,7 @@ public class GetTransactionSettingService extends JobService {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("response",response.toString());
+                        Log.d("responseTagMaster",response.toString());
                         loadPurchaseSalesData(response);
                     }
 
@@ -78,8 +75,9 @@ public class GetTransactionSettingService extends JobService {
                         transSalePurchase=new TransSetting(
                                 jsonObject.getInt(TransSetting.I_DOC_TYPE),
                                 jsonObject.getInt(TransSetting.I_TAG_ID),
-                                jsonObject.getBoolean(TransSetting.B_VISIBLE),
-                                jsonObject.getBoolean(TransSetting.B_MANDATORY));
+                                jsonObject.getString(TransSetting.B_VISIBLE),
+                                jsonObject.getString(TransSetting.B_MANDATORY),
+                                jsonObject.getInt(TransSetting.I_TAG_POSITION));
 
                         if(helper.checkTransSettingById(jsonObject.getString(TransSetting.I_DOC_TYPE),jsonObject.getString(TransSetting.I_TAG_ID))){
                             if(helper.checkAllDataTransSetting(transSalePurchase)){

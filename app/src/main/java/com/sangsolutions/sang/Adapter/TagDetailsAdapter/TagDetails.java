@@ -1,8 +1,31 @@
-package com.sangsolutions.sang.Adapter;
+package com.sangsolutions.sang.Adapter.TagDetailsAdapter;
 
 public class TagDetails {
     String sCode,sName,sAltName,iType;
     int iId;
+
+    public TagDetails() {
+    }
+
+    public void setsCode(String sCode) {
+        this.sCode = sCode;
+    }
+
+    public void setsName(String sName) {
+        this.sName = sName;
+    }
+
+    public void setsAltName(String sAltName) {
+        this.sAltName = sAltName;
+    }
+
+    public void setiType(String iType) {
+        this.iType = iType;
+    }
+
+    public void setiId(int iId) {
+        this.iId = iId;
+    }
 
     public TagDetails(String sCode, String sName, String sAltName, int iId, String iType) {
         this.sCode = sCode;

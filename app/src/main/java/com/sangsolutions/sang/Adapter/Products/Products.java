@@ -5,10 +5,29 @@ public class Products {
     String sCode,sName,sAltName;
     int iId;
 
+    public Products() {
+    }
+
     public Products(String sCode, String sName, String sAltName, int iId) {
         this.sCode = sCode;
         this.sName = sName;
         this.sAltName = sAltName;
+        this.iId = iId;
+    }
+
+    public void setsCode(String sCode) {
+        this.sCode = sCode;
+    }
+
+    public void setsName(String sName) {
+        this.sName = sName;
+    }
+
+    public void setsAltName(String sAltName) {
+        this.sAltName = sAltName;
+    }
+
+    public void setiId(int iId) {
         this.iId = iId;
     }
 

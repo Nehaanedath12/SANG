@@ -7,6 +7,12 @@ import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Patterns;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Objects;
+
 public class Tools {
 
     SharedPreferences preferences;
@@ -44,6 +50,21 @@ public class Tools {
         } catch (Exception e) {
             return false;
         }
+    }
+    public static String checkDigit(int number) {
+        return number <= 9 ? "0" + number : String.valueOf(number);
+    }
+
+    public static String dateFormat(String dateToFormat){
+        DateFormat originalFormat = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        try {
+            date = originalFormat.parse(dateToFormat);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return targetFormat.format(Objects.requireNonNull(date));
     }
 
 

@@ -36,7 +36,6 @@ public class Home extends AppCompatActivity {
     AppBarConfiguration mAppBarConfiguration;
     NavigationView navigationView;
     DrawerLayout drawer;
-    NavDirections action;
 
     @Override
     public void onBackPressed() {
@@ -46,9 +45,16 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.sale_Purchase_Fragment){
             backAlert();
         }
-        else {
-            super.onBackPressed();
+        else if(navController.getCurrentDestination().getId()==R.id.salesPurchaseHistoryFragment){
+           NavDirections action=SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
+           navController.navigate(action);
         }
+        else if(navController.getCurrentDestination().getId()==R.id.homeFragment){
+          finish();
+        }
+//        else {
+//            super.onBackPressed();
+//        }
 
     }
 
@@ -91,11 +97,11 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (navController.getCurrentDestination().getId() == R.id.sale_Purchase_Fragment) {
-                    action=Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToHomeFragment();
+                   NavDirections action=Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToHomeFragment();
                     navController.navigate(action);
                 }
                 else if(navController.getCurrentDestination().getId() == R.id.salesPurchaseHistoryFragment){
-                    action= SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
+                    NavDirections action= SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
             }
@@ -108,25 +114,30 @@ public class Home extends AppCompatActivity {
                     case R.id.purchaseFragment:
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
+                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
+                            navController.navigate(action);
                         }
                         else {
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
                             navController.navigateUp();
+                            navController.navigate(action);
                         }
-                        navController.navigate(action);
+
                     }
                     break;
                     case R.id.salesPurchaseHistoryFragment:
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
+                            navController.navigate(action);
                         }
                         else{
-                            action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
+
+                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
                             navController.navigateUp();
+                            navController.navigate(action);
                         }
-                        navController.navigate(action);
+
                     }
                     break;
 
@@ -189,8 +200,9 @@ public class Home extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        action= Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment();
-                        navController.navigate(action);
+//                        action= Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
+//                        navController.navigate(action);
+                        navController.navigateUp();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {

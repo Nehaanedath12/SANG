@@ -15,7 +15,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.sangsolutions.sang.Adapter.Accounts.Accounts;
+import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -29,7 +29,7 @@ public class GetAccountsService extends JobService {
 
     DatabaseHelper helper;
     JobParameters params;
-    Accounts accounts;
+    Customer customer;
 
     @Override
     public boolean onStartJob(JobParameters params) {
@@ -47,7 +47,7 @@ public class GetAccountsService extends JobService {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("response",response.toString());
+                        Log.d("responseAccounts",response.toString());
                         loadAccountsData(response);
                     }
 
@@ -67,17 +67,17 @@ public class GetAccountsService extends JobService {
                     JSONArray jsonArray = new JSONArray(response.getString("Data"));
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        accounts=new Accounts(
-                                jsonObject.getString(Accounts.S_CODE),
-                                jsonObject.getString(Accounts.S_NAME),
-                                jsonObject.getString(Accounts.S_ALT_NAME),
-                                jsonObject.getInt(Accounts.I_ID));
-                        if(helper.checkAccountsById(jsonObject.getString(Accounts.I_ID))){
-                            if(helper.checkAllDataAccounts(accounts)){
+                        customer =new Customer(
+                                jsonObject.getString(Customer.S_CODE),
+                                jsonObject.getString(Customer.S_NAME),
+                                jsonObject.getString(Customer.S_ALT_NAME),
+                                jsonObject.getInt(Customer.I_ID));
+                        if(helper.checkAccountsById(jsonObject.getString(Customer.I_ID))){
+                            if(helper.checkAllDataAccounts(customer)){
                                 Log.d("success","accounts Updated successfully "+i);
                             }
                         }
-                        else if( helper.insertAccounts(accounts)){
+                        else if( helper.insertAccounts(customer)){
                             Log.d("success","accounts added successfully "+i);
                         }
 
