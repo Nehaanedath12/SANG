@@ -69,18 +69,22 @@
            android:layout_height="wrap_content"
            android:drawableEnd="@drawable/ic_date"/>
 
-           <EditText
+
+           <AutoCompleteTextView
                android:id="@+id/customer"
                android:longClickable="false"
                android:layout_below="@+id/date"
                android:hint="Select Customer"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"/>
-<!--           <AutoCompleteTextView-->
-<!--               android:layout_width="match_parent"-->
-<!--               android:layout_height="wrap_content"-->
+<!--           <EditText-->
 <!--               android:id="@+id/customer"-->
-<!--               android:hint="Select Customer"/>-->
+<!--               android:longClickable="false"-->
+<!--               android:layout_below="@+id/date"-->
+<!--               android:hint="Select Customer"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+
 
 
            <androidx.recyclerview.widget.RecyclerView
@@ -360,6 +364,12 @@
                         android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
+                    <Button
+                        android:id="@+id/save_product"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Save"/>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
