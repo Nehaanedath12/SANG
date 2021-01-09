@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -13,12 +14,16 @@ import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.databinding.ActivityLoginBinding;
 
+import java.util.Objects;
+
 public class Login extends AppCompatActivity {
 
 
     ActivityLoginBinding binding;
     SchedulerJob schedulerJob;
     DatabaseHelper helper;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -37,7 +42,8 @@ public class Login extends AppCompatActivity {
         setContentView(view);
         helper=new DatabaseHelper(this);
         schedulerJob = new SchedulerJob();
-
+        preferences = getSharedPreferences("sync",MODE_PRIVATE);
+        editor = preferences.edit();
 
 
         binding.settings.setOnClickListener(new View.OnClickListener() {
@@ -70,12 +76,14 @@ public class Login extends AppCompatActivity {
                                     syncData();
                                     if (helper.loginUser(u)) {
                                         if (helper.InsertCurrentLoginUser(u)) {
-                                            startActivity(new Intent(Login.this, Home.class));
-                                            finish();
+                                            if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
+                                                startActivity(new Intent(Login.this, Home.class));
+                                                finish();
 
-                                        } else {
-                                            Toast.makeText(Login.this, "An unexpected error occurred!", Toast.LENGTH_SHORT).show();
-                                        }
+                                            } else {
+                                                Toast.makeText(Login.this, "An unexpected error occurred!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }Toast.makeText(Login.this, "syncing not completed", Toast.LENGTH_SHORT).show();
                                     } else {
                                         Toast.makeText(Login.this, "enter correct username and password", Toast.LENGTH_SHORT).show();
                                     }

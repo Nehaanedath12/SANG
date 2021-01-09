@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -24,8 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -71,7 +70,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     String productBarCode,productId;
 
-
+    int iCustomer,iProduct,iTagDetail;
 
     @Nullable
     @Override
@@ -84,15 +83,12 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         customerList =new ArrayList<>();
         customerAdapter=new CustomerAdapter(requireActivity(),customerList);
-        binding.customerRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
         tagList =new ArrayList<>();
         tagDetailsAdapter =new TagDetailsAdapter(requireActivity(),tagList);
 
         productsList=new ArrayList<>();
         productsAdapter=new ProductsAdapter(requireActivity(),productsList);
-        binding.productRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
-
 
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
@@ -303,23 +299,23 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         }
 
-        binding.tag1Header.addTextChangedListener(getTextWatcher(binding.tag1Header,1,binding.tag1HRv));
-        binding.tag2Header.addTextChangedListener(getTextWatcher(binding.tag2Header, 2, binding.tag2HRv));
-        binding.tag3Header.addTextChangedListener(getTextWatcher(binding.tag3Header, 3, binding.tag3Hrv));
-        binding.tag4Header.addTextChangedListener(getTextWatcher(binding.tag4Header,4,binding.tag4Hrv));
-        binding.tag5Header.addTextChangedListener(getTextWatcher(binding.tag5Header, 5, binding.tag5HRV));
-        binding.Tag6Header.addTextChangedListener(getTextWatcher(binding.Tag6Header, 6, binding.Tag6HeaderRV));
-        binding.Tag7Header.addTextChangedListener(getTextWatcher(binding.Tag7Header,7,binding.Tag7HeaderRV));
-        binding.Tag8Header.addTextChangedListener(getTextWatcher(binding.Tag8Header, 8, binding.Tag8HeaderRV));
+        binding.tag1Header.addTextChangedListener(getTextWatcher(binding.tag1Header,1));
+        binding.tag2Header.addTextChangedListener(getTextWatcher(binding.tag2Header, 2));
+        binding.tag3Header.addTextChangedListener(getTextWatcher(binding.tag3Header, 3));
+        binding.tag4Header.addTextChangedListener(getTextWatcher(binding.tag4Header,4));
+        binding.tag5Header.addTextChangedListener(getTextWatcher(binding.tag5Header, 5));
+        binding.Tag6Header.addTextChangedListener(getTextWatcher(binding.Tag6Header, 6));
+        binding.Tag7Header.addTextChangedListener(getTextWatcher(binding.Tag7Header,7));
+        binding.Tag8Header.addTextChangedListener(getTextWatcher(binding.Tag8Header, 8));
 
-        binding.tag1Body.addTextChangedListener(getTextWatcher(binding.tag1Body,1,binding.tag1BodyRv));
-        binding.tag2Body.addTextChangedListener(getTextWatcher(binding.tag2Body, 2, binding.tag2BodyRV));
-        binding.tag3Body.addTextChangedListener(getTextWatcher(binding.tag3Body, 3, binding.tag3BodyRV));
-        binding.tag4Body.addTextChangedListener(getTextWatcher(binding.tag4Body,4,binding.tag4BodyRV));
-        binding.tag5Body.addTextChangedListener(getTextWatcher(binding.tag5Body, 5, binding.tag5HRV));
-        binding.Tag6Body.addTextChangedListener(getTextWatcher(binding.Tag6Body, 6, binding.Tag6BodyRV));
-        binding.Tag7Body.addTextChangedListener(getTextWatcher(binding.Tag7Body,7,binding.Tag7BodyRV));
-        binding.Tag8Body.addTextChangedListener(getTextWatcher(binding.Tag8Body, 8, binding.Tag8BodyRV));
+        binding.tag1Body.addTextChangedListener(getTextWatcher(binding.tag1Body,1));
+        binding.tag2Body.addTextChangedListener(getTextWatcher(binding.tag2Body, 2));
+        binding.tag3Body.addTextChangedListener(getTextWatcher(binding.tag3Body, 3));
+        binding.tag4Body.addTextChangedListener(getTextWatcher(binding.tag4Body,4));
+        binding.tag5Body.addTextChangedListener(getTextWatcher(binding.tag5Body, 5));
+        binding.Tag6Body.addTextChangedListener(getTextWatcher(binding.Tag6Body, 6));
+        binding.Tag7Body.addTextChangedListener(getTextWatcher(binding.Tag7Body,7));
+        binding.Tag8Body.addTextChangedListener(getTextWatcher(binding.Tag8Body, 8));
 
 
         binding.barcodeI.setOnClickListener(new View.OnClickListener() {
@@ -358,7 +354,7 @@ public class Sale_Purchase_Fragment extends Fragment {
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {
                 for (int i = 0; i < cursor.getCount(); i++) {
-                    Products products= new Products();
+                    Products products = new Products();
                     products.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Products.I_ID))));
                     products.setsName(cursor.getString(cursor.getColumnIndex(Products.S_NAME)));
                     products.setsCode(cursor.getString(cursor.getColumnIndex(Products.S_CODE)));
@@ -366,27 +362,27 @@ public class Sale_Purchase_Fragment extends Fragment {
                     productsAdapter.notifyDataSetChanged();
                     cursor.moveToNext();
                     if (i + 1 == cursor.getCount()) {
-                        binding.productRV.setAdapter(productsAdapter);
-                        if(binding.surfaceView.getVisibility()!=View.VISIBLE) {
-                            binding.productRV.setVisibility(View.VISIBLE);
+                        binding.productName.setAdapter(productsAdapter);
+                        if (binding.surfaceView.getVisibility() == View.VISIBLE) {
+                            binding.productName.dismissDropDown();
                         }
                     }
                     productsAdapter.setOnClickListener(new ProductsAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(Products products, int position) {
                             binding.productName.setText(products.getsName());
-                            binding.productRV.setVisibility(View.GONE);
+                            iProduct = products.getiId();
+                            binding.productName.dismissDropDown();
+                            Log.d("iProduct",iProduct+"");
                         }
                     });
                 }
             }
-        }else {
-            binding.productRV.setVisibility(View.GONE);
         }
     }
 
 
-    private TextWatcher getTextWatcher(final EditText editText, int iTag, RecyclerView recyclerTag) {
+    private TextWatcher getTextWatcher(AutoCompleteTextView autocompleteView, int iTag) {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -399,20 +395,19 @@ public class Sale_Purchase_Fragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                GetTagDetails(editable.toString(),iTag,recyclerTag,editText);
+                GetTagDetails(editable.toString(),iTag,autocompleteView);
 
             }
         };
     }
 
-    private void GetTagDetails(String s, int iTag, RecyclerView recyclerTag, EditText editText) {
+    private void GetTagDetails(String s, int iTag, AutoCompleteTextView autocompleteView) {
         tagList.clear();
-
         Cursor cursor=helper.getTagbyKeyword(s,iTag);
         if(cursor!=null && !s.equals("")) {
             cursor.moveToFirst();
+            Log.d("iTag",cursor.getCount()+"count"+"");
             if (cursor.getCount() > 0) {
-                recyclerTag.setLayoutManager(new LinearLayoutManager(requireActivity()));
                 for (int i = 0; i < cursor.getCount(); i++) {
                     TagDetails details=new TagDetails();
                     details.setsName(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
@@ -421,15 +416,17 @@ public class Sale_Purchase_Fragment extends Fragment {
                     tagDetailsAdapter.notifyDataSetChanged();
                     cursor.moveToNext();
                     if (i + 1 == cursor.getCount()) {
-                        recyclerTag.setAdapter(tagDetailsAdapter);
-                        recyclerTag.setVisibility(View.VISIBLE);
+                        autocompleteView.setAdapter(tagDetailsAdapter);
                     }
 
                     tagDetailsAdapter.setOnClickListener(new TagDetailsAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(TagDetails tagDetails, int position) {
-                            editText.setText(tagDetails.getsName());
-                            recyclerTag.setVisibility(View.GONE);
+                            autocompleteView.setText(tagDetails.getsName());
+
+                            autocompleteView.dismissDropDown();
+                            iTagDetail=tagDetails.getiId();
+                            Log.d("iTagDetail",iTagDetail+"");
                         }
                     });
 
@@ -438,11 +435,8 @@ public class Sale_Purchase_Fragment extends Fragment {
             }
         }
         else {
-            recyclerTag.setVisibility(View.GONE);
-            TagDetails details=new TagDetails();
+
             tagList.clear();
-//            details.setsName("No Ta available!!");
-//            customerList.add(customer);
         }
     }
 
@@ -462,22 +456,22 @@ public class Sale_Purchase_Fragment extends Fragment {
                     customerAdapter.notifyDataSetChanged();
                     cursor.moveToNext();
                     if (i + 1 == cursor.getCount()) {
-                        binding.customerRV.setAdapter(customerAdapter);
-                        binding.customerRV.setVisibility(View.VISIBLE);
+                        binding.customer.setAdapter(customerAdapter);
                     }
-                    customerAdapter.setOnClickListener(new CustomerAdapter.OnClickListener() {
-                        @Override
-                        public void onItemClick(Customer customer, int position) {
-                            binding.customer.setText(customer.getsName());
-                            binding.customerRV.setVisibility(View.GONE);
-                            }
-                            });
-                            }
-                            }
+                }
+                customerAdapter.setOnClickListener(new CustomerAdapter.OnClickListener() {
+                    @Override
+                    public void onItemClick(Customer customer, int position) {
+                        iCustomer=customer.getiId();
+                        binding.customer.setText(customer.getsName());
+                        binding.customer.dismissDropDown();
+                        Log.d("iCustomer",iCustomer+"");
+                    }
+                });
+            }
         }
 
         else {
-            binding.customerRV.setVisibility(View.GONE);
             Customer customer=new Customer();
             customerList.clear();
             customer.setsName("No customer available!!");
@@ -541,7 +535,6 @@ public class Sale_Purchase_Fragment extends Fragment {
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
-
                 Toast.makeText(requireContext(), "barcode released", Toast.LENGTH_SHORT).show();
             }
 
@@ -553,14 +546,16 @@ public class Sale_Purchase_Fragment extends Fragment {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
-
-                            binding.productRV.setVisibility(View.GONE);
+                            binding.productName.dismissDropDown();
 
                             productBarCode=array.valueAt(0).displayValue;
                             Cursor cursor=helper.getProductDetailsByBarcode(productBarCode);
+
+
                             if(cursor!=null && cursor.moveToFirst()){
                                 binding.productName.setText(cursor.getString(cursor.getColumnIndex(Products.S_NAME)));
                                 productId=cursor.getString(cursor.getColumnIndex(Products.I_ID));
+                                Log.d("iTag",productId+"count"+"");
                             }
                         }
                     });

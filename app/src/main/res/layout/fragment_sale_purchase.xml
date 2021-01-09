@@ -62,7 +62,6 @@
            android:layout_marginTop="20dp"
            android:longClickable="false"
            android:id="@+id/date"
-           android:layout_below="@+id/docNo"
            android:hint="Date"
            android:focusable="false"
            android:layout_width="match_parent"
@@ -73,7 +72,6 @@
            <AutoCompleteTextView
                android:id="@+id/customer"
                android:longClickable="false"
-               android:layout_below="@+id/date"
                android:hint="Select Customer"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"/>
@@ -87,105 +85,159 @@
 
 
 
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/customerRV"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <EditText
-               android:visibility="gone"
-               android:longClickable="false"
-               android:id="@+id/tag1_header"
-               android:layout_below="@+id/customer"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/tag_1_h_rv"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <EditText
-               android:visibility="gone"
-               android:longClickable="false"
-               android:id="@+id/tag_2_header"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/tag_2_h_rv"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <EditText
-               android:visibility="gone"
-               android:longClickable="false"
-               android:id="@+id/tag_3_header"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/tag_3_hrv"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <EditText
-               android:visibility="gone"
-               android:longClickable="false"
-               android:id="@+id/tag_4_header"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/tag_4_hrv"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <EditText
-               android:visibility="gone"
-               android:longClickable="false"
-               android:focusable="false"
-               android:id="@+id/tag_5_header"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/tag_5_h_r_v"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <EditText
-               android:visibility="gone"
-               android:longClickable="false"
-               android:id="@+id/Tag6_header"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/Tag6_headerRV"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/customerRV"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
 
-           <EditText
+           <AutoCompleteTextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
                android:visibility="gone"
                android:longClickable="false"
-               android:id="@+id/Tag7_header"
+               android:id="@+id/tag1_header" />
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:id="@+id/tag1_header"-->
+<!--               android:layout_below="@+id/customer"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/tag_1_h_rv"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+           <AutoCompleteTextView
                android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/Tag7_headerRV"
-               android:visibility="gone"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <EditText
+               android:layout_height="wrap_content"
                android:visibility="gone"
                android:longClickable="false"
-               android:id="@+id/Tag8_header"
+               android:id="@+id/tag_2_header" />
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:id="@+id/tag_2_header"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/tag_2_h_rv"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+
+           <AutoCompleteTextView
                android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/Tag8_headerRV"
+               android:layout_height="wrap_content"
                android:visibility="gone"
+               android:longClickable="false"
+               android:id="@+id/tag_3_header" />
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:id="@+id/tag_3_header"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/tag_3_hrv"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+           <AutoCompleteTextView
                android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
+               android:layout_height="wrap_content"
+               android:visibility="gone"
+               android:longClickable="false"
+               android:id="@+id/tag_4_header" />
+
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:id="@+id/tag_4_header"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/tag_4_hrv"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+
+           <AutoCompleteTextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:visibility="gone"
+               android:longClickable="false"
+               android:id="@+id/tag_5_header" />
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:focusable="false"-->
+<!--               android:id="@+id/tag_5_header"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/tag_5_h_r_v"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+
+           <AutoCompleteTextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:visibility="gone"
+               android:longClickable="false"
+               android:id="@+id/Tag6_header" />
+
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:id="@+id/Tag6_header"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/Tag6_headerRV"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+
+           <AutoCompleteTextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:visibility="gone"
+               android:longClickable="false"
+               android:id="@+id/Tag7_header" />
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:id="@+id/Tag7_header"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/Tag7_headerRV"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+
+           <AutoCompleteTextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:visibility="gone"
+               android:longClickable="false"
+               android:id="@+id/Tag8_header" />
+<!--           <EditText-->
+<!--               android:visibility="gone"-->
+<!--               android:longClickable="false"-->
+<!--               android:id="@+id/Tag8_header"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
+<!--           <androidx.recyclerview.widget.RecyclerView-->
+<!--               android:id="@+id/Tag8_headerRV"-->
+<!--               android:visibility="gone"-->
+<!--               android:layout_width="match_parent"-->
+<!--               android:layout_height="wrap_content"/>-->
            <EditText
                android:id="@+id/description"
-               android:layout_below="@+id/customer"
                android:hint="Description"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"/>
@@ -213,14 +265,12 @@
                 android:layout_height="wrap_content"
                 android:text="ADD"
                 android:layout_marginEnd="10dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"/>
+                android:layout_alignParentBottom="true" />
 
             </LinearLayout>
 
 
             <androidx.cardview.widget.CardView
-                android:visibility="gone"
                 android:layout_below="@id/linear_add_details"
                 android:id="@+id/cardView_body"
                 android:layout_width="match_parent"
@@ -242,13 +292,13 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-
-                    <EditText
-                        android:id="@+id/product_name"
-                        android:hint="Barcode or Name"
-                        android:layout_width="0dp"
-                        android:layout_weight="2"
-                        android:layout_height="wrap_content" />
+                        <AutoCompleteTextView
+                            android:id="@+id/product_name"
+                            android:longClickable="false"
+                            android:hint="Barcode or Name"
+                            android:layout_width="0dp"
+                            android:layout_weight="2"
+                            android:layout_height="wrap_content"/>
 
                       <ImageView
                           android:layout_width="50dp"
@@ -256,11 +306,11 @@
                           android:src="@drawable/barcode_image"
                           android:id="@+id/barcodeI"/>
                     </LinearLayout>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/productRV"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/productRV"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
                     <SurfaceView
                         android:visibility="gone"
                         android:id="@+id/surfaceView"
@@ -275,95 +325,155 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
-                    <EditText
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:visibility="gone"
                         android:longClickable="false"
-                        android:id="@+id/tag_1_body"
-                        android:layout_below="@+id/customer"
+                        android:id="@+id/tag_1_body"/>
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/tag_1_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/tag_1_body_rv"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+
+                    <AutoCompleteTextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/tag_1_body_rv"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <EditText
-                        android:visibility="gone"
-                        android:longClickable="false"
-                        android:id="@+id/tag_2_body"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/tag_2_body_r_v"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <EditText
+                        android:layout_height="wrap_content"
                         android:visibility="gone"
                         android:longClickable="false"
-                        android:id="@+id/tag_3_body"
+                        android:id="@+id/tag_2_body"/>
+
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/tag_2_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/tag_2_body_r_v"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+
+                    <AutoCompleteTextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/tag_3_body_r_v"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <EditText
-                        android:visibility="gone"
-                        android:longClickable="false"
-                        android:id="@+id/tag_4_body"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/tag_4_body_r_v"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <EditText
+                        android:layout_height="wrap_content"
                         android:visibility="gone"
                         android:longClickable="false"
-                        android:id="@+id/tag_5_body"
+                        android:id="@+id/tag_3_body"/>
+
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/tag_3_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/tag_3_body_r_v"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+                    <AutoCompleteTextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/tag_5_body_r_v"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <EditText
-                        android:visibility="gone"
-                        android:longClickable="false"
-                        android:id="@+id/Tag6_body"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/Tag6_bodyRV"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <EditText
+                        android:layout_height="wrap_content"
                         android:visibility="gone"
                         android:longClickable="false"
-                        android:id="@+id/Tag7_body"
+                        android:id="@+id/tag_4_body"/>
+
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/tag_4_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/tag_4_body_r_v"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+
+                    <AutoCompleteTextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/Tag7_bodyRV"
-                        android:visibility="gone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <EditText
+                        android:layout_height="wrap_content"
                         android:visibility="gone"
                         android:longClickable="false"
-                        android:id="@+id/Tag8_body"
+                        android:id="@+id/tag_5_body"/>
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/tag_5_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/tag_5_body_r_v"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+
+                    <AutoCompleteTextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/Tag8_bodyRV"
+                        android:layout_height="wrap_content"
                         android:visibility="gone"
+                        android:longClickable="false"
+                        android:id="@+id/Tag6_body"/>
+
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/Tag6_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/Tag6_bodyRV"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+
+
+
+                    <AutoCompleteTextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:longClickable="false"
+                        android:id="@+id/Tag7_body"/>
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/Tag7_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/Tag7_bodyRV"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:longClickable="false"
+                        android:id="@+id/Tag8_body"/>
+
+<!--                    <EditText-->
+<!--                        android:visibility="gone"-->
+<!--                        android:longClickable="false"-->
+<!--                        android:id="@+id/Tag8_body"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:id="@+id/Tag8_bodyRV"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"/>-->
                     <Button
                         android:id="@+id/save_product"
                         android:layout_width="match_parent"

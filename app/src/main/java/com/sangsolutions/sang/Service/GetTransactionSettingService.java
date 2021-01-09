@@ -3,6 +3,7 @@ package com.sangsolutions.sang.Service;
 import android.annotation.SuppressLint;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
+import com.sangsolutions.sang.Commons;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -30,17 +32,21 @@ public class GetTransactionSettingService extends JobService {
     DatabaseHelper helper;
     JobParameters params;
     TransSetting transSalePurchase;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
         AndroidNetworking.initialize(this);
-
+        preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
+        editor = preferences.edit();
         GetTransSetting("1");
         GetTransSetting("2");
         return true;
     }
+
 
     private void GetTransSetting(String iDocType) {
 
@@ -69,6 +75,7 @@ public class GetTransactionSettingService extends JobService {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
+
                     JSONArray jsonArray = new JSONArray(response.getString("Data"));
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -110,6 +117,11 @@ public class GetTransactionSettingService extends JobService {
                 return null;
             }
 
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                editor.putString(Commons.TRANSACTION_SETTINGS,"true").apply();
+                jobFinished(params,false);
+            }
         };
         asyncTask.execute();
     }
