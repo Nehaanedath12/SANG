@@ -14,8 +14,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.databinding.FragmentSalesPurchaseHistoryBinding;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class SalesPurchaseHistoryFragment extends Fragment {
     FragmentSalesPurchaseHistoryBinding binding;
@@ -49,6 +57,23 @@ public class SalesPurchaseHistoryFragment extends Fragment {
             }
         });
 
+
+        AndroidNetworking.get(" http://185.151.4.167/Focus/api/Data/GetTransSummary")
+                .addQueryParameter("iDocType",String.valueOf(iDocType))
+                .addQueryParameter("iUser","0")
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseHistory",response.toString());
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseHistory",anError.toString());
+                    }
+                });
 
 
 

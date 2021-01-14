@@ -349,6 +349,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public Cursor getCustomer() {
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select distinct  "+ Customer.S_NAME+","+Customer.I_ID+","+
+                Customer.S_CODE+" from "+TABLE_ACCOUNTS,null);
+
+        if (cursor.moveToFirst()) {
+            return cursor;
+        } else {
+            return null;
+        }
+
+    }
+
+
 
     public Cursor getTransSettings(int iDocType, int tagId) {
         this.db=getReadableDatabase();
@@ -403,5 +417,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             return null;
         }
+    }
+
+    public Cursor getUserId() {
+        this.db=getWritableDatabase();
+        Cursor cursor=db.rawQuery("select "+USER_ID+" from "+TABLE_CURRENT_LOGIN,null);
+        cursor.moveToFirst();
+        return cursor;
     }
 }

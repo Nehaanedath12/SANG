@@ -76,13 +76,14 @@ public class Login extends AppCompatActivity {
                                     syncData();
                                     if (helper.loginUser(u)) {
                                         if (helper.InsertCurrentLoginUser(u)) {
-                                            if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
-                                                startActivity(new Intent(Login.this, Home.class));
-                                                finish();
+//                                            if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
+                                            startActivity(new Intent(Login.this, Home.class));
+                                            finish();
 
-                                            } else {
-                                                Toast.makeText(Login.this, "An unexpected error occurred!", Toast.LENGTH_SHORT).show();
-                                            }
+
+//                                            } else {
+//                                                Toast.makeText(Login.this, "An unexpected error occurred!", Toast.LENGTH_SHORT).show();
+//                                            }
                                         }Toast.makeText(Login.this, "syncing not completed", Toast.LENGTH_SHORT).show();
                                     } else {
                                         Toast.makeText(Login.this, "enter correct username and password", Toast.LENGTH_SHORT).show();

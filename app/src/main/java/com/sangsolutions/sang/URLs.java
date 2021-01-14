@@ -9,4 +9,6 @@ public class URLs {
     public static final String GetTransSettings=domain+"GetTransSettings";
     public static final String GetMasterTagDetails=domain+"GetMasterTagDetails";
     public static String GetUser="";
+    public static final String PostProductStock=domain+"PostProductStock";
+
 }
