@@ -13,17 +13,27 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.sangsolutions.sang.Adapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.R;
+import com.sangsolutions.sang.SalesPurchaseHistoryAdapter;
+import com.sangsolutions.sang.Service.GetAccountsService;
+import com.sangsolutions.sang.Tools;
+import com.sangsolutions.sang.URLs;
 import com.sangsolutions.sang.databinding.FragmentSalesPurchaseHistoryBinding;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SalesPurchaseHistoryFragment extends Fragment {
     FragmentSalesPurchaseHistoryBinding binding;
@@ -31,21 +41,20 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     int iDocType;
     String title;
     NavController navController;
+    List<SalesPurchaseHistory>historyList;
+    SalesPurchaseHistoryAdapter historyAdapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentSalesPurchaseHistoryBinding.inflate(getLayoutInflater());
+        historyList=new ArrayList<>();
+        historyAdapter=new SalesPurchaseHistoryAdapter(requireActivity(),historyList);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
-//        title=SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getToolTitle();
-        Log.d("iDocType",iDocType+"");
-        if(iDocType==1){
-            binding.name.setText("Purchase");
-        }
-        else if(iDocType==2){
-            binding.name.setText("Sales");
-        }
+
 
         binding.fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,7 +67,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
         });
 
 
-        AndroidNetworking.get(" http://185.151.4.167/Focus/api/Data/GetTransSummary")
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser","0")
                 .setPriority(Priority.MEDIUM)
@@ -67,6 +76,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("responseHistory",response.toString());
+                        loadDatas(response);
                     }
 
                     @Override
@@ -75,12 +85,39 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                     }
                 });
 
-
-
-
-
         return binding.getRoot();
 
+    }
 
+    private void loadDatas(JSONObject response) {
+
+        try {
+            JSONArray jsonArray = new JSONArray(response.getString("Data"));
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                Log.d("I_TRANS_ID",jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1)+"");
+                SalesPurchaseHistory history=new SalesPurchaseHistory(
+                        jsonObject.getInt(SalesPurchaseHistory.I_TRANS_ID),
+                        jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1),
+                        jsonObject.getInt(SalesPurchaseHistory.N_AMOUNT),
+                        jsonObject.getString(SalesPurchaseHistory.S_DOC_NO),
+                        jsonObject.getString(SalesPurchaseHistory.S_DATE),
+                        jsonObject.getString(SalesPurchaseHistory.S_ACCOUNT1),
+                        jsonObject.getString(SalesPurchaseHistory.S_ACCOUNT2)
+
+                        );
+
+                historyList.add(history);
+                if(i+1==jsonArray.length()){
+
+
+                    binding.recyclerView.setAdapter(historyAdapter);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

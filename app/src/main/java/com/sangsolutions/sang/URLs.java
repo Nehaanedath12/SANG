@@ -11,4 +11,6 @@ public class URLs {
     public static String GetUser="";
     public static final String PostProductStock=domain+"PostProductStock";
 
+    public static final String GetTransSummary=domain+"GetTransSummary";
+
 }

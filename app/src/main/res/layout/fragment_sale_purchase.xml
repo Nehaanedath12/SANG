@@ -584,14 +584,15 @@
                         <FrameLayout
                             android:id="@+id/frameEmpty"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            >
+                            android:layout_height="match_parent">
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:gravity="center"
                                 android:text="Empty.."
-                                android:textColor="@color/black"/>
+                                android:textSize="15dp"
+                                android:textStyle="bold"
+                                android:textColor="@color/purple_500"/>
                         </FrameLayout>
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/boyPart_RV"

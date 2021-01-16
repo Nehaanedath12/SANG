@@ -165,7 +165,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                 int month = now.get(Calendar.MONTH);
                 int day = now.get(Calendar.DAY_OF_MONTH);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), onDateSetListener, year, month, day);
-                datePickerDialog.setTitle("Select Date");
                 datePickerDialog.show();
             }
         });
@@ -221,6 +220,8 @@ public class Sale_Purchase_Fragment extends Fragment {
                 if(iTagPosition.equals("1")){
 
                     switch (tagId){
+
+
                         case 1:
 
                             if(visibility.equals("false")){
