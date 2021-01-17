@@ -38,7 +38,7 @@ public class CustomerAdapter extends ArrayAdapter<Customer> {
         this.context = context;
 
         this.items = items;
-        tempItems = new ArrayList<Customer>(items); // this makes the difference.
+        tempItems = new ArrayList<Customer>(items);
         suggestions = new ArrayList<Customer>();
     }
 
@@ -87,8 +87,6 @@ public class CustomerAdapter extends ArrayAdapter<Customer> {
             if (constraint != null) {
                 suggestions.clear();
                 for (Customer customer : tempItems) {
-                    Log.d("resultss",constraint.toString());
-
                     if (customer.getsName().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         suggestions.add(customer);
 

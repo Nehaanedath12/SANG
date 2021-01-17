@@ -35,7 +35,7 @@ public class ProductsAdapter extends ArrayAdapter<Products> {
         this.context = context;
 
         this.items = items;
-        tempItems = new ArrayList<Products>(items); // this makes the difference.
+        tempItems = new ArrayList<Products>(items);
         suggestions = new ArrayList<Products>();
     }
 
@@ -83,9 +83,9 @@ public class ProductsAdapter extends ArrayAdapter<Products> {
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint != null) {
                 suggestions.clear();
-                for (Products people : tempItems) {
-                    if (people.getsName().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        suggestions.add(people);
+                for (Products products : tempItems) {
+                    if (products.getsName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        suggestions.add(products);
                     }
                 }
                 FilterResults filterResults = new FilterResults();

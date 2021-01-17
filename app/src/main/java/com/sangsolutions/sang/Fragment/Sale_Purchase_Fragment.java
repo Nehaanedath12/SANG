@@ -3,10 +3,9 @@ package com.sangsolutions.sang.Fragment;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.icu.number.Precision;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,12 +15,12 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -54,10 +53,9 @@ import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetailsAdapter;
 import com.sangsolutions.sang.Database.DatabaseHelper;
-import com.sangsolutions.sang.Home;
-import com.sangsolutions.sang.Login;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
+import com.sangsolutions.sang.URLs;
 import com.sangsolutions.sang.databinding.FragmentSalePurchaseBinding;
 
 import org.json.JSONArray;
@@ -72,7 +70,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static java.nio.file.Paths.get;
 
 public class Sale_Purchase_Fragment extends Fragment {
     FragmentSalePurchaseBinding binding;
@@ -98,14 +97,22 @@ public class Sale_Purchase_Fragment extends Fragment {
     int iCustomer,iProduct,iTagDetail;
     int iTag1=-1,iTag2=-1,iTag3=-1,iTag4=-1,iTag5=-1,iTag6=-1,iTag7=-1,iTag8=-1;
 
-    ArrayList<Map> mapListBody =new ArrayList<>();
-    ArrayList<Map>mapListHeader=new ArrayList<>();
-    HashMap<String, Integer> hashMapBody =new HashMap<>();
-    HashMap<String, Integer> hashMapHeader =new HashMap<>();
+    ArrayList<String> mapListBodyKey;
+    ArrayList<Integer> mapListBodyValues;
+    HashMap<String, Integer> hashMapBody;
+    HashMap<String, Integer> hashMapHeader;
 
     List<BodyPart>bodyPartList;
     BodyPartAdapter bodyPartAdapter;
     NavController navController;
+
+    int numberOfLinesH =0;
+    int numberOfLinesB =0;
+    ArrayList<AutoCompleteTextView>autoText_B_list;
+    ArrayList<AutoCompleteTextView>autoText_H_list;
+
+    AlertDialog alertDialog;
+
 
     @Nullable
     @Override
@@ -115,10 +122,18 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
+
+        hashMapBody=new HashMap<>();
+        hashMapHeader=new HashMap<>();
+
+
         assert getArguments() != null;
         iDocType = Sale_Purchase_FragmentArgs.fromBundle(getArguments()).getIDocType();
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireActivity());
+
+        autoText_B_list=new ArrayList<>();
+        autoText_H_list=new ArrayList<>();
 
 
         customerList =new ArrayList<>();
@@ -134,15 +149,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         bodyPartAdapter=new BodyPartAdapter(requireActivity(),bodyPartList);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-        StringDate=df.format(new Date());
-        binding.date.setText(StringDate);
-
-        if(iDocType==1) {
-            docNo = "P-" + DateFormat.format("ddMMyy-HHmmss", new Date());
-        }else {
-            docNo = "S-" + DateFormat.format("ddMMyy-HHmmss", new Date());
-        }
-        binding.docNo.setText(docNo);
+        initialValueSettingHeader();
 
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,26 +177,9 @@ public class Sale_Purchase_Fragment extends Fragment {
         });
 
 
-        binding.customer.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                GetCustomer(s.toString());
-
-            }
-        });
-
-        binding.customer.setThreshold(1);
-        binding.customer.setAdapter(customerAdapter);
 
 
         binding.addButton.setOnClickListener(new View.OnClickListener() {
@@ -206,9 +196,9 @@ public class Sale_Purchase_Fragment extends Fragment {
         });
 
 
-        for (int tagId=1;tagId<=8;tagId++){
-            Cursor cursor=helper.getTransSettings(iDocType,tagId);
-            if(cursor!=null ){
+                for (int tagId=1;tagId<=8;tagId++){
+                Cursor cursor=helper.getTransSettings(iDocType,tagId);
+                if(cursor!=null ){
                 cursor.moveToFirst();
                 String iTagPosition=cursor.getString(cursor.getColumnIndex(TransSetting.I_TAG_POSITION));
                 String mandatory=cursor.getString(cursor.getColumnIndex(TransSetting.B_MANDATORY));
@@ -219,129 +209,47 @@ public class Sale_Purchase_Fragment extends Fragment {
                 cursor1.moveToFirst();
                 if(iTagPosition.equals("1")){
 
-                    switch (tagId){
 
 
-                        case 1:
-
-                            if(visibility.equals("false")){
-                            binding.tag1Header.setEnabled(false);
-                            }
-                            binding.tag1Header.setVisibility(View.VISIBLE);
-                            binding.tag1Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 2:
-                            if(visibility.equals("false")){
-                                binding.tag2Header.setEnabled(false);
-                            }
-                            binding.tag2Header.setVisibility(View.VISIBLE);
-                            binding.tag2Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 3:
-                            if(visibility.equals("false")){
-                                binding.tag3Header.setEnabled(false);
-                            }
-                            binding.tag3Header.setVisibility(View.VISIBLE);
-                            binding.tag3Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 4:
-                            if(visibility.equals("false")){
-                                binding.tag4Header.setEnabled(false);
-                            }
-                            binding.tag4Header.setVisibility(View.VISIBLE);
-                            binding.tag4Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 5:
-                            if(visibility.equals("false")){
-                                binding.tag5Header.setEnabled(false);
-                            }
-                            binding.tag5Header.setVisibility(View.VISIBLE);
-                            binding.tag5Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 6:
-                            if(visibility.equals("false")){
-                                binding.Tag6Header.setEnabled(false);
-                            }
-                            binding.Tag6Header.setVisibility(View.VISIBLE);
-                            binding.Tag6Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 7:
-                            if(visibility.equals("false")){
-                                binding.Tag7Header.setEnabled(false);
-                            }
-                            binding.Tag7Header.setVisibility(View.VISIBLE);
-                            binding.Tag7Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 8:
-                            if(visibility.equals("false")){
-                                binding.Tag8Header.setEnabled(false);
-                            }
-                            binding.Tag8Header.setVisibility(View.VISIBLE);
-                            binding.Tag8Header.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-
+                    LinearLayout ll = binding.linearHeader;
+                    // add autocompleteTextView
+                     AutoCompleteTextView autoTextHeader = new AutoCompleteTextView(requireActivity());
+                    LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    autoTextHeader.setLayoutParams(p);
+                    if(visibility.equals("false")){
+                        autoTextHeader.setEnabled(false);
                     }
+                    autoTextHeader.setLongClickable(false);
+                    autoTextHeader.cancelLongPress();
+                    autoTextHeader.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
+                    autoTextHeader.setId(numberOfLinesH +1);
+                    autoTextHeader.setTag("tag"+autoTextHeader.getId()+"Header");
+                    ll.addView(autoTextHeader);
+                    numberOfLinesH++;
+                    autoText_H_list.add(autoTextHeader);
+                    autoTextHeader.addTextChangedListener(getTextWatcher(autoTextHeader,tagId,"Header"));
+
 
                 }else if(iTagPosition.equals("2")){
-                    switch (tagId){
-                        case 1:
-                            if(visibility.equals("false")){
-                                binding.tag1Body.setEnabled(false);
-                            }
-                            binding.tag1Body.setVisibility(View.VISIBLE);
-                            binding.tag1Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 2:
-                            if(visibility.equals("false")){
-                                binding.tag2Body.setEnabled(false);
-                            }
-                            binding.tag2Body.setVisibility(View.VISIBLE);
-                            binding.tag2Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 3:
-                            if(visibility.equals("false")){
-                                binding.tag3Body.setEnabled(false);
-                            }
-                            binding.tag3Body.setVisibility(View.VISIBLE);
-                            binding.tag3Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 4:
-                            if(visibility.equals("false")){
-                                binding.tag4Body.setEnabled(false);
-                            }
-                            binding.tag4Body.setVisibility(View.VISIBLE);
-                            binding.tag4Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 5:
-                            if(visibility.equals("false")){
-                                binding.tag5Body.setEnabled(false);
-                            }
-                            binding.tag5Body.setVisibility(View.VISIBLE);
-                            binding.tag5Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 6:
-                            if(visibility.equals("false")){
-                                binding.Tag6Body.setEnabled(false);
-                            }
-                            binding.Tag6Body.setVisibility(View.VISIBLE);
-                            binding.Tag6Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 7:
-                            if(visibility.equals("false")){
-                                binding.Tag7Body.setEnabled(false);
-                            }
-                            binding.Tag7Body.setVisibility(View.VISIBLE);
-                            binding.Tag7Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
-                        case 8:
-                            if(visibility.equals("false")){
-                                binding.Tag8Body.setEnabled(false);
-                            }
-                            binding.Tag8Body.setVisibility(View.VISIBLE);
-                            binding.Tag8Body.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
-                            break;
 
+                    LinearLayout ll = binding.linearBody;
+                    // add autocompleteTextView
+                    AutoCompleteTextView autoTextBody = new AutoCompleteTextView(requireActivity());
+                    LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    autoTextBody.setLayoutParams(p);
+                    if(visibility.equals("false")){
+                        autoTextBody.setEnabled(false);
                     }
+                    autoTextBody.setLongClickable(false);
+                    autoTextBody.cancelLongPress();
+                    autoTextBody.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
+                    autoTextBody.setId(numberOfLinesB +1);
+                    autoTextBody.setTag("tag"+autoTextBody.getId()+"Body");
+                    ll.addView(autoTextBody);
+                    numberOfLinesB++;
+                    autoText_B_list.add(autoTextBody);
+                    autoTextBody.addTextChangedListener(getTextWatcher(autoTextBody,tagId,"Body"));
+
 
                 }
 
@@ -349,23 +257,6 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         }
 
-        binding.tag1Header.addTextChangedListener(getTextWatcher(binding.tag1Header,1,"Header"));
-        binding.tag2Header.addTextChangedListener(getTextWatcher(binding.tag2Header, 2,"Header"));
-        binding.tag3Header.addTextChangedListener(getTextWatcher(binding.tag3Header, 3,"Header"));
-        binding.tag4Header.addTextChangedListener(getTextWatcher(binding.tag4Header,4, "Header"));
-        binding.tag5Header.addTextChangedListener(getTextWatcher(binding.tag5Header, 5, "Header"));
-        binding.Tag6Header.addTextChangedListener(getTextWatcher(binding.Tag6Header, 6, "Header"));
-        binding.Tag7Header.addTextChangedListener(getTextWatcher(binding.Tag7Header,7, "Header"));
-        binding.Tag8Header.addTextChangedListener(getTextWatcher(binding.Tag8Header, 8, "Header"));
-
-        binding.tag1Body.addTextChangedListener(getTextWatcher(binding.tag1Body,1, "Body"));
-        binding.tag2Body.addTextChangedListener(getTextWatcher(binding.tag2Body, 2, "Body"));
-        binding.tag3Body.addTextChangedListener(getTextWatcher(binding.tag3Body, 3, "Body"));
-        binding.tag4Body.addTextChangedListener(getTextWatcher(binding.tag4Body,4, "Body"));
-        binding.tag5Body.addTextChangedListener(getTextWatcher(binding.tag5Body, 5, "Body"));
-        binding.Tag6Body.addTextChangedListener(getTextWatcher(binding.Tag6Body, 6, "Body"));
-        binding.Tag7Body.addTextChangedListener(getTextWatcher(binding.Tag7Body,7, "Body"));
-        binding.Tag8Body.addTextChangedListener(getTextWatcher(binding.Tag8Body, 8, "Body"));
 
 
         binding.barcodeI.setOnClickListener(new View.OnClickListener() {
@@ -400,23 +291,46 @@ public class Sale_Purchase_Fragment extends Fragment {
         }
 
 
-        binding.saveProduct.setOnClickListener(new View.OnClickListener() {
+        binding.customer.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View v) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                GetCustomer(s.toString());
+
+            }
+        });
+        binding.customer.setThreshold(1);
+        binding.customer.setAdapter(customerAdapter);
+
+
+
+        binding.saveProduct.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                mapListBodyKey =new ArrayList<String>(hashMapBody.keySet());
+                mapListBodyValues=new ArrayList<Integer>(hashMapBody.values());
                 saveBodyPartProduct();
+
             }
         });
 
-        binding.saveMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
-                    builder.setTitle("save!")
+                            binding.saveMain.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                            AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+                            builder.setTitle("save!")
                             .setMessage("Do you want to save ?")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if(!binding.customer.getText().toString().equals("")) {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        if(!binding.customer.getText().toString().equals("")) {
                                         if(bodyPartList.size()>0) {
                                             saveMain();
 
@@ -424,18 +338,18 @@ public class Sale_Purchase_Fragment extends Fragment {
                                         else {
                                             Toast.makeText(requireContext(), "No products to add", Toast.LENGTH_SHORT).show();
                                         }
-                                    }
-                                    else {
+                                        }
+                                        else {
                                         binding.customer.setError("empty customer!");
-                                    }
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                        }
+                                        })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
-                                }
-                            }).create().show();
+                                    }
+                                    }).create().show();
 
 
             }
@@ -444,30 +358,51 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.deleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
-                builder.setTitle("delete!")
-                        .setMessage("Do you want to delete all ?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+                            builder.setTitle("delete!")
+                            .setMessage("Do you want to delete all ?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                bodyPartList.clear();
-                                mapListBody.clear();
-                                NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(iDocType);
-                                navController.navigate(actions);
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                                deleteAll();
+
+                                }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                            }
-                        }).create().show();
+                                }
+                                }).create().show();
 
 
             }
         });
 
         return binding.getRoot();
+    }
+
+    private void initialValueSettingHeader() {
+        StringDate=df.format(new Date());
+        binding.date.setText(StringDate);
+        if(iDocType==1) {
+            docNo = "P-" + DateFormat.format("ddMMyy-HHmmss", new Date());
+        }else {
+            docNo = "S-" + DateFormat.format("ddMMyy-HHmmss", new Date());
+        }
+        binding.docNo.setText(docNo);
+    }
+
+    private void deleteAll() {
+        initialValueSettingBody();
+        binding.customer.setText("");
+        binding.description.setText("");
+        for (int i=0;i<autoText_H_list.size();i++){
+            autoText_H_list.get(i).setText("");
+        }
+        bodyPartList.clear();
+        NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(iDocType);
+        navController.navigate(actions);
     }
 
     private void saveMain() {
@@ -483,96 +418,36 @@ public class Sale_Purchase_Fragment extends Fragment {
             jsonObjectMain.put("iAccount2",0);
             jsonObjectMain.put("sNarration",binding.description.getText().toString());
             jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
+
+            Log.d("jsonObjecMain",jsonObjectMain.get("iTransId")+"");
+            Log.d("jsonObjecMain",jsonObjectMain.get("sDocNo")+"");
+            Log.d("jsonObjecMain",jsonObjectMain.get("iDocType")+"");
+            Log.d("jsonObjecMain",jsonObjectMain.get("iAccount1")+"");
+            Log.d("jsonObjecMain",jsonObjectMain.get("iAccount2")+"");
+            Log.d("jsonObjecMain",jsonObjectMain.get("sNarration")+"");
+            Log.d("jsonObjecMain",jsonObjectMain.get("iUser")+"");
+
+
             JSONArray jsonArray=new JSONArray();
             for (int i=0;i<bodyPartList.size();i++){
                 JSONObject jsonObject=new JSONObject();
-                Log.d("iTag11",String.valueOf(hashMapHeader.get("iTag1")));
-
-                if(hashMapHeader.containsKey("iTag1")){
-                    jsonObject.put("iTag1",hashMapHeader.get("iTag1"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag1")){
-                         jsonObject.put("iTag1", mapListBody.get(i).get("iTag1"));
-                }
-                else {
-                    jsonObject.put("iTag1",-1);
-                }
 
 
-                if(hashMapHeader.containsKey("iTag2")){
-                    jsonObject.put("iTag2",hashMapHeader.get("iTag2"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag2")) {
-                    jsonObject.put("iTag2", mapListBody.get(i).get("iTag2"));
-                }
-                else {
-                    jsonObject.put("iTag2",-1);
-                }
+                Log.d("bodyPartList size",bodyPartList.size()+""+i);
 
+                for (int j=1;j<=8;j++){
+                    if(hashMapHeader.containsKey("iTag"+j)){
+                        jsonObject.put("iTag"+j,hashMapHeader.get("iTag"+j));
+                    }
+                    else if(bodyPartList.get(i).hashMapBody.containsKey("iTag"+j)){
+                            jsonObject.put("iTag"+j, bodyPartList.get(i).hashMapBody.get("iTag"+j));
+                    }
+                    else {
+                        jsonObject.put("iTag"+j,-1);
+                    }
 
-                if(hashMapHeader.containsKey("iTag3")){
-                    jsonObject.put("iTag3",hashMapHeader.get("iTag3"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag3")){
-                    jsonObject.put("iTag3", mapListBody.get(i).get("iTag3"));
-                }
-                else {
-                    jsonObject.put("iTag3",-1);
-                }
+                    Log.d("jsonObjectTagDetails",jsonObject.get("iTag"+j)+" "+j);
 
-                if(hashMapHeader.containsKey("iTag4")){
-                    jsonObject.put("iTag4",hashMapHeader.get("iTag4"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag4")){
-                    jsonObject.put("iTag4", mapListBody.get(i).get("iTag4"));
-                }
-                else {
-                    jsonObject.put("iTag4",-1);
-                }
-
-
-
-
-
-
-                if(hashMapHeader.containsKey("iTag5")){
-                    jsonObject.put("iTag5",hashMapHeader.get("iTag5"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag5")) {
-                    jsonObject.put("iTag5", mapListBody.get(i).get("iTag5"));
-                }
-                else {
-                    jsonObject.put("iTag5",-1);
-                }
-
-
-                if(hashMapHeader.containsKey("iTag6")){
-                    jsonObject.put("iTag6",hashMapHeader.get("iTag6"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag6"))  {
-                    jsonObject.put("iTag6", mapListBody.get(i).get("iTag6"));
-                }else {
-                    jsonObject.put("iTag6",-1);
-                }
-
-
-                if(hashMapHeader.containsKey("iTag7")){
-                    jsonObject.put("iTag7",hashMapHeader.get("iTag7"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag7")) {
-                    jsonObject.put("iTag7", mapListBody.get(i).get("iTag7"));
-                }else {
-                    jsonObject.put("iTag7",-1);
-                }
-
-                if(hashMapHeader.containsKey("iTag8")){
-                    jsonObject.put("iTag8",hashMapHeader.get("iTag8"));
-                }
-                else if(mapListBody.get(i).containsKey("iTag8")){
-                    jsonObject.put("iTag8", mapListBody.get(i).get("iTag8"));
-                }
-                else {
-                    jsonObject.put("iTag8",-1);
                 }
 
                 jsonObject.put("iProduct",bodyPartList.get(i).getiProduct());
@@ -584,7 +459,18 @@ public class Sale_Purchase_Fragment extends Fragment {
                 jsonObject.put("fVAT",bodyPartList.get(i).getVat());
                 jsonObject.put("sRemarks",binding.remarksProduct.getText().toString());
 
-                Log.d("producti",bodyPartList.get(i).getiProduct()+"");
+
+                Log.d("jsonObjecttIproduct",jsonObject.get("iProduct")+"");
+                Log.d("jsonObjecttQty",jsonObject.get("fQty")+"");
+                Log.d("jsonObjecttrate",jsonObject.get("fRate")+"");
+                Log.d("jsonObjecttdis",jsonObject.get("fDiscount")+"");
+                Log.d("jsonObjecttaddcha",jsonObject.get("fAddCharges")+"");
+                Log.d("jsonObjecttvarper",jsonObject.get("fVatPer")+"");
+                Log.d("jsonObjecttvat",jsonObject.get("fVAT")+"");
+                Log.d("jsonObjecttrema",jsonObject.get("sRemarks")+"");
+
+
+
                 jsonArray.put(jsonObject);
             }
             jsonObjectMain.put("Body",jsonArray);
@@ -592,41 +478,50 @@ public class Sale_Purchase_Fragment extends Fragment {
             uploadToAPI(jsonObjectMain);
 
 
-
-
         } catch (JSONException e) {
+            Log.d("exception",e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain) {
         if(Tools.isConnected(requireActivity())) {
-            Log.d("Uploadd", "response");
-            AndroidNetworking.post("http://185.151.4.167/Focus/api/Data/PostProductStock")
+            AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+            View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
+            builder.setView(view);
+            builder.setCancelable(false);
+            alertDialog = builder.create();
+            alertDialog.show();
+            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity()) + URLs.PostProductStock)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
                     .getAsString(new StringRequestListener() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.d("Uploadd", response);
+                            @Override
+                            public void onResponse(String response) {
+                            Log.d("responsePost", response);
                             if (response.contains(docNo)) {
-                                Log.d("Uploading ", "successfully");
+                                    alertDialog.dismiss();
+                                Log.d("responsePost ", "successfully");
                                 Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
                                 bodyPartList.clear();
                                 NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(iDocType);
                                 navController.navigate(actions);
-                            }
-                        }
+                                }
+                                }
 
                         @Override
                         public void onError(ANError anError) {
-                            Log.d("Uploadd", anError.getErrorDetail() + anError.getErrorBody() + anError.toString());
+                                    alertDialog.dismiss();
+                            Log.d("responsePost", anError.getErrorDetail() + anError.getErrorBody() + anError.toString());
                         }
                     });
         }
         else {
-            Toast.makeText(requireActivity(), "connect to network", Toast.LENGTH_SHORT).show();
+            Snackbar snackbar=Snackbar.make(binding.getRoot(),"No Internet",Snackbar.LENGTH_LONG);
+            snackbar.setBackgroundTint(Color.RED);
+            snackbar.setTextColor(Color.WHITE);
+            snackbar.show();
         }
     }
 
@@ -639,9 +534,9 @@ public class Sale_Purchase_Fragment extends Fragment {
             if(!binding.qtyProduct.getText().toString().equals("")){
                 if(!binding.rateProduct.getText().toString().equals("")){
                     if(!binding.vatProduct.getText().toString().equals("")){
-                        mapListBody.add(hashMapBody);
+                        if(!binding.disProduct.getText().toString().equals("")){
+                            if(!binding.addChargesProduct.getText().toString().equals("")){
 
-                        Log.d("maplist", mapListBody.size()+"");
                         BodyPart bodyPart=new BodyPart();
                         qty=Integer.parseInt(binding.qtyProduct.getText().toString());
                         rate=Integer.parseInt(binding.rateProduct.getText().toString());
@@ -663,8 +558,10 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPart.setQty(qty);
                         bodyPart.setRate(rate);
                         bodyPart.setiProduct(iProduct);
+                        bodyPart.setHashMapBody(hashMapBody);
 
                         bodyPartList.add(bodyPart);
+
                         if(bodyPartList.size()>0){
                             binding.frameEmpty.setVisibility(View.GONE);
                         }
@@ -672,12 +569,14 @@ public class Sale_Purchase_Fragment extends Fragment {
                             binding.frameEmpty.setVisibility(View.VISIBLE);
                         }
                         binding.boyPartRV.setAdapter(bodyPartAdapter);
-                        Log.d("listSize",bodyPartList.size()+"");
 
                         initialValueSettingBody();
+
                         binding.cardViewBody.setVisibility(View.GONE);
-                    }
-                }
+                            }else {binding.addChargesProduct.setError("no addChargesProduct");}
+                        }else {binding.disProduct.setError("no disProduct");}
+                    }else {binding.vatProduct.setError("no Vat");}
+                }else {binding.rateProduct.setError("no Rate");}
             }else {binding.qtyProduct.setError("no qty");}
         }else {binding.productName.setError("no Product");}
 
@@ -685,32 +584,29 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void initialValueSettingBody() {
+        hashMapBody=new HashMap<>();
         binding.productName.setText("");
         binding.qtyProduct.setText("");
         binding.rateProduct.setText("");
         binding.vatProduct.setText("");
         binding.disProduct.setText("");
         binding.addChargesProduct.setText("");
-        binding.tag1Body.setText("");
-        binding.tag2Body.setText("");
-        binding.tag3Body.setText("");
-        binding.tag4Body.setText("");
-        binding.tag5Body.setText("");
-        binding.Tag6Body.setText("");
-        binding.Tag7Body.setText("");
-        binding.Tag8Body.setText("");
+
+        for (int i=0;i<autoText_B_list.size();i++){
+            autoText_B_list.get(i).setText("");
+        }
         binding.remarksProduct.setText("");
 
 
     }
 
     private void GetProduct(String productKeyword) {
-        productsList.clear();
-        Cursor cursor=helper.getProductByKeyword(productKeyword);
-        if(cursor!=null && !productKeyword.equals("")) {
-            cursor.moveToFirst();
-            if (cursor.getCount() > 0) {
-                for (int i = 0; i < cursor.getCount(); i++) {
+                    productsList.clear();
+                    Cursor cursor=helper.getProductByKeyword(productKeyword);
+                    if(cursor!=null && !productKeyword.equals("")) {
+                    cursor.moveToFirst();
+                    if (cursor.getCount() > 0) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
                     Products products = new Products();
                     products.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Products.I_ID))));
                     products.setsName(cursor.getString(cursor.getColumnIndex(Products.S_NAME)));
@@ -719,11 +615,8 @@ public class Sale_Purchase_Fragment extends Fragment {
                     productsAdapter.notifyDataSetChanged();
                     cursor.moveToNext();
                     if (i + 1 == cursor.getCount()) {
-//                        binding.productName.setThreshold(1);
-//                        binding.productName.setAdapter(productsAdapter);
-//                        if (binding.surfaceView.getVisibility() == View.VISIBLE) {
-//                            binding.productName.dismissDropDown();
-//                        }
+
+
                     }
                     productsAdapter.setOnClickListener(new ProductsAdapter.OnClickListener() {
                         @Override
@@ -750,7 +643,8 @@ public class Sale_Purchase_Fragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                calllbeforeTag(autocompleteView);
+                autocompleteView.setThreshold(1);
+                autocompleteView.setAdapter(tagDetailsAdapter);
             }
 
             @Override
@@ -761,19 +655,14 @@ public class Sale_Purchase_Fragment extends Fragment {
         };
     }
 
-    private void calllbeforeTag(AutoCompleteTextView autocompleteView) {
-        autocompleteView.setThreshold(1);
-        autocompleteView.setAdapter(tagDetailsAdapter);
-    }
-
     private void GetTagDetails(String s, int iTag, AutoCompleteTextView autocompleteView, String iTagPosition) {
-        tagList.clear();
-        Cursor cursor=helper.getTagbyKeyword(s,iTag);
-        if(cursor!=null && !s.equals("")) {
-            cursor.moveToFirst();
-            Log.d("iTag",cursor.getCount()+"count"+"");
-            if (cursor.getCount() > 0) {
-                for (int i = 0; i < cursor.getCount(); i++) {
+                    tagList.clear();
+                    Cursor cursor=helper.getTagbyKeyword(s,iTag);
+                    if(cursor!=null && !s.equals("")) {
+                    cursor.moveToFirst();
+                    Log.d("iTag",cursor.getCount()+"count"+"");
+                    if (cursor.getCount() > 0) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
                     TagDetails details=new TagDetails();
                     details.setsName(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
                     details.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(TagDetails.I_ID))));
@@ -785,47 +674,43 @@ public class Sale_Purchase_Fragment extends Fragment {
 //                        autocompleteView.setAdapter(tagDetailsAdapter);
                     }
 
-                    tagDetailsAdapter.setOnClickListener(new TagDetailsAdapter.OnClickListener() {
-                        @Override
-                        public void onItemClick(TagDetails tagDetails, int position) {
+                                tagDetailsAdapter.setOnClickListener(new TagDetailsAdapter.OnClickListener() {
+                                @Override
+                                public void onItemClick(TagDetails tagDetails, int position) {
 
-                            autocompleteView.setText(tagDetails.getsName());
-                            iTagDetail=tagDetails.getiId();
-                            Log.d("itagId",iTagDetail+"");
-                            if(iTagPosition.equals("Body")){
+                                autocompleteView.setText(tagDetails.getsName());
+                                iTagDetail=tagDetails.getiId();
+                                if(iTagPosition.equals("Body")){
                                 hashMapBody.put("iTag"+iTag,iTagDetail);
-                                Log.d("itagIdBody",iTagDetail+"");
-                            }
-                            else if(iTagPosition.equals("Header"))
-                            {
-                                hashMapHeader.put("iTag"+iTag,iTagDetail);
-                            }
+                                Log.d("hashMapBody", hashMapBody.get("iTag"+iTag)+"");
 
-                            mapListHeader.add(hashMapHeader);
-                            autocompleteView.dismissDropDown();
+                                }
+                                else if(iTagPosition.equals("Header"))
+                                {
+                                    hashMapHeader.put("iTag"+iTag,iTagDetail);
+                                }
+                                autocompleteView.dismissDropDown();
+                                }
+                                });
 
-                            Log.d("iTagDetail",iTagDetail+"");
                         }
-                    });
 
-                }
+                        }
+                        }
+                    else {
 
-            }
-        }
-        else {
-
-            tagList.clear();
-        }
+                        tagList.clear();
+                    }
     }
 
 
     private void GetCustomer(String customerKeyword) {
-        customerList.clear();
-        Cursor cursor=helper.getCustomerbyKeyword(customerKeyword);
-        if(cursor!=null && !customerKeyword.equals("")) {
-            cursor.moveToFirst();
-            if (cursor.getCount() > 0) {
-                for (int i = 0; i < cursor.getCount(); i++) {
+                    customerList.clear();
+                    Cursor cursor=helper.getCustomerbyKeyword(customerKeyword);
+                    if(cursor!=null && !customerKeyword.equals("")) {
+                    cursor.moveToFirst();
+                    if (cursor.getCount() > 0) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
                     Customer customer = new Customer();
                     customer.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Customer.I_ID))));
                     customer.setsCode(cursor.getString(cursor.getColumnIndex(Customer.S_CODE)));
@@ -833,15 +718,13 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                     Log.d("dddd",cursor.getString(cursor.getColumnIndex(Customer.S_NAME))+"");
 
-//                    binding.customer.setThreshold(1);
 
                     customerList.add(customer);
                     customerAdapter.notifyDataSetChanged();
                     cursor.moveToNext();
                     if (i + 1 == cursor.getCount()) {
                         Log.d("dddd",customerList.size()+"");
-//                        binding.customer.setThreshold(1);
-//                        binding.customer.setAdapter(customerAdapter);
+
 
                     }
                 }
@@ -856,21 +739,13 @@ public class Sale_Purchase_Fragment extends Fragment {
                 });
             }
         }
-
-        else {
-            Customer customer=new Customer();
-            customerList.clear();
-            customer.setsName("No customer available!!");
-            customerList.add(customer);
-
-        }
     }
 
     private void barcodeScanningChecking() {
-        if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(requireActivity(),new String[]{Manifest.permission.CAMERA},101);
-        }
-        else {
+            if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(requireActivity(),new String[]{Manifest.permission.CAMERA},101);
+            }
+            else {
             if (binding.surfaceView.getVisibility() == View.VISIBLE) {
                 if(cameraSource!=null){
                     cameraSource.stop();
@@ -926,22 +801,22 @@ public class Sale_Purchase_Fragment extends Fragment {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                final SparseArray<Barcode> array = detections.getDetectedItems();
-                if (array.size() > 0) {
+                            final SparseArray<Barcode> array = detections.getDetectedItems();
+                            if (array.size() > 0) {
 
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable() {
-                        public void run() {
+                            Handler handler = new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                            public void run() {
                             binding.productName.dismissDropDown();
 
                             productBarCode=array.valueAt(0).displayValue;
                             Cursor cursor=helper.getProductDetailsByBarcode(productBarCode);
 
-                            if(cursor!=null && cursor.moveToFirst()){
+                                if(cursor!=null && cursor.moveToFirst()){
                                 binding.productName.setText(cursor.getString(cursor.getColumnIndex(Products.S_NAME)));
                                 productId=cursor.getString(cursor.getColumnIndex(Products.I_ID));
                                 Log.d("iTag",productId+"count"+"");
-                            }
+                                }
                         }
                     });
                 }

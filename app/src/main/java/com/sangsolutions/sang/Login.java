@@ -30,7 +30,7 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        syncData();
+//        syncData();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

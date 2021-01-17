@@ -13,4 +13,5 @@ public class URLs {
 
     public static final String GetTransSummary=domain+"GetTransSummary";
 
+
 }

@@ -1,10 +1,13 @@
 package com.sangsolutions.sang.Adapter.BodyAdapter;
 
 
+import java.util.HashMap;
+
 public class BodyPart {
     String productName,unit;
     Float gross,net,rate,vat,vatPer,discount,addCharges;
     int iProduct,qty;
+    public HashMap<String, Integer> hashMapBody;
 
     public BodyPart() {
     }
@@ -19,6 +22,15 @@ public class BodyPart {
         this.vat = vat;
         this.iProduct = iProduct;
     }
+
+    public HashMap<String, Integer> getHashMapBody() {
+        return hashMapBody;
+    }
+
+    public void setHashMapBody(HashMap<String, Integer> hashMapBody) {
+        this.hashMapBody = hashMapBody;
+    }
+
     public Float getVatPer() {
         return vatPer;
     }
