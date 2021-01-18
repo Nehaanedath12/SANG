@@ -104,8 +104,8 @@ public class Home extends AppCompatActivity {
                     NavDirections action= SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
-            }
-        });
+                }
+                });
                     binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -155,8 +155,8 @@ public class Home extends AppCompatActivity {
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
-        });
-    }
+            });
+            }
 
                 private void logoutAlert() {
 
@@ -181,36 +181,35 @@ public class Home extends AppCompatActivity {
                         }
     @Override
     public boolean onSupportNavigateUp() {
-        Log.d("backk","backk");
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        if(navController.getCurrentDestination().getId()==R.id.sale_Purchase_Fragment){
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            if(navController.getCurrentDestination().getId()==R.id.sale_Purchase_Fragment){
             backAlert();
             return true;
-        }
-        else {
+            }
+            else {
             return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                     || super.onSupportNavigateUp();
-        }
-    }
+            }
+            }
 
-    private void backAlert() {
-        AlertDialog.Builder builder=new AlertDialog.Builder(Home.this);
-        builder.setTitle("Close!")
+                private void backAlert() {
+                AlertDialog.Builder builder=new AlertDialog.Builder(Home.this);
+                builder.setTitle("Close!")
                 .setMessage("Do you want to close without saving ?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 //                        action= Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
 //                        navController.navigate(action);
-                        navController.navigateUp();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            navController.navigateUp();
+                            }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                }).create().show();
+                    }).create().show();
 
     }
 }

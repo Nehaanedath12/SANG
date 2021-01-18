@@ -410,7 +410,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.db = getReadableDatabase();
         Cursor cursor = db.rawQuery("select distinct "+Products.S_NAME+","+Products.I_ID+","+
                 Products.S_CODE+" from "+TABLE_PRODUCT+" where "+Products.S_CODE
-                +" " + "like '"+productKeyword+"%' or "+Products.S_NAME+" like '"+productKeyword+"%' limit 10",null);
+                +" " + "like '"+productKeyword+"%' or "+Products.S_NAME+" like '"+productKeyword+"%' limit 10 ",null);
 
         if (cursor.moveToFirst()) {
             return cursor;
@@ -422,6 +422,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getUserId() {
         this.db=getWritableDatabase();
         Cursor cursor=db.rawQuery("select "+USER_ID+" from "+TABLE_CURRENT_LOGIN,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getTagName(int tagId, int tagDetails) {
+        this.db=getWritableDatabase();
+        Cursor cursor=db.rawQuery("select "+TagDetails.S_NAME+" from "+TABLE_TAG_DETAILS+
+                " where "+TagDetails.I_TYPE+"="+tagId+ " and "+TagDetails.I_ID+"="+tagDetails,null);
         cursor.moveToFirst();
         return cursor;
     }

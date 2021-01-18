@@ -1,6 +1,5 @@
 package com.sangsolutions.sang.Fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -18,12 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.SalesPurchaseHistoryAdapter;
-import com.sangsolutions.sang.Service.GetAccountsService;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 import com.sangsolutions.sang.databinding.FragmentSalesPurchaseHistoryBinding;
@@ -43,6 +41,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     NavController navController;
     List<SalesPurchaseHistory>historyList;
     SalesPurchaseHistoryAdapter historyAdapter;
+    AlertDialog alertDialog;
 
     @Nullable
     @Override
@@ -53,6 +52,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        assert getArguments() != null;
         iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
 
 
@@ -66,24 +66,32 @@ public class SalesPurchaseHistoryFragment extends Fragment {
             }
         });
 
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+        View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
+        builder.setView(view);
+        builder.setCancelable(false);
+        alertDialog = builder.create();
+        alertDialog.show();
+
 
         AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
-                .addQueryParameter("iDocType",String.valueOf(iDocType))
-                .addQueryParameter("iUser","0")
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
+                        .addQueryParameter("iDocType",String.valueOf(iDocType))
+                        .addQueryParameter("iUser","0")
+                        .setPriority(Priority.MEDIUM)
+                        .build()
+                        .getAsJSONObject(new JSONObjectRequestListener() {
+                        @Override
+                        public void onResponse(JSONObject response) {
                         Log.d("responseHistory",response.toString());
                         loadDatas(response);
-                    }
+                        }
 
-                    @Override
-                    public void onError(ANError anError) {
+                        @Override
+                        public void onError(ANError anError) {
                         Log.d("responseHistory",anError.toString());
+                        alertDialog.dismiss();
                     }
-                });
+                    });
 
         return binding.getRoot();
 
@@ -91,14 +99,14 @@ public class SalesPurchaseHistoryFragment extends Fragment {
 
     private void loadDatas(JSONObject response) {
 
-        try {
-            JSONArray jsonArray = new JSONArray(response.getString("Data"));
+                        try {
+                        JSONArray jsonArray = new JSONArray(response.getString("Data"));
 
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                Log.d("I_TRANS_ID",jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1)+"");
-                SalesPurchaseHistory history=new SalesPurchaseHistory(
+                        Log.d("I_TRANS_ID",jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1)+"");
+                        SalesPurchaseHistory history=new SalesPurchaseHistory(
                         jsonObject.getInt(SalesPurchaseHistory.I_TRANS_ID),
                         jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1),
                         jsonObject.getInt(SalesPurchaseHistory.N_AMOUNT),
@@ -109,15 +117,14 @@ public class SalesPurchaseHistoryFragment extends Fragment {
 
                         );
 
-                historyList.add(history);
-                if(i+1==jsonArray.length()){
-
-
+                    historyList.add(history);
+                    if(i+1==jsonArray.length()){
+                    alertDialog.dismiss();
                     binding.recyclerView.setAdapter(historyAdapter);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                    }
+                    }
+                    } catch (JSONException e) {
+                    e.printStackTrace();
+                    }
     }
 }

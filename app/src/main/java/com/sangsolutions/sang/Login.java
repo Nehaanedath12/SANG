@@ -30,7 +30,7 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        syncData();
+        syncData();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -56,66 +56,69 @@ public class Login extends AppCompatActivity {
         if (helper.GetLoginStatus()) {
             startActivity(new Intent(Login.this, Home.class));
             finish();
-            syncData();
-        }
-        
-        binding.save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                if(!binding.userName.getText().toString().isEmpty()){
+        }
+        binding.save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    if(!binding.userName.getText().toString().isEmpty()){
                     if(!binding.password.getText().toString().isEmpty()){
 
-                        if(!new Tools().getIP(Login.this).isEmpty()) {
+                            if(!new Tools().getIP(Login.this).isEmpty()) {
                             User u = new User();
                             u.setsLoginName(binding.userName.getText().toString().trim());
                             u.setsPassword(binding.password.getText().toString().trim());
 
-                                schedulerJob.SyncUser(Login.this);
-                                if (helper.GetUser()) {
-                                    syncData();
-                                    if (helper.loginUser(u)) {
-                                        if (helper.InsertCurrentLoginUser(u)) {
-//                                            if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
+                                            schedulerJob.SyncUser(Login.this);
+                                            if (helper.GetUser()) {
+                                            syncData();
+                                            if (helper.loginUser(u)) {
+                                            if (helper.InsertCurrentLoginUser(u)) {
+                                            if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
                                             startActivity(new Intent(Login.this, Home.class));
                                             finish();
 
 
-//                                            } else {
-//                                                Toast.makeText(Login.this, "An unexpected error occurred!", Toast.LENGTH_SHORT).show();
-//                                            }
-                                        }Toast.makeText(Login.this, "syncing not completed", Toast.LENGTH_SHORT).show();
-                                    } else {
+                                            } else
+                                            {
+                                            Toast.makeText(Login.this, "Sync not completed!", Toast.LENGTH_SHORT).show();
+                                            }
+                                            }
+                                        else {
+                                        Toast.makeText(Login.this, "syncing not completed", Toast.LENGTH_SHORT).show();
+                                        }
+                                        } else {
                                         Toast.makeText(Login.this, "enter correct username and password", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(Login.this, "Check your network or IP", Toast.LENGTH_SHORT).show();
+                                        }
+                                        } else {
+                                        Toast.makeText(Login.this, "Check your network or IP", Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
+                                } else {
                                 Toast.makeText(Login.this, "Please enter IP Address", Toast.LENGTH_SHORT).show();
-                            }
+                                }
+                                }
+                                else {
+                                binding.password.setError("enter Password");
+                                }
+                                }
+                                else {
+                                binding.userName.setError("enter Username");
+                                }
+                                }
+                                });
 
-                    }
-                    else {
-                        binding.password.setError("enter Password");
-                    }
-                }
-                else {
-                    binding.userName.setError("enter Username");
-                }
-            }
-        });
 
-
-    }
+                                }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void syncData() {
+        schedulerJob.SyncTransSalePurchase(this);
         schedulerJob.SyncUser(this);
         schedulerJob.SyncMasterSettings(this);
         schedulerJob.SyncAccounts(this);
         schedulerJob.SyncProduct(this);
-        schedulerJob.SyncTransSalePurchase(this);
+
 
     }
 }

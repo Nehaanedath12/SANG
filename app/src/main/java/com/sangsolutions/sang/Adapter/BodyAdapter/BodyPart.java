@@ -4,15 +4,15 @@ package com.sangsolutions.sang.Adapter.BodyAdapter;
 import java.util.HashMap;
 
 public class BodyPart {
-    String productName,unit;
-    Float gross,net,rate,vat,vatPer,discount,addCharges;
-    int iProduct,qty;
-    public HashMap<String, Integer> hashMapBody;
+    String productName,unit,remarks;
+    Float gross,net,rate,vat,vatPer,discount,addCharges,qty;
+    int iProduct;
+    public HashMap<Integer, Integer> hashMapBody;
 
     public BodyPart() {
     }
 
-    public BodyPart(String productName, String unit, Float gross, Float net, float rate, int qty, float vat, int iProduct) {
+    public BodyPart(String productName, String unit, Float gross, Float net, float rate, float qty, float vat, int iProduct) {
         this.productName = productName;
         this.unit = unit;
         this.gross = gross;
@@ -23,11 +23,31 @@ public class BodyPart {
         this.iProduct = iProduct;
     }
 
-    public HashMap<String, Integer> getHashMapBody() {
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public void setVat(Float vat) {
+        this.vat = vat;
+    }
+
+    public Float getQty() {
+        return qty;
+    }
+
+    public void setQty(Float qty) {
+        this.qty = qty;
+    }
+
+    public HashMap<Integer, Integer> getHashMapBody() {
         return hashMapBody;
     }
 
-    public void setHashMapBody(HashMap<String, Integer> hashMapBody) {
+    public void setHashMapBody(HashMap<Integer, Integer> hashMapBody) {
         this.hashMapBody = hashMapBody;
     }
 
@@ -63,13 +83,6 @@ public class BodyPart {
         this.rate = rate;
     }
 
-    public int getQty() {
-        return qty;
-    }
-
-    public void setQty(int qty) {
-        this.qty = qty;
-    }
 
     public String getProductName() {
         return productName;

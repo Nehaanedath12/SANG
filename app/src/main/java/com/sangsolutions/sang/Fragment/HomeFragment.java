@@ -74,9 +74,9 @@ public class HomeFragment extends Fragment {
             }
         });
         binding.sync.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onClick(View v) {
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void onClick(View v) {
                 if(Tools.isConnected(requireActivity())) {
                     Log.d("homeFragment","homeFragment");
 //                    schedulerJob.syncMasterTagDetails(requireActivity());
@@ -103,22 +103,22 @@ public class HomeFragment extends Fragment {
         GetAllTag();
     }
 
-    private void GetAllTag() {
-        for (int i=1;i<=8;i++) {
-            GetTag_Details(i);
-            if(i==8){
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
+            private void GetAllTag() {
+                    for (int i=1;i<=8;i++) {
+                    GetTag_Details(i);
+                    if(i==8){
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
                     public void run() {
                         Toast.makeText(requireContext(), "TAG Synced", Toast.LENGTH_SHORT).show();
                     }
                 });
-            }
-        }
-    }
+                }
+                }
+                }
 
     private void GetTag_Details(int iType) {
-        AndroidNetworking.get("http://"+new Tools().getIP(requireContext()) + URLs.GetMasterTagDetails)
+                AndroidNetworking.get("http://"+new Tools().getIP(requireContext()) + URLs.GetMasterTagDetails)
                 .addQueryParameter("iType",String.valueOf(iType))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -138,10 +138,10 @@ public class HomeFragment extends Fragment {
 
     private void loadTagData(JSONObject response, String iType) {
         try {
-            JSONArray jsonArray = new JSONArray(response.getString("Data"));
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                details = new TagDetails(
+                        JSONArray jsonArray = new JSONArray(response.getString("Data"));
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        details = new TagDetails(
                         jsonObject.getString(TagDetails.S_CODE),
                         jsonObject.getString(TagDetails.S_NAME),
                         jsonObject.getString(TagDetails.S_ALT_NAME),
@@ -154,14 +154,11 @@ public class HomeFragment extends Fragment {
                 } else if (helper.insertMasterTag(details)) {
                     Log.d("successTag", "tag details  added successfully " + i);
                 }
-            }
-        }
+                }
+                }
             catch (JSONException e) {
             e.printStackTrace();
-    }
-
-
-
-        }
-    }
+                }
+                }
+                }
 
