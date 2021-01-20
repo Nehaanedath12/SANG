@@ -10,10 +10,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -21,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -103,8 +106,8 @@ public class Sale_Purchase_Fragment extends Fragment {
     BodyPartAdapter bodyPartAdapter;
     NavController navController;
 
-    int numberOfLinesH =0;
-    int numberOfLinesB =0;
+    int numberOfLinesH;
+    int numberOfLinesB;
     ArrayList<AutoCompleteTextView>autoText_B_list;
     ArrayList<AutoCompleteTextView>autoText_H_list;
 
@@ -115,7 +118,10 @@ public class Sale_Purchase_Fragment extends Fragment {
 
 
     int position_body_Edit;
-    boolean editMode=false;
+    boolean editMode;
+
+    Cursor cursorTagNumber;
+    int tagTotalNumber;
 
 
     @Nullable
@@ -154,6 +160,12 @@ public class Sale_Purchase_Fragment extends Fragment {
         bodyPartList=new ArrayList<>();
         bodyPartAdapter=new BodyPartAdapter(requireActivity(),bodyPartList);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
+
+        cursorTagNumber =helper.getTotalTagNumber();
+        if(cursorTagNumber!=null) {
+            tagTotalNumber = cursorTagNumber.getCount();
+            Log.d("tagTotalNumber",tagTotalNumber+"");
+        }
 
         initialValueSettingHeader();
 
@@ -202,7 +214,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         });
 
 
-                for (int tagId=1;tagId<=8;tagId++){
+                for (int tagId=1;tagId<=tagTotalNumber;tagId++){
                 Cursor cursor=helper.getTransSettings(iDocType,tagId);
                 if(cursor!=null ){
                 cursor.moveToFirst();
@@ -261,6 +273,24 @@ public class Sale_Purchase_Fragment extends Fragment {
                     numberOfLinesB++;
                     autoText_B_list.add(autoTextBody);
                     autoTextBody.addTextChangedListener(getTextWatcher(autoTextBody,tagId,"Body"));
+
+
+
+
+                    LinearLayout l_tags = binding.linearTags;
+                    // add TextView
+                    TextView textView=new TextView(requireActivity());
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150,ViewGroup.LayoutParams.MATCH_PARENT);
+
+                    textView.setLayoutParams(params);
+                    params.setMargins(5,0,5,0);
+                    l_tags.addView(textView);
+
+                    textView.setGravity(Gravity.CENTER);
+                    textView.setText(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
+                    textView.setTextColor(Color.WHITE);
+                    textView.setAllCaps(true);
+//                    textView.setPadding(5,0,5,0);
 
 
                 }
@@ -325,21 +355,29 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.saveProduct.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    boolean flag=true;
                     if(mandatoryList_B.size()<=0){
                         saveBodyPartProduct();
                     }
-                    for (int i = 0; i< mandatoryList_B.size(); i++){
-                        if(mandatoryList_B.get(i).getText().toString().equals("")){
-                            Toast.makeText(requireContext(), "Mandatory fields are not filled", Toast.LENGTH_SHORT).show();
-                            mandatoryList_B.get(i).setError("Mandatory");
+
+                        for (int i = 0; i < mandatoryList_B.size(); i++) {
+                            if (!mandatoryList_B.get(i).getText().toString().equals("")) {
+                                if (i + 1 == mandatoryList_B.size() && flag ) {
+                                    Log.d("sizeee",mandatoryList_B.size()+"  "+hashMapBody.size());
+                                    if(mandatoryList_B.size()==hashMapBody.size()){
+
+                                        saveBodyPartProduct();
+                                    }
+
+
+                                }
+
+                            } else {
+                                Toast.makeText(requireContext(), "Mandatory fields are not filled", Toast.LENGTH_SHORT).show();
+                                mandatoryList_B.get(i).setError("Mandatory");
+                                flag = false;
+                            }
                         }
-                        else if(i+1==mandatoryList_B.size()) {
-                            saveBodyPartProduct();
-                        }
-
-                    }
-
-
             }
         });
 
@@ -352,27 +390,34 @@ public class Sale_Purchase_Fragment extends Fragment {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            if(bodyPartList.size()>0) {
-                                        if(!binding.customer.getText().toString().equals("")) {
+                                            boolean flag = true;
+                                            if (bodyPartList.size() > 0) {
+                                                if (!binding.customer.getText().toString().equals("")) {
 
-                                            if(mandatoryList_H.size()<=0){
-                                                saveMain();
-                                            }
+                                                    if (mandatoryList_H.size() <= 0) {
+                                                        saveMain();
+                                                    }
 
-                                            for (int i = 0; i< mandatoryList_H.size(); i++){
-                                                if(mandatoryList_H.get(i).getText().toString().equals("")){
-                                                    Toast.makeText(requireContext(), "Mandatory fields are not filled", Toast.LENGTH_SHORT).show();
-                                                    mandatoryList_H.get(i).setError("Mandatory");
+                                                    for (int i = 0; i < mandatoryList_H.size(); i++) {
+                                                        if (!mandatoryList_H.get(i).getText().toString().equals("")) {
+                                                            if (i + 1 == mandatoryList_H.size() && flag) {
+                                                                if(mandatoryList_H.size()==hashMapHeader.size()){
+                                                                    saveMain();
+                                                                }
+                                                                else {
+                                                                    Toast.makeText(requireContext(), "Enter valid Header values", Toast.LENGTH_SHORT).show();
+                                                                }
+
+                                                            }
+                                                        } else {
+                                                            Toast.makeText(requireContext(), "Mandatory fields are not filled", Toast.LENGTH_SHORT).show();
+                                                            mandatoryList_H.get(i).setError("Mandatory");
+                                                            flag = false;
+                                                        }
+                                                    }
                                                 }
-                                                 else if(!mandatoryList_H.get(i).getText().toString().equals("")) {
-                                                     if(i+1==mandatoryList_H.size()){
-                                                         saveMain();
-                                                     }
 
-                                                }
 
-                                            }
-                                        }
                                         else {
                                             binding.customer.setError("empty customer!");
                                         }
@@ -423,6 +468,9 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void initialValueSettingHeader() {
+
+        numberOfLinesH =0;
+        numberOfLinesB =0;
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
         if(iDocType==1) {
@@ -477,7 +525,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                 Log.d("bodyPartList size",bodyPartList.size()+""+i);
 
-                for (int j=1;j<=8;j++){
+                for (int j=1;j<=tagTotalNumber;j++){
                     if(hashMapHeader.containsKey(j)){
                         jsonObject.put("iTag"+j,hashMapHeader.get(j));
                     }
@@ -569,9 +617,6 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void saveBodyPartProduct() {
 
-
-
-
         float rate,gross,net,vatPer,vat,discount,addCharges,qty;
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")){
@@ -594,7 +639,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                         net=gross-discount+addCharges+vat;
 
                         bodyPart.setGross(gross);
-                        bodyPart.setNet(net);
+                        bodyPart.setNet(Float.parseFloat(df.format(net)));
                         bodyPart.setVat(Float.parseFloat(df.format(vat)));
                         bodyPart.setVatPer(vatPer);
                         bodyPart.setDiscount(discount);
@@ -604,11 +649,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPart.setRate(rate);
                         bodyPart.setiProduct(iProduct);
                         bodyPart.setHashMapBody(hashMapBody);
+
                         bodyPart.setRemarks(binding.remarksProduct.getText().toString());
 
                         if(editMode) {
                             bodyPartList.set(position_body_Edit,bodyPart);
-                            editMode=false;
+
                         }else {
                             bodyPartList.add(bodyPart);
 
@@ -644,13 +690,17 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 binding.remarksProduct.setText(bodyPart.getRemarks());
 
 
-                                    for (int i=0;i<autoText_B_list.size();i++){
-                                        int tagId= (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
-                                        int tagDetails= (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
-                                        Cursor cursor=helper.getTagName(tagId,tagDetails);
+                                try {
+                                    for (int i = 0; i < autoText_B_list.size(); i++) {
+                                        int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
+                                        int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
+                                        Cursor cursor = helper.getTagName(tagId, tagDetails);
                                         autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
-                                        hashMapBody.put(tagId,tagDetails);
+                                        hashMapBody.put(tagId, tagDetails);
                                     }
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
 
                             }
                         });
@@ -667,6 +717,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void initialValueSettingBody() {
+        editMode=false;
         hashMapBody=new HashMap<>();
         binding.productName.setText("");
         binding.qtyProduct.setText("");
@@ -674,11 +725,15 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.vatProduct.setText("");
         binding.disProduct.setText("");
         binding.addChargesProduct.setText("");
+        binding.cardViewBody.setVisibility(View.GONE);
 
         for (int i=0;i<autoText_B_list.size();i++){
             autoText_B_list.get(i).setText("");
         }
         binding.remarksProduct.setText("");
+        if(bodyPartList.size()==0) {
+            binding.frameEmpty.setVisibility(View.VISIBLE);
+        }
 
 
     }

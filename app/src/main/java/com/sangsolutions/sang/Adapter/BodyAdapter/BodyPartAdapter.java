@@ -2,8 +2,10 @@ package com.sangsolutions.sang.Adapter.BodyAdapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
+import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
+import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
+import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 
 import java.util.List;
@@ -29,6 +34,7 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
     Context context;
     List<BodyPart>list;
     private OnClickListener onClickListener;
+    DatabaseHelper helper;
 
     public void setOnClickListener(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
@@ -48,13 +54,13 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
     @Override
     public BodyPartAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(context).inflate(R.layout.body_part_adapter,parent,false);
+        helper=new DatabaseHelper(context);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull BodyPartAdapter.ViewHolder holder, int position) {
 
-        Log.d("bodyValues","String.valueOf(list.get(position).qty");
         holder.productName.setText(list.get(position).productName);
         holder.unit.setText(list.get(position).unit);
         holder.qty.setText(String.valueOf(list.get(position).qty));
@@ -62,11 +68,37 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
         holder.gross.setText(String.valueOf(list.get(position).gross));
         holder.vat.setText(String.valueOf(list.get(position).vat));
         holder.net.setText(String.valueOf(list.get(position).net));
+        holder.vat_per.setText(String.valueOf(list.get(position).vatPer));
+        holder.discount.setText(String.valueOf(list.get(position).discount));
+        holder.add_charges.setText(String.valueOf(list.get(position).addCharges));
+        holder.remarks.setText(String.valueOf(list.get(position).remarks));
+
+        Log.d("mapsizee",list.get(position).hashMapBody.size()+"");
+
+        for (int i=0;i<list.get(position).hashMapBody.size();i++){
+            LinearLayout l_tags = holder.linearTag;
+            // add autocompleteTextView
+            TextView textView=new TextView(context);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150,ViewGroup.LayoutParams.WRAP_CONTENT);
+            textView.setLayoutParams(params);
+            params.setMargins(5,0,5,0);
+            l_tags.addView(textView);
+            textView.setGravity(Gravity.CENTER);
+            int tagId = (int) list.get(position).hashMapBody.keySet().toArray()[i];
+            int tagDetails = (int) list.get(position).hashMapBody.values().toArray()[i];
+            Cursor cursor = helper.getTagName(tagId, tagDetails);
+            textView.setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+
+
+
+        }
+
+
         if (position % 2 == 0) {
-            holder.parentLinear.setBackgroundColor(Color.rgb(234, 234, 234));
+            holder.parentCard.setBackgroundColor(Color.rgb(234, 234, 234));
         } else {
 
-            holder.parentLinear.setBackgroundColor(Color.rgb(255, 255, 255));
+            holder.parentCard.setBackgroundColor(Color.rgb(255, 255, 255));
         }
         holder.parentCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,10 +141,10 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView productName,unit,qty,rate,gross,vat,net;
-        LinearLayout parentLinear;
+        TextView productName,unit,qty,rate,gross,vat,net,vat_per,discount,add_charges,remarks;
         ImageView delete;
         CardView parentCard;
+        LinearLayout linearTag;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             productName=itemView.findViewById(R.id.product_name);
@@ -122,7 +154,13 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
             gross=itemView.findViewById(R.id.gross);
             vat=itemView.findViewById(R.id.vat);
             net=itemView.findViewById(R.id.net);
-            parentLinear=itemView.findViewById(R.id.parentLinear);
+            vat_per=itemView.findViewById(R.id.vat_per);
+            discount=itemView.findViewById(R.id.discount);
+            add_charges=itemView.findViewById(R.id.add_charges);
+            remarks=itemView.findViewById(R.id.remarks);
+
+            linearTag=itemView.findViewById(R.id.linear_tags);
+
             delete=itemView.findViewById(R.id.delete);
             parentCard=itemView.findViewById(R.id.cardView_body_adapter);
 
