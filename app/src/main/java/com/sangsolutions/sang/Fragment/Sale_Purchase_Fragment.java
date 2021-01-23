@@ -157,15 +157,17 @@ public class Sale_Purchase_Fragment extends Fragment {
         productsList=new ArrayList<>();
         productsAdapter=new ProductsAdapter(requireActivity(),productsList);
 
-        bodyPartList=new ArrayList<>();
-        bodyPartAdapter=new BodyPartAdapter(requireActivity(),bodyPartList);
-        binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
+
 
         cursorTagNumber =helper.getTotalTagNumber();
         if(cursorTagNumber!=null) {
             tagTotalNumber = cursorTagNumber.getCount();
             Log.d("tagTotalNumber",tagTotalNumber+"");
         }
+
+        bodyPartList=new ArrayList<>();
+        bodyPartAdapter=new BodyPartAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
+        binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
         initialValueSettingHeader();
 
@@ -275,21 +277,19 @@ public class Sale_Purchase_Fragment extends Fragment {
                     autoTextBody.addTextChangedListener(getTextWatcher(autoTextBody,tagId,"Body"));
 
 
-
-
                     LinearLayout l_tags = binding.linearTags;
                     // add TextView
                     TextView textView=new TextView(requireActivity());
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150,ViewGroup.LayoutParams.MATCH_PARENT);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT);
 
                     textView.setLayoutParams(params);
                     params.setMargins(5,0,5,0);
                     l_tags.addView(textView);
-
+                    textView.setWidth(150);
                     textView.setGravity(Gravity.CENTER);
                     textView.setText(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
                     textView.setTextColor(Color.WHITE);
-                    textView.setAllCaps(true);
+//                    textView.setAllCaps(true);
 //                    textView.setPadding(5,0,5,0);
 
 
@@ -364,10 +364,11 @@ public class Sale_Purchase_Fragment extends Fragment {
                             if (!mandatoryList_B.get(i).getText().toString().equals("")) {
                                 if (i + 1 == mandatoryList_B.size() && flag ) {
                                     Log.d("sizeee",mandatoryList_B.size()+"  "+hashMapBody.size());
-                                    if(mandatoryList_B.size()==hashMapBody.size()){
+//                                    if(mandatoryList_B.size()==hashMapBody.size()){
 
-                                        saveBodyPartProduct();
-                                    }
+                                    saveBodyPartProduct();
+
+//                                    }
 
 
                                 }
@@ -401,12 +402,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                                                     for (int i = 0; i < mandatoryList_H.size(); i++) {
                                                         if (!mandatoryList_H.get(i).getText().toString().equals("")) {
                                                             if (i + 1 == mandatoryList_H.size() && flag) {
-                                                                if(mandatoryList_H.size()==hashMapHeader.size()){
+//                                                                if(mandatoryList_H.size()==hashMapHeader.size()){
                                                                     saveMain();
-                                                                }
-                                                                else {
-                                                                    Toast.makeText(requireContext(), "Enter valid Header values", Toast.LENGTH_SHORT).show();
-                                                                }
+//                                                                }
+//                                                                else {
+//                                                                    Toast.makeText(requireContext(), "Enter valid Header values", Toast.LENGTH_SHORT).show();
+//                                                                }
 
                                                             }
                                                         } else {
@@ -650,6 +651,8 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPart.setiProduct(iProduct);
                         bodyPart.setHashMapBody(hashMapBody);
 
+                        Log.d("hashmapbody",hashMapBody.toString());
+
                         bodyPart.setRemarks(binding.remarksProduct.getText().toString());
 
                         if(editMode) {
@@ -728,6 +731,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.cardViewBody.setVisibility(View.GONE);
 
         for (int i=0;i<autoText_B_list.size();i++){
+            Log.d("autoText_B_list",autoText_B_list.get(i).getText().toString());
             autoText_B_list.get(i).setText("");
         }
         binding.remarksProduct.setText("");
@@ -807,6 +811,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                     tagList.add(details);
                     tagDetailsAdapter.notifyDataSetChanged();
                     cursor.moveToNext();
+
                                 tagDetailsAdapter.setOnClickListener(new TagDetailsAdapter.OnClickListener() {
                                 @Override
                                 public void onItemClick(TagDetails tagDetails, int position) {

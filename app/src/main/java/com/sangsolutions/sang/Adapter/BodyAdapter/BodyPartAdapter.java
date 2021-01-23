@@ -24,6 +24,7 @@ import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
+import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 
@@ -35,6 +36,8 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
     List<BodyPart>list;
     private OnClickListener onClickListener;
     DatabaseHelper helper;
+    int tagTotalNumber;
+    int iDocType;
 
     public void setOnClickListener(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
@@ -44,9 +47,12 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
 
     }
 
-    public BodyPartAdapter(Context context, List<BodyPart> list) {
+    public BodyPartAdapter(Context context, List<BodyPart> list, int tagTotalNumber, int iDocType) {
         this.context=context;
         this.list=list;
+        this.tagTotalNumber=tagTotalNumber;
+        this.iDocType=iDocType;
+
     }
 
 
@@ -75,23 +81,68 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
 
         Log.d("mapsizee",list.get(position).hashMapBody.size()+"");
 
-        for (int i=0;i<list.get(position).hashMapBody.size();i++){
-            LinearLayout l_tags = holder.linearTag;
-            // add autocompleteTextView
-            TextView textView=new TextView(context);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150,ViewGroup.LayoutParams.WRAP_CONTENT);
-            textView.setLayoutParams(params);
-            params.setMargins(5,0,5,0);
-            l_tags.addView(textView);
-            textView.setGravity(Gravity.CENTER);
-            int tagId = (int) list.get(position).hashMapBody.keySet().toArray()[i];
-            int tagDetails = (int) list.get(position).hashMapBody.values().toArray()[i];
-            Cursor cursor = helper.getTagName(tagId, tagDetails);
-            textView.setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
 
 
 
+
+        for (int tagId=1;tagId<=tagTotalNumber;tagId++){
+            Cursor cursor=helper.getTransSettings(iDocType,tagId);
+            if(cursor!=null ) {
+                cursor.moveToFirst();
+                String iTagPosition = cursor.getString(cursor.getColumnIndex(TransSetting.I_TAG_POSITION));
+                String mandatory = cursor.getString(cursor.getColumnIndex(TransSetting.B_MANDATORY));
+                String visibility = cursor.getString(cursor.getColumnIndex(TransSetting.B_VISIBLE));
+                Log.d(" iTagPositionN ", iTagPosition + " pos " + mandatory + " visible " + visibility + " iTagId " + tagId);
+
+                Cursor cursor1 = helper.getTagNamebyId(tagId);
+                cursor1.moveToFirst();
+                if (iTagPosition.equals("2")) {
+
+                    LinearLayout l_tags = holder.linearTag;
+                    // add autocompleteTextView
+                    TextView textView = new TextView(context);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    textView.setLayoutParams(params);
+                    params.setMargins(5, 0, 5, 0);
+                    l_tags.addView(textView);
+                    textView.setGravity(Gravity.CENTER);
+                    textView.setWidth(150);
+
+                    for (int i=0;i<list.get(position).hashMapBody.size();i++) {
+                        int tagId_map = (int) list.get(position).hashMapBody.keySet().toArray()[i];
+                        int tagDetails_map = (int) list.get(position).hashMapBody.values().toArray()[i];
+
+                        if( tagId_map == tagId){
+                            Cursor cursor_map = helper.getTagName(tagId, tagDetails_map);
+                            textView.setText(cursor_map.getString(cursor_map.getColumnIndex(TagDetails.S_NAME)));
+                        }
+
+                    }
+                }
+            }
         }
+
+
+
+
+//        for (int i=0;i<list.get(position).hashMapBody.size();i++){
+//            LinearLayout l_tags = holder.linearTag;
+//            // add autocompleteTextView
+//            TextView textView=new TextView(context);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//            textView.setLayoutParams(params);
+//            params.setMargins(5,0,5,0);
+//            l_tags.addView(textView);
+//            textView.setGravity(Gravity.CENTER);
+//            textView.setWidth(150);
+//            int tagId = (int) list.get(position).hashMapBody.keySet().toArray()[i];
+//            int tagDetails = (int) list.get(position).hashMapBody.values().toArray()[i];
+//            Cursor cursor = helper.getTagName(tagId, tagDetails);
+//            textView.setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+//
+//
+//
+//        }
 
 
         if (position % 2 == 0) {
