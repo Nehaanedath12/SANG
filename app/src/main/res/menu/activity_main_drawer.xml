@@ -18,6 +18,14 @@
             android:title="Purchase"
             tools:ignore="DuplicateIds" />
         <item
+            android:id="@+id/syncNav"
+            android:icon="@drawable/ic_sync"
+            android:title="Sync" />
+        <item
+            android:id="@+id/ReportNav"
+            android:icon="@drawable/ic_report"
+            android:title="Report" />
+        <item
             android:id="@+id/Logout"
             android:icon="@drawable/ic_logout"
             android:title="Logout" />

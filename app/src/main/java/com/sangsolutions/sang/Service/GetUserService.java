@@ -18,6 +18,7 @@ import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
+import com.sangsolutions.sang.URLs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +41,7 @@ public class GetUserService extends JobService {
     }
 
     private void GetUsers() {
-        AndroidNetworking.get("http://"+new Tools().getIP(GetUserService.this)+"/Vansales/api/Data/Get_User")
+        AndroidNetworking.get("http://"+new Tools().getIP(GetUserService.this)+ URLs.GetUser)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
@@ -71,7 +72,11 @@ public class GetUserService extends JobService {
                         user=new User(
                                 jsonObject.getInt(User.I_ID),
                                 jsonObject.getString(User.S_LOGIN_NAME),
-                                jsonObject.getString(User.S_PASSWORD));
+                                jsonObject.getString(User.S_PASSWORD),
+                                jsonObject.getInt(User.I_STATUS),
+                                jsonObject.getString(User.S_USERNAME),
+                                jsonObject.getString(User.B_WEB),
+                                jsonObject.getString(User.B_MOB));
                         if(helper.checkUserById(jsonObject.getString(User.I_ID))){
                             if(helper.checkAllDataUser(user)){
                                 Log.d("success","User Updated successfully "+i);

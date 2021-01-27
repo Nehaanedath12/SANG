@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Database.DatabaseHelper;
@@ -40,38 +41,40 @@ public class GetProductService extends JobService {
     }
 
     private void GetProducts() {
-
+        Log.d("syncProduct","http://"+new Tools().getIP(GetProductService.this) + URLs.GetProducts);
         AndroidNetworking.get("http://"+new Tools().getIP(GetProductService.this) + URLs.GetProducts)
                 .setPriority(Priority.MEDIUM)
                 .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
+                .getAsJSONArray(new JSONArrayRequestListener() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("responseProduct",response.toString());
+                    public void onResponse(JSONArray response) {
                         loadProductData(response);
+                        Log.d("responseProduct",response.toString());
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        Log.d("response",anError.toString());
+                        Log.d("responseProduct",anError.toString());
                     }
                 });
     }
 
-    private void loadProductData(JSONObject response) {
+    private void loadProductData(JSONArray response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    JSONArray jsonArray = new JSONArray(response.getString("Data"));
+                    JSONArray jsonArray = new JSONArray(response.toString());
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         products=new Products(
                                 jsonObject.getString(Products.S_CODE),
                                 jsonObject.getString(Products.S_NAME),
                                 jsonObject.getString(Products.S_ALT_NAME),
-                                jsonObject.getInt(Products.I_ID));
+                                jsonObject.getInt(Products.I_ID),
+                                jsonObject.getString(Products.S_UNIT),
+                                jsonObject.getString(Products.S_BARCODE));
                         if(helper.checkProductsById(jsonObject.getString(Products.I_ID))){
                             if(helper.checkAllDataProducts(products)){
                                 Log.d("success","products Updated successfully "+i+" "+jsonArray.length());

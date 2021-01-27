@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -55,6 +54,7 @@ import com.sangsolutions.sang.Adapter.Products.ProductsAdapter;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetailsAdapter;
+import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -69,6 +69,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -162,7 +163,6 @@ public class Sale_Purchase_Fragment extends Fragment {
         cursorTagNumber =helper.getTotalTagNumber();
         if(cursorTagNumber!=null) {
             tagTotalNumber = cursorTagNumber.getCount();
-            Log.d("tagTotalNumber",tagTotalNumber+"");
         }
 
         bodyPartList=new ArrayList<>();
@@ -223,7 +223,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                 String iTagPosition=cursor.getString(cursor.getColumnIndex(TransSetting.I_TAG_POSITION));
                 String mandatory=cursor.getString(cursor.getColumnIndex(TransSetting.B_MANDATORY));
                 String visibility=cursor.getString(cursor.getColumnIndex(TransSetting.B_VISIBLE));
-                Log.d(" iTagPositionN " ,iTagPosition+" pos "+mandatory+" visible "+visibility+" iTagId "+tagId);
 
                 Cursor cursor1=helper.getTagNamebyId(tagId);
                 cursor1.moveToFirst();
@@ -363,14 +362,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                         for (int i = 0; i < mandatoryList_B.size(); i++) {
                             if (!mandatoryList_B.get(i).getText().toString().equals("")) {
                                 if (i + 1 == mandatoryList_B.size() && flag ) {
-                                    Log.d("sizeee",mandatoryList_B.size()+"  "+hashMapBody.size());
-//                                    if(mandatoryList_B.size()==hashMapBody.size()){
-
-                                    saveBodyPartProduct();
-
-//                                    }
-
-
+                                   saveBodyPartProduct();
                                 }
 
                             } else {
@@ -392,8 +384,9 @@ public class Sale_Purchase_Fragment extends Fragment {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             boolean flag = true;
+
                                             if (bodyPartList.size() > 0) {
-                                                if (!binding.customer.getText().toString().equals("")) {
+                                                if (!binding.customer.getText().toString().equals("") && helper.getCustomerNameValid(binding.customer.getText().toString().trim())) {
 
                                                     if (mandatoryList_H.size() <= 0) {
                                                         saveMain();
@@ -420,7 +413,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
 
                                         else {
-                                            binding.customer.setError("empty customer!");
+                                            binding.customer.setError("Enter valid customer!");
                                         }
 
                                         }
@@ -492,8 +485,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         }
         bodyPartList.clear();
         bodyPartAdapter.notifyDataSetChanged();
-//        NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(iDocType);
-//        navController.navigate(actions);
+
     }
 
     private void saveMain() {
@@ -537,7 +529,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                         jsonObject.put("iTag"+j,-1);
                     }
 
-                    Log.d("jsonObjectTagDetails",jsonObject.get("iTag"+j)+" "+j);
 
                 }
 
@@ -590,7 +581,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                     .getAsString(new StringRequestListener() {
                             @Override
                             public void onResponse(String response) {
-                            Log.d("responsePost", response);
                             if (response.contains(docNo)) {
                                     alertDialog.dismiss();
                                 Log.d("responsePost ", "successfully");
@@ -620,7 +610,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         float rate,gross,net,vatPer,vat,discount,addCharges,qty;
         DecimalFormat df = new DecimalFormat("#.00");
-        if(!binding.productName.getText().toString().equals("")){
+        if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("")){
                 if(!binding.rateProduct.getText().toString().equals("")){
                     if(!binding.vatProduct.getText().toString().equals("")){
@@ -650,8 +640,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPart.setRate(rate);
                         bodyPart.setiProduct(iProduct);
                         bodyPart.setHashMapBody(hashMapBody);
-
-                        Log.d("hashmapbody",hashMapBody.toString());
+                        bodyPart.setUnit(binding.spinnerUnit.getSelectedItem().toString());
 
                         bodyPart.setRemarks(binding.remarksProduct.getText().toString());
 
@@ -675,7 +664,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                         initialValueSettingBody();
                         binding.cardViewBody.setVisibility(View.GONE);
 
-                        /////////////////////////////////////////edittt
+                        /////////////////////////////////////////editProduct
 
                         bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
                             @Override
@@ -691,6 +680,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 binding.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
                                 binding.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
                                 binding.remarksProduct.setText(bodyPart.getRemarks());
+                                setUnit(helper.getProductUnitById(iProduct),position);
 
 
                                 try {
@@ -708,13 +698,14 @@ public class Sale_Purchase_Fragment extends Fragment {
                             }
                         });
 
-                        ////////////////////////////////////////edittt
+                        ////////////////////////////////////////editProduct
+
                             }else {binding.addChargesProduct.setError("no addChargesProduct");}
                         }else {binding.disProduct.setError("no disProduct");}
                     }else {binding.vatProduct.setError("no Vat");}
                 }else {binding.rateProduct.setError("no Rate");}
             }else {binding.qtyProduct.setError("no qty");}
-        }else {binding.productName.setError("no Product");}
+        }else {binding.productName.setError("enter valid product");}
 
 
     }
@@ -731,7 +722,6 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.cardViewBody.setVisibility(View.GONE);
 
         for (int i=0;i<autoText_B_list.size();i++){
-            Log.d("autoText_B_list",autoText_B_list.get(i).getText().toString());
             autoText_B_list.get(i).setText("");
         }
         binding.remarksProduct.setText("");
@@ -765,12 +755,28 @@ public class Sale_Purchase_Fragment extends Fragment {
                             public void onItemClick(Products products, int position) {
                             binding.productName.setText(products.getsName());
                             iProduct = products.getiId();
+
+                            setUnit(helper.getProductUnitById(iProduct),-1);
                             binding.productName.dismissDropDown();
-                            Log.d("iProduct",iProduct+"");
                         }
                         });
                         }
             }
+        }
+    }
+
+    private void setUnit(String units, int position) {
+        List<String> list;
+        list = Arrays.asList(units.split("\\s*,\\s*"));
+        UnitAdapter unitAdapter = new UnitAdapter(list, requireActivity());
+        binding.spinnerUnit.setAdapter(unitAdapter);
+        if (bodyPartList.size() > 0) {
+            if (position != -1)
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).equals(bodyPartList.get(position).getUnit())) {
+                        binding.spinnerUnit.setSelection(i);
+                    }
+                }
         }
     }
 
@@ -802,7 +808,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                     Cursor cursor=helper.getTagbyKeyword(s,iTag);
                     if(cursor!=null && !s.equals("")) {
                     cursor.moveToFirst();
-                    Log.d("iTag",cursor.getCount()+"count"+"");
                     if (cursor.getCount() > 0) {
                     for (int i = 0; i < cursor.getCount(); i++) {
                     TagDetails details=new TagDetails();
@@ -820,7 +825,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 iTagDetail=tagDetails.getiId();
                                 if(iTagPosition.equals("Body")){
                                 hashMapBody.put(iTag,iTagDetail);
-                                Log.d("hashMapBody", hashMapBody.get(iTag)+"");
 
                                 }
                                 else if(iTagPosition.equals("Header"))
@@ -854,12 +858,10 @@ public class Sale_Purchase_Fragment extends Fragment {
                     customer.setsCode(cursor.getString(cursor.getColumnIndex(Customer.S_CODE)));
                     customer.setsName(cursor.getString(cursor.getColumnIndex(Customer.S_NAME)));
 
-                    Log.d("dddd",cursor.getString(cursor.getColumnIndex(Customer.S_NAME))+"");
 
                     customerList.add(customer);
                     cursor.moveToNext();
                     if (i + 1 == cursor.getCount()) {
-                        Log.d("dddd",customerList.size()+"");
                         customerAdapter.notifyDataSetChanged();
                     }
                 }
@@ -870,7 +872,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                         iCustomer=customer.getiId();
                         binding.customer.setText(customer.getsName());
                         binding.customer.dismissDropDown();
-                        Log.d("iCustomer",iCustomer+"");
                     }
                 });
             }
@@ -951,7 +952,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 if(cursor!=null && cursor.moveToFirst()){
                                 binding.productName.setText(cursor.getString(cursor.getColumnIndex(Products.S_NAME)));
                                 productId=cursor.getString(cursor.getColumnIndex(Products.I_ID));
-                                Log.d("iTag",productId+"count"+"");
                                 }
                             }
                             });

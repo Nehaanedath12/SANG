@@ -5,171 +5,98 @@
     android:orientation="vertical"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
+        <ScrollView
+            android:layout_below="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="10dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_sales"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:layout_marginBottom="10dp"
             app:cardCornerRadius="10dp">
+                <RelativeLayout
+                    android:id="@+id/sales_Relative"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp">
+                <LinearLayout
+                    android:id="@+id/text"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/purple_500">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:layout_gravity="center"
-     >
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="20dp"
+                            android:gravity="center_vertical"
+                            android:text="Sales Week Report"
+                            android:textColor="@color/white"
+                            android:textSize="15dp" />
+                </LinearLayout>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/sale_card"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        app:cardCornerRadius="10dp"
-        android:backgroundTint="@color/cardview_shadow_start_color"
-        app:cardElevation="3dp">
+                <com.github.mikephil.charting.charts.BarChart
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/barChart_Sale"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/text" />
+                </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/sale"
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_below="@+id/card_sales"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="10dp">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp">
+                        <LinearLayout
+                            android:id="@+id/text_p"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:background="@color/purple_500">
 
-            <ImageView
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="20dp"
+                                    android:gravity="center_vertical"
+                                    android:text="Purchase Week Report"
+                                    android:textColor="@color/white"
+                                    android:textSize="15dp" />
+                        </LinearLayout>
 
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="50dp"
-                android:src="@drawable/ic_sales" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Sales"
-                android:textColor="?android:attr/textColorPrimary" />
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_purchase"
-            android:layout_toEndOf="@+id/sale_card"
-            android:layout_width="150dp"
-            android:layout_marginStart="20dp"
-            android:layout_height="150dp"
-            app:cardCornerRadius="10dp"
-            android:backgroundTint="@color/cardview_shadow_start_color"
-            app:cardElevation="3dp">
-
-            <LinearLayout
-                android:id="@+id/purchase"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="50dp"
-                    android:src="@drawable/ic_purchase" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Purchase"
-                    android:textColor="?android:attr/textColorPrimary" />
-
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/sale_card"
-            android:id="@+id/sync_card"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            app:cardCornerRadius="10dp"
-            android:backgroundTint="@color/cardview_shadow_start_color"
-            app:cardElevation="3dp">
-
-            <LinearLayout
-                android:id="@+id/sync"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:orientation="vertical">
-
-                <ImageView
-
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="50dp"
-                    android:src="@drawable/ic_sync" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Sync"
-                    android:textColor="?android:attr/textColorPrimary" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-        <androidx.cardview.widget.CardView
-            android:layout_marginTop="20dp"
-            android:layout_toRightOf="@+id/sync_card"
-            android:layout_below="@+id/card_purchase"
-            android:id="@+id/card_report"
-            android:layout_marginLeft="20dp"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            app:cardCornerRadius="10dp"
-            android:backgroundTint="@color/cardview_shadow_start_color"
-            app:cardElevation="3dp">
-
-            <LinearLayout
-                android:id="@+id/report"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:orientation="vertical">
-
-                <ImageView
-
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="50dp"
-                    android:src="@drawable/ic_report" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Report"
-                    android:textColor="?android:attr/textColorPrimary" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-
-
-    </RelativeLayout>
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:layout_marginTop="5dp"
+                            android:id="@+id/barChart_Purchase"
+                            android:layout_below="@+id/text_p"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                </RelativeLayout>
 
         </androidx.cardview.widget.CardView>
-    </RelativeLayout>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-
+        </RelativeLayout>
+        </ScrollView>
 </LinearLayout>

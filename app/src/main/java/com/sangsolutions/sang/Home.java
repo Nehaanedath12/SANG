@@ -15,17 +15,33 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
 import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
 import com.sangsolutions.sang.databinding.ActivityMainBinding;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class Home extends AppCompatActivity {
@@ -52,9 +68,6 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.homeFragment){
           finish();
         }
-//        else {
-//            super.onBackPressed();
-//        }
 
     }
 
@@ -72,17 +85,14 @@ public class Home extends AppCompatActivity {
         setSupportActionBar(toolbar);
         navController = Navigation.findNavController(this,R.id.nav_host_fragment);
 
+        View headerView=navigationView.getHeaderView(0);
+        TextView textHeader=headerView.findViewById(R.id.username);
+        textHeader.setText(helper.getUserName(helper.getUserId()));
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.homeFragment, R.id.salesPurchaseHistoryFragment, R.id.purchaseFragment).setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-
-//        ActionBarDrawerToggle toggle=new ActionBarDrawerToggle(this,drawer,toolbar,
-//                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-//        drawer.addDrawerListener(toggle);
-//        toggle.syncState();
 
 
         binding.logout.setOnClickListener(new View.OnClickListener() {
@@ -142,12 +152,30 @@ public class Home extends AppCompatActivity {
                     break;
 
                     case R.id.homeFragment:
-                    {
-                        if (navController.getCurrentDestination().getId() != R.id.homeFragment) {
+                            {
+                            if (navController.getCurrentDestination().getId() != R.id.homeFragment) {
                             navController.navigateUp();
-                        }
-                    }
+                            }
+                            }
+
                         break;
+
+
+                        case R.id.syncNav:{
+                            if(Tools.isConnected(Home.this)) {
+                                Log.d("homeFragment","homeFragment");
+//                    schedulerJob.syncMasterTagDetails(requireActivity());
+                                syncTag();
+                            }
+                            else {
+                                Snackbar snackbar=Snackbar.make(getWindow().getDecorView().getRootView(),"Offline",Snackbar.LENGTH_LONG);
+                                snackbar.setTextColor(Color.WHITE);
+                                snackbar.setBackgroundTint(Color.RED);
+                                snackbar.show();
+                            }
+                        }
+                        break;
+
                     case R.id.Logout:
                         logoutAlert();
 
@@ -158,7 +186,67 @@ public class Home extends AppCompatActivity {
             });
             }
 
-                private void logoutAlert() {
+    private void syncTag() {
+        AndroidNetworking.initialize(this);
+        for (int i=1;i<=8;i++) {
+            GetTag_Details(i);
+            if(i==8){
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Home.this, "TAG Synced", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }
+    }
+
+    private void GetTag_Details(int iType) {
+        AndroidNetworking.get("http://"+new Tools().getIP(Home.this) + URLs.GetMasterTagDetails)
+                .addQueryParameter("iType",String.valueOf(iType))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseTag",response.toString());
+                        loadTagData(response,String.valueOf(iType));
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("response",anError.toString());
+                    }
+                });
+    }
+
+    private void loadTagData(JSONObject response, String iType) {
+
+        try {
+            JSONArray jsonArray = new JSONArray(response.getString("Data"));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                TagDetails details = new TagDetails(
+                        jsonObject.getString(TagDetails.S_CODE),
+                        jsonObject.getString(TagDetails.S_NAME),
+                        jsonObject.getString(TagDetails.S_ALT_NAME),
+                        jsonObject.getInt(TagDetails.I_ID),
+                        iType);
+
+                if (helper.checkTagDetailsById(jsonObject.getString(TagDetails.I_ID), iType)) {
+                    if (helper.checkAllDataMasterTag(details)) {
+                    }
+                } else if (helper.insertMasterTag(details)) {
+                    Log.d("successTag", "tag details  added successfully " + i);
+                }
+            }
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void logoutAlert() {
 
                             AlertDialog.Builder builder=new AlertDialog.Builder(Home.this);
                             builder.setTitle("Logout!")

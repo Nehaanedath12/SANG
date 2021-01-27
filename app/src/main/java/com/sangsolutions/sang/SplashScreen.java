@@ -15,7 +15,7 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void run() {
                 try{
-                    sleep(3000);
+                    sleep(2000);
 
                     if(!new Tools().getIP(SplashScreen.this).isEmpty()){
                         startActivity(new Intent(getApplicationContext(),Login.class));

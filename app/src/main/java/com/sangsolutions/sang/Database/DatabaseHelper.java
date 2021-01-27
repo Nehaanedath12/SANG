@@ -1,12 +1,10 @@
 package com.sangsolutions.sang.Database;
 
-import android.accounts.Account;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -20,7 +18,7 @@ import com.sangsolutions.sang.Adapter.User;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     Context context;
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Sang.db";
     private static final String TABLE_MASTER_SETTINGS = "t1_masterSettings";
     private static final String TABLE_ACCOUNTS = "t1_accounts";
@@ -36,8 +34,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_USER=" create table if not exists " + TABLE_USER + " (" +
             "" + User.I_ID + " INTEGER DEFAULT 0, " +
+            "" + User.I_STATUS + " INTEGER DEFAULT 0, " +
             "" + User.S_LOGIN_NAME  + " TEXT(50) DEFAULT null , " +
-            "" + User.S_PASSWORD  +  " TEXT(50) DEFAULT null  "+ ");";
+            "" + User.S_PASSWORD  + " TEXT(50) DEFAULT null , " +
+            "" + User.S_USERNAME  + " TEXT(50) DEFAULT null , " +
+            "" + User.B_MOB  + " TEXT(50) DEFAULT null , " +
+            "" + User.B_WEB  +  " TEXT(50) DEFAULT null  "+ ");";
 
     private static final String CREATE_TABLE_CURRENT_LOGIN = "create table if not exists  " + TABLE_CURRENT_LOGIN + " (" +
             "" + IID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -60,6 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + Products.I_ID + " INTEGER DEFAULT 0, " +
             "" + Products.S_NAME + " TEXT(50) DEFAULT null , " +
             "" + Products.S_CODE + " TEXT(50) DEFAULT null , " +
+            "" + Products.S_UNIT + " TEXT(50) DEFAULT null , " +
+            "" + Products.S_BARCODE + " TEXT(50) DEFAULT null , " +
             "" + Products.S_ALT_NAME +  " TEXT(50) DEFAULT null  "+ ");";
 
     private static final String CREATE_TRANSACTION_SETTING=" create table if not exists " + TABLE_TRANSACTION_SETTING + " (" +
@@ -99,6 +103,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+//            db.execSQL("DROP TABLE IF EXISTS "+TABLE_USER);
+            db.execSQL("DROP TABLE IF EXISTS "+TABLE_PRODUCT);
+            onCreate(db);
 
 
     }
@@ -172,6 +179,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(Products.I_ID,products.getiId());
         cv.put(Products.S_NAME,products.getsName());
         cv.put(Products.S_CODE,products.getsCode());
+        cv.put(Products.S_UNIT,products.getsUnit());
+        cv.put(Products.S_BARCODE,products.getsBarcode());
         cv.put(Products.S_ALT_NAME,products.getsAltName());
         float status = db.insert(TABLE_PRODUCT, null, cv);
         return status != -1;
@@ -191,6 +200,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(Products.S_NAME,products.getsName());
         cv.put(Products.S_ALT_NAME,products.getsAltName());
         cv.put(Products.S_CODE,products.getsCode());
+        cv.put(Products.S_UNIT,products.getsUnit());
+        cv.put(Products.S_BARCODE,products.getsBarcode());
         status=db.update(TABLE_PRODUCT,cv,Products.I_ID+" =? ",new String[]{String.valueOf(products.getiId())});
         return status!=-1;
     }
@@ -233,8 +244,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.db=getReadableDatabase();
         ContentValues cv=new ContentValues();
         cv.put(User.I_ID,user.getiId());
+        cv.put(User.I_STATUS,user.getiStatus());
         cv.put(User.S_LOGIN_NAME,user.getsLoginName());
         cv.put(User.S_PASSWORD,user.getsPassword());
+        cv.put(User.S_USERNAME,user.getsUserName());
+        cv.put(User.B_MOB,user.getbMob());
+        cv.put(User.B_WEB,user.getbMob());
         float status = db.insert(TABLE_USER, null, cv);
         return status != -1;
     }
@@ -251,8 +266,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         float status ;
         ContentValues cv=new ContentValues();
         cv.put(User.I_ID,user.getiId());
+        cv.put(User.I_STATUS,user.getiStatus());
         cv.put(User.S_LOGIN_NAME,user.getsLoginName());
         cv.put(User.S_PASSWORD,user.getsPassword());
+        cv.put(User.S_USERNAME,user.getsUserName());
+        cv.put(User.B_MOB,user.getbMob());
+        cv.put(User.B_WEB,user.getbMob());
         status=db.update(TABLE_USER,cv,User.I_ID+" =? ",new String[]{String.valueOf(user.getiId())});
         return status!=-1;
     }
@@ -402,7 +421,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getProductDetailsByBarcode(String productBarCode) {
         this.db = getReadableDatabase();
         Cursor cursor=db.rawQuery("select "+Products.I_ID+","+Products.S_NAME+" from "+
-                TABLE_PRODUCT+" where "+Products.S_CODE+"='"+productBarCode+"'",null);
+                TABLE_PRODUCT+" where "+Products.S_BARCODE+"='"+productBarCode+"'",null);
         if(cursor.getCount()>0){
             return cursor;
         }else return null;
@@ -441,5 +460,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor=db.rawQuery("select "+MasterSettings.I_ID+" from "+TABLE_MASTER_SETTINGS,null);
         cursor.moveToFirst();
         return cursor;
+    }
+
+    public boolean getProductNameValid(String productName) {
+        this.db=getWritableDatabase();
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+Products.I_ID+" from "+TABLE_PRODUCT+" where "+Products.S_NAME
+                +" = '"+productName+"'",null);
+        return cursor.getCount() > 0;
+    }
+
+    public boolean getCustomerNameValid(String customer) {
+        this.db=getWritableDatabase();
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+Customer.I_ID+" from "+TABLE_ACCOUNTS+" where "+Customer.S_NAME
+                +" = '"+customer+"'",null);
+        return cursor.getCount() > 0;
+    }
+
+    public boolean getTagNameValid(String tagName) {
+        this.db=getWritableDatabase();
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+TagDetails.I_ID+" from "+TABLE_TAG_DETAILS+" where "+TagDetails.S_NAME
+                +" = '"+tagName+"'",null);
+        return cursor.getCount() > 0;
+    }
+
+    public String getUserName(Cursor userId) {
+        String  id=userId.getString(userId.getColumnIndex("user_Id"));
+        this.db=getWritableDatabase();
+        Cursor cursor=db.rawQuery("select "+User.S_USERNAME+" from "+TABLE_USER+
+                " where "+User.I_ID+"='"+id+"'",null);
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndex(User.S_USERNAME));
+    }
+
+
+    public String getProductUnitById(int iProduct) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+Products.S_UNIT+" from "+TABLE_PRODUCT+" where "+
+                Products.I_ID+"="+iProduct,null);
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndex(Products.S_UNIT));
     }
 }

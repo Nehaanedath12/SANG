@@ -107,6 +107,7 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
                     l_tags.addView(textView);
                     textView.setGravity(Gravity.CENTER);
                     textView.setWidth(150);
+                    textView.setText("null");
 
                     for (int i=0;i<list.get(position).hashMapBody.size();i++) {
                         int tagId_map = (int) list.get(position).hashMapBody.keySet().toArray()[i];
@@ -121,28 +122,6 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
                 }
             }
         }
-
-
-
-
-//        for (int i=0;i<list.get(position).hashMapBody.size();i++){
-//            LinearLayout l_tags = holder.linearTag;
-//            // add autocompleteTextView
-//            TextView textView=new TextView(context);
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//            textView.setLayoutParams(params);
-//            params.setMargins(5,0,5,0);
-//            l_tags.addView(textView);
-//            textView.setGravity(Gravity.CENTER);
-//            textView.setWidth(150);
-//            int tagId = (int) list.get(position).hashMapBody.keySet().toArray()[i];
-//            int tagDetails = (int) list.get(position).hashMapBody.values().toArray()[i];
-//            Cursor cursor = helper.getTagName(tagId, tagDetails);
-//            textView.setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
-//
-//
-//
-//        }
 
 
         if (position % 2 == 0) {

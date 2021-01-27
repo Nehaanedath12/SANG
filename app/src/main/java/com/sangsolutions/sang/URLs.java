@@ -8,9 +8,10 @@ public class URLs {
     public static final String GetProducts=domain+"Getproducts";
     public static final String GetTransSettings=domain+"GetTransSettings";
     public static final String GetMasterTagDetails=domain+"GetMasterTagDetails";
-    public static String GetUser="";
+    public static String GetUser=domain+"GetUserLogin";
     public static final String PostProductStock=domain+"PostProductStock";
 
+    public static final String GetDashTransactionData=domain+"GetDashTransactiondata";
     public static final String GetTransSummary=domain+"GetTransSummary";
 
 
