@@ -62,7 +62,7 @@ public class Login extends AppCompatActivity {
         binding.save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        schedulerJob.SyncProduct(Login.this);
+                        syncData();
 
                     if(!binding.userName.getText().toString().isEmpty()){
                     if(!binding.password.getText().toString().isEmpty()){

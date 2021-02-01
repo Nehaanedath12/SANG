@@ -26,8 +26,13 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.android.gms.common.internal.Constants;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.SchedulerJob;
@@ -39,6 +44,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -74,34 +81,34 @@ public class HomeFragment extends Fragment {
 
         AndroidNetworking.initialize(getContext());
         cursor_iUser=helper.getUserId();
-        userIdS=cursor_iUser.getString(cursor_iUser.getColumnIndex("user_Id"));
+        if(cursor_iUser!=null && cursor_iUser.moveToFirst()) {
+            userIdS = cursor_iUser.getString(cursor_iUser.getColumnIndex("user_Id"));
+
+        }
         formatter = new SimpleDateFormat("yyyy-MM-dd");
         today_date=formatter.format(new Date());
 
         LocalDate date = LocalDate.parse(today_date);
 
-        for (int i=7;i>=0;i--){
+        for (int i=6;i>=0;i--){
             LocalDate returnValue = date.minusDays(i);
             weekList.add(String.valueOf(returnValue));
         }
-        getDataFromAPI("1",barEntryList_S,binding.barChartSale);
-        getDataFromAPI("2", barEntryList_P, binding.barChartPurchase);
-
+        getDataFromAPI("1", barEntryList_P, binding.barChartPurchase);
+        getDataFromAPI("2",barEntryList_S,binding.barChartSale);
         return binding.getRoot();
-
-
     }
 
     private void getDataFromAPI(String iDoc, List<BarEntry> barEntryList, BarChart barChart) {
-
+        barEntryList.clear();
         AndroidNetworking.get("http://"+new Tools().getIP(getContext()) + URLs.GetDashTransactionData)
                 .addQueryParameter("iDoc",iDoc)
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
-                    @Override
-                    public void onResponse(JSONArray response) {
+                        @Override
+                        public void onResponse(JSONArray response) {
                         Log.d("responseHome",response.toString());
                         getValues(response,iDoc,barEntryList,barChart);
 
@@ -123,9 +130,10 @@ public class HomeFragment extends Fragment {
                 for (int i=0;i<jsonArray.length();i++){
                 JSONObject jsonObject=jsonArray.getJSONObject(i);
                 String Dates=jsonObject.getString("Date");
-                String  Value=jsonObject.getString("Value");
+                String Value=jsonObject.getString("Value");
                  if(Dates.contains(weekList.get(j))){
-                         barEntryList.add(new BarEntry(j,Float.parseFloat(Value)));
+
+                         barEntryList.add(new BarEntry(j, Float.parseFloat(Value)));
                          flag=true;
                         }
                         }
@@ -141,12 +149,18 @@ public class HomeFragment extends Fragment {
 
     }
 
+
     private void settingBarData(List<BarEntry> barEntryList, String iDoc, BarChart barChart) {
+
+
+
         BarDataSet barDataSet=new BarDataSet(barEntryList,"week");
         barDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
         BarData barData=new BarData(barDataSet);
+        barData.setValueFormatter(new MyValueFormatter());
         barData.setBarWidth(0.5f);
         barChart.setData(barData);
+        barChart.setScaleEnabled(false);
         Description description=new Description();
         description.setText("No.of Data");
         barChart.setDescription(description);
@@ -160,6 +174,14 @@ public class HomeFragment extends Fragment {
         xAxis.setLabelRotationAngle(270);
         barChart.invalidate();
 
+    }
+
+    public static class MyValueFormatter extends ValueFormatter{
+
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            return value+"";
+        }
     }
 }
 

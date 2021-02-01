@@ -490,7 +490,10 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void saveMain() {
         Cursor cursor=helper.getUserId();
-        String userIdS=cursor.getString(cursor.getColumnIndex("user_Id"));
+        String userIdS = null;
+        if(cursor!=null) {
+             userIdS = cursor.getString(cursor.getColumnIndex("user_Id"));
+        }
         JSONObject jsonObjectMain=new JSONObject();
         try{
             jsonObjectMain.put("iTransId",0);
@@ -500,6 +503,7 @@ public class Sale_Purchase_Fragment extends Fragment {
             jsonObjectMain.put("iAccount1",iCustomer);
             jsonObjectMain.put("iAccount2",0);
             jsonObjectMain.put("sNarration",binding.description.getText().toString());
+            assert userIdS != null;
             jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
 
             Log.d("jsonObjecMain",jsonObjectMain.get("iTransId")+"");

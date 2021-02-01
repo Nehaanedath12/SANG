@@ -51,7 +51,7 @@ public class SchedulerJob {
             JobScheduler js =
                     (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobInfo job = new JobInfo.Builder(
-                    5,
+                    2,
                     new ComponentName(context, GetProductService.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .build();
@@ -74,6 +74,7 @@ public class SchedulerJob {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void SyncUser(Context context) {
+        Log.d("Userr","User");
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobInfo job = new JobInfo.Builder(

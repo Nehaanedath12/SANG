@@ -1,7 +1,6 @@
 package com.sangsolutions.sang;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -52,6 +51,7 @@ public class Home extends AppCompatActivity {
     AppBarConfiguration mAppBarConfiguration;
     NavigationView navigationView;
     DrawerLayout drawer;
+    String userName;
 
     @Override
     public void onBackPressed() {
@@ -68,7 +68,6 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.homeFragment){
           finish();
         }
-
     }
 
     @Override
@@ -87,7 +86,14 @@ public class Home extends AppCompatActivity {
 
         View headerView=navigationView.getHeaderView(0);
         TextView textHeader=headerView.findViewById(R.id.username);
-        textHeader.setText(helper.getUserName(helper.getUserId()));
+        Cursor cursor=helper.getUserId();
+
+        if(cursor!=null && cursor.moveToFirst()) {
+            userName = helper.getUserName(cursor.getString(cursor.getColumnIndex("user_Id")));
+            Log.d("usernamee", userName);
+            textHeader.setText(userName);
+        }
+
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.homeFragment, R.id.salesPurchaseHistoryFragment, R.id.purchaseFragment).setDrawerLayout(drawer).build();
@@ -235,6 +241,8 @@ public class Home extends AppCompatActivity {
 
                 if (helper.checkTagDetailsById(jsonObject.getString(TagDetails.I_ID), iType)) {
                     if (helper.checkAllDataMasterTag(details)) {
+
+                        Log.d("Tag","updated successfully");
                     }
                 } else if (helper.insertMasterTag(details)) {
                     Log.d("successTag", "tag details  added successfully " + i);

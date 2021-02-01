@@ -103,12 +103,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-//            db.execSQL("DROP TABLE IF EXISTS "+TABLE_USER);
+            db.execSQL("DROP TABLE IF EXISTS "+TABLE_USER);
             db.execSQL("DROP TABLE IF EXISTS "+TABLE_PRODUCT);
             onCreate(db);
-
-
-    }
+}
 
     public boolean insertMasterSettings(MasterSettings settings) {
 
@@ -486,11 +484,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor.getCount() > 0;
     }
 
-    public String getUserName(Cursor userId) {
-        String  id=userId.getString(userId.getColumnIndex("user_Id"));
+    public String getUserName(String userId) {
         this.db=getWritableDatabase();
         Cursor cursor=db.rawQuery("select "+User.S_USERNAME+" from "+TABLE_USER+
-                " where "+User.I_ID+"='"+id+"'",null);
+                " where "+User.I_ID+"='"+userId+"'",null);
         cursor.moveToFirst();
         return cursor.getString(cursor.getColumnIndex(User.S_USERNAME));
     }
