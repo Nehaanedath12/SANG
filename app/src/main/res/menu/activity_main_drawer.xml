@@ -22,7 +22,7 @@
             android:icon="@drawable/ic_sync"
             android:title="Sync" />
         <item
-            android:id="@+id/ReportNav"
+            android:id="@+id/report_selection_fragment"
             android:icon="@drawable/ic_report"
             android:title="Report" />
         <item

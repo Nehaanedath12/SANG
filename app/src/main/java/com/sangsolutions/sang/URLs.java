@@ -13,6 +13,7 @@ public class URLs {
 
     public static final String GetDashTransactionData=domain+"GetDashTransactiondata";
     public static final String GetTransSummary=domain+"GetTransSummary";
+    public static final String GetSales_PurchaseReport =domain+"GetSales_PurchaseReport";
 
 
 }

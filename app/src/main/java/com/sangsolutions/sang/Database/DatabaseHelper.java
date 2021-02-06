@@ -500,4 +500,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         return cursor.getString(cursor.getColumnIndex(Products.S_UNIT));
     }
+
+    public Cursor getUserCode() {
+        this.db=getWritableDatabase();
+        Cursor cursor=db.rawQuery("select "+USER_ID+" from "+TABLE_CURRENT_LOGIN,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
 }

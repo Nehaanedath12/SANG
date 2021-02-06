@@ -124,6 +124,8 @@ public class Sale_Purchase_Fragment extends Fragment {
     Cursor cursorTagNumber;
     int tagTotalNumber;
 
+    String toolTitle;
+
 
     @Nullable
     @Override
@@ -467,9 +469,15 @@ public class Sale_Purchase_Fragment extends Fragment {
         numberOfLinesB =0;
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
+
+//        Cursor cursor=helper.getUserCode();
         if(iDocType==1) {
+            toolTitle="Purchase Summary";
+
+//            docNo=
             docNo = "P-" + DateFormat.format("ddMMyy-HHmmss", new Date());
         }else {
+            toolTitle="Sale Summary";
             docNo = "S-" + DateFormat.format("ddMMyy-HHmmss", new Date());
         }
         binding.docNo.setText(docNo);
@@ -590,7 +598,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 Log.d("responsePost ", "successfully");
                                 Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
                                 bodyPartList.clear();
-                                NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(iDocType);
+                                NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
                                 navController.navigate(actions);
                                 }
                                 }

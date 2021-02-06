@@ -18,11 +18,14 @@
         <action
             android:id="@+id/action_homeFragment_to_salesPurchaseHistoryFragment"
             app:destination="@id/salesPurchaseHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_report_selection_fragment"
+            app:destination="@id/report_selection_fragment" />
     </fragment>
     <fragment
         android:id="@+id/salesPurchaseHistoryFragment"
         android:name="com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragment"
-        android:label="SalesPurchaseHistoryFragment"
+        android:label="{tool_title}"
         tools:layout="@layout/fragment_sales_purchase_history">
         <action
             android:id="@+id/action_salesPurchaseHistoryFragment_to_homeFragment"
@@ -34,6 +37,9 @@
             android:name="iDocType"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/sale_Purchase_Fragment"
@@ -54,6 +60,33 @@
             app:destination="@id/salesPurchaseHistoryFragment" />
         <action
             android:id="@+id/action_sale_Purchase_Fragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/report_selection_fragment"
+        android:name="com.sangsolutions.sang.Fragment.Report_selection_fragment"
+        android:label="Report_selection_fragment"
+        tools:layout="@layout/fragment_report_selection">
+        <action
+            android:id="@+id/action_report_selection_fragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_report_selection_fragment_to_reportFragment"
+            app:destination="@id/reportFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/reportFragment"
+        android:name="com.sangsolutions.sang.Fragment.ReportFragment"
+        android:label="ReportFragment"
+        tools:layout="@layout/fragment_report">
+        <action
+            android:id="@+id/action_reportFragment_to_report_selection_fragment"
+            app:destination="@id/report_selection_fragment" />
+        <argument
+            android:name="iDocType"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_reportFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 </navigation>

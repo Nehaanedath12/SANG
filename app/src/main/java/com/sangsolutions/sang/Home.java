@@ -34,6 +34,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
+import com.sangsolutions.sang.Fragment.ReportFragment;
+import com.sangsolutions.sang.Fragment.ReportFragmentDirections;
+import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
 import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
 import com.sangsolutions.sang.databinding.ActivityMainBinding;
@@ -68,6 +71,10 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.homeFragment){
           finish();
         }
+        else if(navController.getCurrentDestination().getId()==R.id.report_selection_fragment){
+            NavDirections action= Report_selection_fragmentDirections.actionReportSelectionFragmentToHomeFragment();
+            navController.navigate(action);
+        }
     }
 
     @Override
@@ -90,13 +97,12 @@ public class Home extends AppCompatActivity {
 
         if(cursor!=null && cursor.moveToFirst()) {
             userName = helper.getUserName(cursor.getString(cursor.getColumnIndex("user_Id")));
-            Log.d("usernamee", userName);
             textHeader.setText(userName);
         }
 
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.homeFragment, R.id.salesPurchaseHistoryFragment, R.id.purchaseFragment).setDrawerLayout(drawer).build();
+                R.id.homeFragment, R.id.salesPurchaseHistoryFragment, R.id.purchaseFragment,R.id.report_selection_fragment).setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
@@ -120,6 +126,15 @@ public class Home extends AppCompatActivity {
                     NavDirections action= SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
+                else if(navController.getCurrentDestination().getId()==R.id.report_selection_fragment){
+                    NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToHomeFragment();
+                    navController.navigate(actions);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
+                    NavDirections action= ReportFragmentDirections.actionReportFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+
                 }
                 });
                     binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -130,47 +145,59 @@ public class Home extends AppCompatActivity {
                     case R.id.purchaseFragment:
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
+                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1).setToolTitle("Purchase Summary");
+                            navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
                         else {
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1);
                             navController.navigateUp();
                             navController.navigate(action);
                         }
-
                     }
                     break;
                     case R.id.salesPurchaseHistoryFragment:
                     {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(2);
+                            navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
                         else{
-
-                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment().setIDocType(2);
+                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(2);
                             navController.navigateUp();
                             navController.navigate(action);
                         }
-
                     }
                     break;
 
                     case R.id.homeFragment:
                             {
                             if (navController.getCurrentDestination().getId() != R.id.homeFragment) {
-                            navController.navigateUp();
+//                            navController.navigateUp();
+                                navController.navigate(R.id.homeFragment);
                             }
                             }
 
                         break;
 
+                        case R.id.report_selection_fragment:{
+
+                            if(navController.getCurrentDestination().getId()!=R.id.report_selection_fragment){
+                                NavDirections action= HomeFragmentDirections.actionHomeFragmentToReportSelectionFragment();
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+                            }
+                            else {
+                                NavDirections action= HomeFragmentDirections.actionHomeFragmentToReportSelectionFragment();
+                                navController.navigateUp();
+                                navController.navigate(action);
+                            }
+                        }
+                        break;
 
                         case R.id.syncNav:{
                             if(Tools.isConnected(Home.this)) {
-                                Log.d("homeFragment","homeFragment");
-//                    schedulerJob.syncMasterTagDetails(requireActivity());
                                 syncTag();
                             }
                             else {
@@ -181,7 +208,6 @@ public class Home extends AppCompatActivity {
                             }
                         }
                         break;
-
                     case R.id.Logout:
                         logoutAlert();
 
