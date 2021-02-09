@@ -8,12 +8,19 @@ public class URLs {
     public static final String GetProducts=domain+"Getproducts";
     public static final String GetTransSettings=domain+"GetTransSettings";
     public static final String GetMasterTagDetails=domain+"GetMasterTagDetails";
-    public static String GetUser=domain+"GetUserLogin";
+    public static String GetUserLogin =domain+"GetUserLogin";
     public static final String PostProductStock=domain+"PostProductStock";
+
+    public static final String GetBanks =domain+"GetBanks";
 
     public static final String GetDashTransactionData=domain+"GetDashTransactiondata";
     public static final String GetTransSummary=domain+"GetTransSummary";
     public static final String GetSales_PurchaseReport =domain+"GetSales_PurchaseReport";
+    public static final String GetInvoiceList =domain+"GetInvoiceList";
+    public static final String Post_Receipt_Payment =domain+"Post_Receipt_Payment";
+    public static final String GetTransReceipt_PaymentSummary =domain+"GetTransReceipt_PaymentSummary";
+
+
 
 
 }

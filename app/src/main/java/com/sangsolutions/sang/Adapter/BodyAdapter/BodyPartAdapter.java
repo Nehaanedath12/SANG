@@ -81,10 +81,6 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
 
         Log.d("mapsizee",list.get(position).hashMapBody.size()+"");
 
-
-
-
-
         for (int tagId=1;tagId<=tagTotalNumber;tagId++){
             Cursor cursor=helper.getTransSettings(iDocType,tagId);
             if(cursor!=null ) {

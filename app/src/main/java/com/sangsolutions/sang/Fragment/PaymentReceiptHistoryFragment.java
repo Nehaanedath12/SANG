@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,33 +14,39 @@ import androidx.navigation.Navigation;
 
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.databinding.FragmentPaymentReceiptHistoryBinding;
-import com.sangsolutions.sang.databinding.FragmentReportSelectionBinding;
+import com.sangsolutions.sang.databinding.FragmentSalesPurchaseHistoryBinding;
 
-public class Report_selection_fragment extends Fragment {
+public class PaymentReceiptHistoryFragment extends Fragment {
 
-    FragmentReportSelectionBinding binding;
+    FragmentPaymentReceiptHistoryBinding binding;
     NavController navController;
+    int iDocType;
+    String toolTitle;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        binding=FragmentReportSelectionBinding.inflate(getLayoutInflater());
+        binding=FragmentPaymentReceiptHistoryBinding.inflate(getLayoutInflater());
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
-        binding.saleReport.setOnClickListener(new View.OnClickListener() {
+
+        assert getArguments() != null;
+        iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
+
+        if(iDocType==1){
+            toolTitle="Payment";
+        }
+        else {
+            toolTitle="Receipt";
+        }
+
+        binding.fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("2","Sales Report");
-                navController.navigate(actions);
+                NavDirections action=PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToPaymentReceiptFragment(toolTitle,iDocType);
+                navController.navigate(action);
             }
         });
-        binding.purchaseReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("1","Purchase Report");
-                navController.navigate(actions);
-            }
-        });
+
         return binding.getRoot();
     }
 }

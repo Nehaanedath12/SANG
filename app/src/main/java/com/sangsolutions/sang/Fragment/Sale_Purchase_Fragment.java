@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -55,6 +56,7 @@ import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetailsAdapter;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
+import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -74,6 +76,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static java.nio.file.Paths.get;
 
@@ -125,6 +128,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     int tagTotalNumber;
 
     String toolTitle;
+    String userIdS = null;
 
 
     @Nullable
@@ -136,6 +140,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
 
+
         hashMapBody=new HashMap<>();
         hashMapHeader=new HashMap<>();
 
@@ -144,6 +149,13 @@ public class Sale_Purchase_Fragment extends Fragment {
         iDocType = Sale_Purchase_FragmentArgs.fromBundle(getArguments()).getIDocType();
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireActivity());
+
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+        View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
+        builder.setView(view);
+        builder.setCancelable(false);
+        alertDialog = builder.create();
 
         autoText_B_list=new ArrayList<>();
         autoText_H_list=new ArrayList<>();
@@ -160,7 +172,10 @@ public class Sale_Purchase_Fragment extends Fragment {
         productsList=new ArrayList<>();
         productsAdapter=new ProductsAdapter(requireActivity(),productsList);
 
-
+        Cursor cursor_userId=helper.getUserId();
+        if(cursor_userId!=null &&cursor_userId.moveToFirst()) {
+            userIdS = cursor_userId.getString(cursor_userId.getColumnIndex("user_Id"));
+        }
 
         cursorTagNumber =helper.getTotalTagNumber();
         if(cursorTagNumber!=null) {
@@ -197,12 +212,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                 datePickerDialog.show();
             }
         });
-
-
-
-
-
-
 
         binding.addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -464,23 +473,60 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void initialValueSettingHeader() {
+        alertDialog.show();
+        String userCode = null;
+        Cursor cursor=helper.getUserCode(userIdS);
+        if(cursor.moveToFirst() && cursor.getCount()>0){
+            userCode=cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        }
+        final int[] arrayLength = new int[1];
+        ///////
+
+        String finalUserCode = userCode;
+        if(Tools.isConnected(requireActivity())) {
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
+                    .addQueryParameter("iDocType", String.valueOf(iDocType))
+                    .addQueryParameter("iUser", userIdS)
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONObject(new JSONObjectRequestListener() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d("responseHistory", response.toString());
+                            try {
+                                JSONArray jsonArray = new JSONArray(response.getString("Data"));
+                                arrayLength[0] = jsonArray.length() + 1;
+                                if (iDocType == 1) {
+                                    toolTitle = "Purchase Summary";
+                                } else {
+                                    toolTitle = "Sale Summary";
+                                }
+                                docNo = finalUserCode + "-" + DateFormat.format("MM", new Date()) + "-" +"000"+arrayLength[0];
+                                binding.docNo.setText(docNo);
+                                alertDialog.dismiss();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            Log.d("responseTotalNumber", anError.toString());
+                            alertDialog.dismiss();
+                        }
+                    });
+        }
+        else {
+            Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
+            alertDialog.dismiss();
+        }
+
+        ///////
 
         numberOfLinesH =0;
         numberOfLinesB =0;
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
-
-//        Cursor cursor=helper.getUserCode();
-        if(iDocType==1) {
-            toolTitle="Purchase Summary";
-
-//            docNo=
-            docNo = "P-" + DateFormat.format("ddMMyy-HHmmss", new Date());
-        }else {
-            toolTitle="Sale Summary";
-            docNo = "S-" + DateFormat.format("ddMMyy-HHmmss", new Date());
-        }
-        binding.docNo.setText(docNo);
     }
 
     private void deleteAll() {
@@ -497,11 +543,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void saveMain() {
-        Cursor cursor=helper.getUserId();
-        String userIdS = null;
-        if(cursor!=null) {
-             userIdS = cursor.getString(cursor.getColumnIndex("user_Id"));
-        }
+
         JSONObject jsonObjectMain=new JSONObject();
         try{
             jsonObjectMain.put("iTransId",0);
@@ -580,11 +622,6 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void uploadToAPI(JSONObject jsonObjectMain) {
         if(Tools.isConnected(requireActivity())) {
-            AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
-            View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
-            builder.setView(view);
-            builder.setCancelable(false);
-            alertDialog = builder.create();
             alertDialog.show();
             AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity()) + URLs.PostProductStock)
                     .addJSONObjectBody(jsonObjectMain)
@@ -620,7 +657,8 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void saveBodyPartProduct() {
 
-        float rate,gross,net,vatPer,vat,discount,addCharges,qty;
+        float rate,gross,net,vatPer,vat,discount,addCharges;
+        int qty;
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("")){
@@ -631,7 +669,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                         BodyPart bodyPart=new BodyPart();
 
-                        qty=Float.parseFloat(binding.qtyProduct.getText().toString());
+                        qty=Integer.parseInt(binding.qtyProduct.getText().toString());
                         rate=Float.parseFloat(binding.rateProduct.getText().toString());
                         vatPer=Float.parseFloat(binding.vatProduct.getText().toString());
                         discount=Float.parseFloat(binding.disProduct.getText().toString());
@@ -694,7 +732,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 binding.remarksProduct.setText(bodyPart.getRemarks());
                                 setUnit(helper.getProductUnitById(iProduct),position);
 
-
                                 try {
                                     for (int i = 0; i < autoText_B_list.size(); i++) {
                                         int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
@@ -732,6 +769,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.disProduct.setText("");
         binding.addChargesProduct.setText("");
         binding.cardViewBody.setVisibility(View.GONE);
+        setUnit("",-1);
 
         for (int i=0;i<autoText_B_list.size();i++){
             autoText_B_list.get(i).setText("");

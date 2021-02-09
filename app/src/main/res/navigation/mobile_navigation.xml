@@ -9,7 +9,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.sangsolutions.sang.Fragment.HomeFragment"
-        android:label="HomeFragment"
+        android:label="Home"
         tools:layout="@layout/fragment_home">
         <argument
             android:name="iDocType"
@@ -21,6 +21,11 @@
         <action
             android:id="@+id/action_homeFragment_to_report_selection_fragment"
             app:destination="@id/report_selection_fragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_paymentReceiptHistoryFragment"
+            app:destination="@id/paymentReceiptHistoryFragment" />
+
+
     </fragment>
     <fragment
         android:id="@+id/salesPurchaseHistoryFragment"
@@ -44,7 +49,7 @@
     <fragment
         android:id="@+id/sale_Purchase_Fragment"
         android:name="com.sangsolutions.sang.Fragment.Sale_Purchase_Fragment"
-        android:label="Sale_Purchase_Fragment"
+        android:label="{tool_title}"
         tools:layout="@layout/fragment_sale_purchase">
 
         <argument
@@ -61,11 +66,14 @@
         <action
             android:id="@+id/action_sale_Purchase_Fragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/report_selection_fragment"
         android:name="com.sangsolutions.sang.Fragment.Report_selection_fragment"
-        android:label="Report_selection_fragment"
+        android:label="Reports"
         tools:layout="@layout/fragment_report_selection">
         <action
             android:id="@+id/action_report_selection_fragment_to_homeFragment"
@@ -77,7 +85,7 @@
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.sangsolutions.sang.Fragment.ReportFragment"
-        android:label="ReportFragment"
+        android:label="{tool_title}"
         tools:layout="@layout/fragment_report">
         <action
             android:id="@+id/action_reportFragment_to_report_selection_fragment"
@@ -87,6 +95,51 @@
             app:argType="string" />
         <action
             android:id="@+id/action_reportFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/paymentReceiptFragment"
+        android:name="com.sangsolutions.sang.Fragment.PaymentReceiptFragment"
+        android:label="{tool_title}"
+        tools:layout="@layout/fragment_payment_receipt">
+        <action
+            android:id="@+id/action_paymentReceiptFragment_to_paymentReceiptHistoryFragment"
+            app:destination="@id/paymentReceiptHistoryFragment" />
+        <action
+            android:id="@+id/action_paymentReceiptFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+        <argument
+            android:name="iDocType"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_paymentReceiptFragment_to_homeFragment2"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/paymentReceiptHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragment"
+        android:label="{tool_title}"
+        tools:layout="@layout/fragment_payment_receipt_history">
+        <action
+            android:id="@+id/action_paymentReceiptHistoryFragment_to_paymentReceiptFragment"
+            app:destination="@id/paymentReceiptFragment" />
+        <action
+            android:id="@+id/action_paymentReceiptHistoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+        <argument
+            android:name="iDocType"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_paymentReceiptHistoryFragment_to_homeFragment2"
             app:destination="@id/homeFragment" />
     </fragment>
 </navigation>

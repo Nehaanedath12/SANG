@@ -5,23 +5,15 @@ import java.util.HashMap;
 
 public class BodyPart {
     String productName,unit,remarks;
-    Float gross,net,rate,vat,vatPer,discount,addCharges,qty;
+    Float gross,net,rate,vat,vatPer,discount,addCharges;
+    int qty;
     int iProduct;
     public HashMap<Integer, Integer> hashMapBody;
 
     public BodyPart() {
     }
 
-    public BodyPart(String productName, String unit, Float gross, Float net, float rate, float qty, float vat, int iProduct) {
-        this.productName = productName;
-        this.unit = unit;
-        this.gross = gross;
-        this.net = net;
-        this.rate = rate;
-        this.qty = qty;
-        this.vat = vat;
-        this.iProduct = iProduct;
-    }
+
 
     public String getRemarks() {
         return remarks;
@@ -35,11 +27,11 @@ public class BodyPart {
         this.vat = vat;
     }
 
-    public Float getQty() {
+    public int getQty() {
         return qty;
     }
 
-    public void setQty(Float qty) {
+    public void setQty(int qty) {
         this.qty = qty;
     }
 

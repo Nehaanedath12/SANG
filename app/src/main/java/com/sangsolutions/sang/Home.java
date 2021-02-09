@@ -34,6 +34,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
+import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
+import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.ReportFragment;
 import com.sangsolutions.sang.Fragment.ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
@@ -75,6 +77,17 @@ public class Home extends AppCompatActivity {
             NavDirections action= Report_selection_fragmentDirections.actionReportSelectionFragmentToHomeFragment();
             navController.navigate(action);
         }
+        else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
+            backAlert();
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptHistoryFragment){
+            NavDirections action= PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptFragment){
+            backAlert();
+        }
+
     }
 
     @Override
@@ -102,7 +115,9 @@ public class Home extends AppCompatActivity {
 
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.homeFragment, R.id.salesPurchaseHistoryFragment, R.id.purchaseFragment,R.id.report_selection_fragment).setDrawerLayout(drawer).build();
+                R.id.homeFragment, R.id.salesPurchaseHistoryFragment,
+                R.id.purchaseFragment,R.id.report_selection_fragment,
+                R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment).setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
@@ -132,6 +147,14 @@ public class Home extends AppCompatActivity {
                 }
                 else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
                     NavDirections action= ReportFragmentDirections.actionReportFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptHistoryFragment){
+                    NavDirections action=PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptFragment){
+                    NavDirections action= PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToHomeFragment();
                     navController.navigate(action);
                 }
 
@@ -171,10 +194,38 @@ public class Home extends AppCompatActivity {
                     }
                     break;
 
+                        case R.id.paymentReceiptHistoryFragment:    {
+                            if(navController.getCurrentDestination().getId()!=R.id.paymentReceiptHistoryFragment){
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",1);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+                            }
+                            else {
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",1);
+                                navController.navigateUp();
+                                navController.navigate(action);
+                            }
+                        }
+                        break;
+
+
+                        case R.id.ReceiptHistoryFragment:    {
+                            if(navController.getCurrentDestination().getId()!=R.id.paymentReceiptHistoryFragment){
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",2);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+                            }
+                            else {
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",2);
+                                navController.navigateUp();
+                                navController.navigate(action);
+                            }
+                        }
+                        break;
+
                     case R.id.homeFragment:
                             {
                             if (navController.getCurrentDestination().getId() != R.id.homeFragment) {
-//                            navController.navigateUp();
                                 navController.navigate(R.id.homeFragment);
                             }
                             }
@@ -307,6 +358,10 @@ public class Home extends AppCompatActivity {
             if(navController.getCurrentDestination().getId()==R.id.sale_Purchase_Fragment){
             backAlert();
             return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptFragment){
+                backAlert();
+                return true;
             }
             else {
             return NavigationUI.navigateUp(navController, mAppBarConfiguration)

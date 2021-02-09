@@ -120,6 +120,8 @@ public class Login extends AppCompatActivity {
         schedulerJob.SyncMasterSettings(this);
         schedulerJob.SyncAccounts(this);
         schedulerJob.SyncProduct(this);
+        schedulerJob.SyncBank(this);
+
 
     }
 }

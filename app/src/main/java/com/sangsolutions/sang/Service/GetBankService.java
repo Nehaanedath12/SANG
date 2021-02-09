@@ -15,7 +15,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
-import com.sangsolutions.sang.Adapter.User;
+import com.sangsolutions.sang.Adapter.BankAdapter.Bank;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -25,43 +25,41 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class GetUserService extends JobService {
+public class GetBankService extends JobService {
 
     DatabaseHelper helper;
     JobParameters params;
-    User user;
-
+    Bank bank;
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
-        Log.d("Userr","User1");
-        GetUsers();
+        GetBanks();
         AndroidNetworking.initialize(this);
-        return true;
-    }
+        return true;    }
 
-    private void GetUsers() {
-        AndroidNetworking.get("http://"+new Tools().getIP(GetUserService.this)+ URLs.GetUserLogin)
+    private void GetBanks() {
+
+        AndroidNetworking.get("http://"+ new Tools().getIP(GetBankService.this) + URLs.GetBanks)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        Log.d("responseUser",response.toString());
-                        loadUserData(response);
+                        loadBankData(response);
+                        Log.d("responseBank",response.toString());
+
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        Log.d("responseUser",anError.toString());
 
+                        Log.d("responseBank",anError.toString());
                     }
                 });
-
     }
 
-    private void loadUserData(JSONArray response) {
+    private void loadBankData(JSONArray response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
             @Override
@@ -70,29 +68,24 @@ public class GetUserService extends JobService {
                     JSONArray jsonArray = new JSONArray(response.toString());
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        user=new User(
-                                jsonObject.getInt(User.I_ID),
-                                jsonObject.getString(User.S_LOGIN_NAME),
-                                jsonObject.getString(User.S_PASSWORD),
-                                jsonObject.getInt(User.I_STATUS),
-                                jsonObject.getString(User.S_USERNAME),
-                                jsonObject.getString(User.B_WEB),
-                                jsonObject.getString(User.B_MOB),
-                                jsonObject.getString(User.USER_CODE));
-                        if(helper.checkUserById(jsonObject.getString(User.I_ID))){
-                            if(helper.checkAllDataUser(user)){
-                                Log.d("success","User Updated successfully "+i);
+                        bank =new Bank(
+                                jsonObject.getString(Bank.S_NAME),
+                                jsonObject.getString(Bank.S_CODE),
+                                jsonObject.getInt(Bank.I_ID));
+                        if(helper.checkBankById(jsonObject.getString(Bank.I_ID))){
+                            if(helper.checkAllDataBank(bank)){
+                                Log.d("success", "Bank Updated successfully "+i);
                             }
                         }
-                        else if( helper.insertUser(user)){
-                            Log.d("success","User added successfully "+i);
+                        else if( helper.insertBanks(bank)){
+                            Log.d("success","bank added successfully "+i);
                         }
 
                         if(i+1==jsonArray.length()){
                             Handler handler = new Handler(Looper.getMainLooper());
                             handler.post(new Runnable() {
                                 public void run() {
-//                                    Toast.makeText(GetProductService.this, "products Synced", Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(GetAccountsService.this, "accounts Synced", Toast.LENGTH_SHORT).show();
 
                                 }
                             });

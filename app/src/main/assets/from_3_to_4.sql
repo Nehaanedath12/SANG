@@ -1,0 +1,1 @@
+ALTER TABLE t1_user ADD UserCode TEXT(50) DEFAULT null;

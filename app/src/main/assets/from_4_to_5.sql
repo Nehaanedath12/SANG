@@ -1,0 +1,1 @@
+CREATE TABLE t1_bank(iId INTEGER DEFAULT 0, sName TEXT(50) DEFAULT null ,sCode TEXT(50) DEFAULT null);

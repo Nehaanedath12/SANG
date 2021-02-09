@@ -2,12 +2,16 @@ package com.sangsolutions.sang.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.sangsolutions.sang.Adapter.BankAdapter.Bank;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Adapter.Products.Products;
@@ -15,10 +19,15 @@ import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.User;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     Context context;
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "Sang.db";
     private static final String TABLE_MASTER_SETTINGS = "t1_masterSettings";
     private static final String TABLE_ACCOUNTS = "t1_accounts";
@@ -27,6 +36,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_USER = "t1_user";
     private static  final String TABLE_CURRENT_LOGIN = "t1_currentLogin";
     private static  final String TABLE_TAG_DETAILS = "t1_tag_details";
+    private static  final String TABLE_BANK = "t1_bank";
+
 
     private static  final String IID = "iId";
     private static  final String USER_ID = "user_Id";
@@ -38,6 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + User.S_LOGIN_NAME  + " TEXT(50) DEFAULT null , " +
             "" + User.S_PASSWORD  + " TEXT(50) DEFAULT null , " +
             "" + User.S_USERNAME  + " TEXT(50) DEFAULT null , " +
+            "" + User.USER_CODE  + " TEXT(50) DEFAULT null , " +
             "" + User.B_MOB  + " TEXT(50) DEFAULT null , " +
             "" + User.B_WEB  +  " TEXT(50) DEFAULT null  "+ ");";
 
@@ -80,6 +92,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + TagDetails.I_TYPE + " TEXT(50) DEFAULT null , " +
             "" + TagDetails.S_ALT_NAME +  " TEXT(50) DEFAULT null  "+ ");";
 
+    private static final String CREATE_TABLE_BANK=" create table if not exists " + TABLE_BANK + " (" +
+            "" + Bank.I_ID + " INTEGER DEFAULT 0, " +
+            "" + Bank.S_NAME + " TEXT(50) DEFAULT null , " +
+            "" + Bank.S_CODE + " TEXT(50) DEFAULT null  "+ ");";
+
 
     private SQLiteDatabase db;
 
@@ -98,15 +115,69 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_CURRENT_LOGIN);
         db.execSQL(CREATE_TABLE_TAG_DETAILS);
+        db.execSQL(CREATE_TABLE_BANK);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-            db.execSQL("DROP TABLE IF EXISTS "+TABLE_USER);
-            db.execSQL("DROP TABLE IF EXISTS "+TABLE_PRODUCT);
-            onCreate(db);
+//            db.execSQL("DROP TABLE IF EXISTS "+TABLE_USER);
+//            db.execSQL("DROP TABLE IF EXISTS "+TABLE_PRODUCT);
+//            onCreate(db);
+
+        for (int i = oldVersion; i < newVersion; ++i) {
+            String migrationName = String.format("from_%d_to_%d.sql", i, (i + 1));
+            Log.d("databasehelper", "Looking for migration file: " + migrationName);
+            readAndExecuteSQLScript(db, context, migrationName);
+        }
+        db.delete(TABLE_CURRENT_LOGIN,null,null);
+        onCreate(db);
+
 }
+
+    private void readAndExecuteSQLScript(SQLiteDatabase db, Context ctx, String fileName) {
+        if (TextUtils.isEmpty(fileName)) {
+            return;
+        }
+
+        Log.d("Databasehelper", "Script found. Executing...");
+        AssetManager assetManager = ctx.getAssets();
+        BufferedReader reader = null;
+
+        try {
+            InputStream is = assetManager.open(fileName);
+            InputStreamReader isr = new InputStreamReader(is);
+            reader = new BufferedReader(isr);
+            executeSQLScript(db, reader);
+        } catch (IOException e) {
+            Log.e("Databasehelper", "IOException:", e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.e("Databasehelper", "IOException:", e);
+                }
+            }
+        }
+    }
+
+    private void executeSQLScript(SQLiteDatabase db, BufferedReader reader) throws IOException {
+        String line;
+        StringBuilder statement = new StringBuilder();
+        try {
+            while ((line = reader.readLine()) != null) {
+                statement.append(line);
+                statement.append("\n");
+                if (line.endsWith(";")) {
+                    db.execSQL(statement.toString());
+                    statement = new StringBuilder();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public boolean insertMasterSettings(MasterSettings settings) {
 
@@ -246,6 +317,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(User.S_LOGIN_NAME,user.getsLoginName());
         cv.put(User.S_PASSWORD,user.getsPassword());
         cv.put(User.S_USERNAME,user.getsUserName());
+        cv.put(User.USER_CODE,user.getUserCode());
         cv.put(User.B_MOB,user.getbMob());
         cv.put(User.B_WEB,user.getbMob());
         float status = db.insert(TABLE_USER, null, cv);
@@ -268,6 +340,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(User.S_LOGIN_NAME,user.getsLoginName());
         cv.put(User.S_PASSWORD,user.getsPassword());
         cv.put(User.S_USERNAME,user.getsUserName());
+        cv.put(User.USER_CODE,user.getUserCode());
         cv.put(User.B_MOB,user.getbMob());
         cv.put(User.B_WEB,user.getbMob());
         status=db.update(TABLE_USER,cv,User.I_ID+" =? ",new String[]{String.valueOf(user.getiId())});
@@ -440,6 +513,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getUserId() {
         this.db=getWritableDatabase();
+        this.db=getReadableDatabase();
         Cursor cursor=db.rawQuery("select "+USER_ID+" from "+TABLE_CURRENT_LOGIN,null);
         cursor.moveToFirst();
         return cursor;
@@ -501,10 +575,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor.getString(cursor.getColumnIndex(Products.S_UNIT));
     }
 
-    public Cursor getUserCode() {
+    public Cursor getUserCode(String userIdS) {
         this.db=getWritableDatabase();
-        Cursor cursor=db.rawQuery("select "+USER_ID+" from "+TABLE_CURRENT_LOGIN,null);
+        Cursor cursor=db.rawQuery("select "+User.USER_CODE+" from "+TABLE_USER+" where "+User.I_ID+"='"+userIdS+"'",null);
         cursor.moveToFirst();
         return cursor;
     }
+
+    public boolean insertBanks(Bank bank) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(Bank.I_ID, bank.getiId());
+        cv.put(Bank.S_NAME, bank.getsName());
+        cv.put(Bank.S_CODE, bank.getsCode());
+        float status = db.insert(TABLE_BANK, null, cv);
+        return status != -1;
+    }
+
+    public boolean checkAllDataBank(Bank bank) {
+        this.db=getReadableDatabase();
+        float status;
+        ContentValues cv=new ContentValues();
+        cv.put(Bank.I_ID, bank.getiId());
+        cv.put(Bank.S_NAME, bank.getsName());
+        cv.put(Bank.S_CODE, bank.getsCode());
+        status=db.update(TABLE_BANK,cv, Bank.I_ID+" =? ",new String[]{String.valueOf(bank.getiId())});
+        return status!=-1;    }
+
+    public boolean checkBankById(String id) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select  * from "+TABLE_BANK+
+                " where "+ Bank.I_ID+"="+id,null);
+        return cursor.getCount() > 0;    }
+
+    public Cursor getBankyKeyword(String s) {
+        this.db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select distinct  "+ Bank.S_NAME+","+Bank.I_ID+","+
+                Bank.S_CODE+" from "+TABLE_BANK+" where "+Bank.S_CODE
+                +" " + "like '"+s+"%' or "+Bank.S_NAME+" like '"+s+"%' limit 10",null);
+
+        if (cursor.moveToFirst()) {
+            return cursor;
+        } else {
+            return null;
+        }    }
 }

@@ -17,6 +17,15 @@
             android:icon="@drawable/ic_purchase"
             android:title="Purchase"
             tools:ignore="DuplicateIds" />
+
+        <item
+            android:id="@+id/paymentReceiptHistoryFragment"
+            android:icon="@drawable/ic_sales"
+            android:title="Payment" />
+        <item
+            android:id="@+id/ReceiptHistoryFragment"
+            android:icon="@drawable/ic_sales"
+            android:title="Receipt" />
         <item
             android:id="@+id/syncNav"
             android:icon="@drawable/ic_sync"

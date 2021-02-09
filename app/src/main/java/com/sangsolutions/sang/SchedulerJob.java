@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import com.sangsolutions.sang.Service.GetAccountsService;
+import com.sangsolutions.sang.Service.GetBankService;
 import com.sangsolutions.sang.Service.GetMasterSettingsService;
 import com.sangsolutions.sang.Service.GetMasterTagDetails;
 import com.sangsolutions.sang.Service.GetProductService;
@@ -97,5 +98,19 @@ public class SchedulerJob {
                     .build();
             assert js != null;
             js.schedule(job);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void SyncBank(Context context) {
+        Log.d("Userr","User");
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                4,
+                new ComponentName(context, GetBankService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        assert js != null;
+        js.schedule(job);
     }
 }

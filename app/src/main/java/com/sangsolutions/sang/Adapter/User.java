@@ -2,12 +2,12 @@ package com.sangsolutions.sang.Adapter;
 
 public class User {
     int iId,iStatus;
-    String sLoginName,sPassword,sUserName,bWeb,bMob;
+    String sLoginName,sPassword,sUserName,bWeb,bMob,userCode;
 
     public User() {
     }
 
-    public User(int iId, String sLoginName, String sPassword, int iStatus, String sUserName, String bWeb, String bMob) {
+    public User(int iId, String sLoginName, String sPassword, int iStatus, String sUserName, String bWeb, String bMob,String userCode) {
         this.iId = iId;
         this.sLoginName = sLoginName;
         this.sPassword = sPassword;
@@ -15,6 +15,15 @@ public class User {
         this.sUserName=sUserName;
         this.bMob=bMob;
         this.bWeb=bWeb;
+        this.userCode=userCode;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 
     public void setsLoginName(String sLoginName) {
@@ -80,4 +89,5 @@ public class User {
     public  static  String S_USERNAME="sUserName";
     public  static  String B_WEB="bWeb";
     public  static  String B_MOB="bMob";
+    public  static  String USER_CODE="UserCode";
 }
