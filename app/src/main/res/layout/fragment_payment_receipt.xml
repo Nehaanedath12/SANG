@@ -72,7 +72,6 @@
 
                     <AutoCompleteTextView
                         android:id="@+id/customer"
-                        android:longClickable="false"
                         android:hint="Select Customer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
@@ -339,19 +338,19 @@
                                 android:layout_height="wrap_content"
                                 android:text="Remarks"/>
                         </LinearLayout>
-                        <FrameLayout
-                            android:id="@+id/frameEmpty"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:text="Empty.."
-                                android:textSize="15dp"
-                                android:textStyle="bold"
-                                android:textColor="@color/purple_500"/>
-                        </FrameLayout>
+<!--                        <FrameLayout-->
+<!--                            android:id="@+id/frameEmpty"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="match_parent">-->
+<!--                            <TextView-->
+<!--                                android:layout_width="match_parent"-->
+<!--                                android:layout_height="match_parent"-->
+<!--                                android:gravity="center"-->
+<!--                                android:text="Empty.."-->
+<!--                                android:textSize="15dp"-->
+<!--                                android:textStyle="bold"-->
+<!--                                android:textColor="@color/purple_500"/>-->
+<!--                        </FrameLayout>-->
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/boyPart_RV"
                             android:layout_width="match_parent"

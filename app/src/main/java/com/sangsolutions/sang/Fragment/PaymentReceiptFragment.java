@@ -90,7 +90,8 @@ import java.util.List;
 public class PaymentReceiptFragment extends Fragment {
     FragmentPaymentReceiptBinding binding;
     NavController navController;
-    int iDocType;
+    int iDocType,iTransId;
+    boolean EditMode;
     String StringDate;
     SimpleDateFormat df;
     DatabaseHelper helper;
@@ -145,7 +146,7 @@ public class PaymentReceiptFragment extends Fragment {
     List<Products>productsList;
     ProductsAdapter productsAdapter;
 
-    boolean editMode;
+    boolean editModeProduct;
     int position_body_Edit;
 
 
@@ -153,6 +154,9 @@ public class PaymentReceiptFragment extends Fragment {
     BodyPartAdapter bodyPartAdapter;
 
     AlertDialog alertDialog_product;
+
+    List<Integer> headerListTags;
+    List<Integer>bodyListTags;
 
     @Nullable
     @Override
@@ -163,7 +167,11 @@ public class PaymentReceiptFragment extends Fragment {
         helper=new DatabaseHelper(requireContext());
 
         assert getArguments() != null;
-        iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
+        iDocType = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getIDocType();
+        iTransId = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getITransId();
+        EditMode = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getEditMode();
+        Log.d("PaymentReceipt","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +"");
+
 
         AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
         View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
@@ -171,6 +179,8 @@ public class PaymentReceiptFragment extends Fragment {
         builder.setCancelable(false);
         alertDialog = builder.create();
 
+        headerListTags =new ArrayList<>();
+        bodyListTags =new ArrayList<>();
 
         autoText_H_list=new ArrayList<>();
         mandatoryList_H =new ArrayList<>();
@@ -195,8 +205,6 @@ public class PaymentReceiptFragment extends Fragment {
         productsList=new ArrayList<>();
         productsAdapter=new ProductsAdapter(requireActivity(),productsList);
 
-
-
         hashMapBody=new HashMap<>();
         hashMapHeader=new HashMap<>();
 
@@ -216,11 +224,6 @@ public class PaymentReceiptFragment extends Fragment {
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
        initialValueSettingHeader();
-
-
-        List<String> list= Arrays.asList("Cash","Cheque");
-        UnitAdapter unitAdapter = new UnitAdapter(list, requireActivity());
-        binding.paymentSpinner.setAdapter(unitAdapter);
 
         binding.paymentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -242,7 +245,6 @@ public class PaymentReceiptFragment extends Fragment {
         });
 
 
-
         for (int tagId=1;tagId<=tagTotalNumber;tagId++){
             Cursor cursor=helper.getTransSettings(iDocType,tagId);
             if(cursor!=null ){
@@ -255,7 +257,7 @@ public class PaymentReceiptFragment extends Fragment {
                 cursor1.moveToFirst();
                 if(iTagPosition.equals("1")) {
 
-
+                    headerListTags.add(tagId);
                     LinearLayout ll = binding.linearHeader;
                     // add autocompleteTextView
                     AutoCompleteTextView autoTextHeader = new AutoCompleteTextView(requireActivity());
@@ -272,6 +274,7 @@ public class PaymentReceiptFragment extends Fragment {
                     autoTextHeader.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
                     autoTextHeader.setId(numberOfLinesH + 1);
                     autoTextHeader.setTag("tag" + autoTextHeader.getId() + "Header");
+
                     ll.addView(autoTextHeader);
                     numberOfLinesH++;
                     autoText_H_list.add(autoTextHeader);
@@ -279,6 +282,8 @@ public class PaymentReceiptFragment extends Fragment {
 
                 }
                 else if(iTagPosition.equals("2")) {
+
+                    bodyListTags.add(tagId);
                     LinearLayout l_tags = binding.linearTags;
                     // add TextView
                     TextView textView=new TextView(requireActivity());
@@ -331,8 +336,6 @@ public class PaymentReceiptFragment extends Fragment {
         binding.bankName.setAdapter(bankAdapter);
 
 
-
-
         binding.customer.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -374,7 +377,46 @@ public class PaymentReceiptFragment extends Fragment {
             }
         });
 
+        binding.deleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+                builder.setTitle("delete!")
+                        .setMessage("Do you want to delete all ?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteAll();
+
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create().show();
+            }
+        });
        return binding.getRoot();
+    }
+
+    private void deleteAll() {
+        initialValueSettingHeader();
+//        initialValueSettingBody();
+        binding.customer.setText("");
+        binding.description.setText("");
+        binding.amount.setText("");
+        binding.bankName.setText("");
+        binding.checkNo.setText("");
+        binding.linearInvoice.setVisibility(View.GONE);
+        for (int i=0;i<autoText_H_list.size();i++){
+            autoText_H_list.get(i).setText("");
+            Log.d("autoText_H_list",autoText_B_list.size()+""+autoText_H_list.get(i).getTag(i).toString());
+        }
+        bodyPartList.clear();
+        bodyPartAdapter.notifyDataSetChanged();
+
     }
 
     private void saveMain() {
@@ -384,7 +426,6 @@ public class PaymentReceiptFragment extends Fragment {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         if(binding.paymentSpinner.getSelectedItem().toString().equals("Cheque")){
                             iPaymentMethod=2;
                         }
@@ -450,11 +491,12 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void uploadToJson() {
+        Log.d("bodypartListSizee",bodyPartList.size()+"");
 
 
         JSONObject jsonObjectMain=new JSONObject();
         try{
-            jsonObjectMain.put("iTransId",0);
+            jsonObjectMain.put("iTransId",iTransId);
             jsonObjectMain.put("sDocNo",docNo);
             jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
             jsonObjectMain.put("iDocType",iDocType);
@@ -465,13 +507,13 @@ public class PaymentReceiptFragment extends Fragment {
             jsonObjectMain.put("iPaymentMethod",iPaymentMethod);
             if(iPaymentMethod==2) {
                 jsonObjectMain.put("iBank", iBank);
-                jsonObjectMain.put("iChequeNo", binding.checkNo.getText().toString());
-                jsonObjectMain.put("iChequeDate", Tools.dateFormat(binding.checkDate.getText().toString()));
-            }else {
-                jsonObjectMain.put("iBank", "");
-                jsonObjectMain.put("iChequeNo", "");
-                jsonObjectMain.put("iChequeDate", "");
+                jsonObjectMain.put("iChequeNo", Float.parseFloat(binding.checkNo.getText().toString()));
+            }else if(iPaymentMethod==1){
+                jsonObjectMain.put("iBank", 0);
+                jsonObjectMain.put("iChequeNo", 0);
             }
+            jsonObjectMain.put("sChequeDate", Tools.dateFormat(binding.checkDate.getText().toString()));
+
             assert userIdS != null;
             jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
 
@@ -483,10 +525,10 @@ public class PaymentReceiptFragment extends Fragment {
             Log.d("jsonObjecMain",jsonObjectMain.get("sNarration")+"");
             Log.d("jsonObjecMain",jsonObjectMain.get("iUser")+"");
 
-            Log.d("jsonObjecMain",jsonObjectMain.get("iPaymentMethod")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iBank")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iChequeNo")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iChequeDate")+"");
+            Log.d("jsonObjecMainp",jsonObjectMain.get("iPaymentMethod")+"");
+            Log.d("jsonObjecMainbank",jsonObjectMain.get("iBank")+"");
+            Log.d("jsonObjecMainche",jsonObjectMain.get("iChequeNo")+"");
+            Log.d("jsonObjecMainda",jsonObjectMain.get("sChequeDate")+"");
 
             JSONArray jsonArray=new JSONArray();
             for (int i=0;i<bodyPartList.size();i++){
@@ -502,9 +544,21 @@ public class PaymentReceiptFragment extends Fragment {
                         jsonObject.put("iTag"+j, bodyPartList.get(i).hashMapBody.get(j));
                     }
                     else {
-                        jsonObject.put("iTag"+j,-1);
+                        jsonObject.put("iTag"+j,0);
                     }
                 }
+
+
+
+//                Log.d("Tagss",jsonObject.get("iTag1")+"");
+//                Log.d("Tagss",jsonObject.get("iTag2")+"");
+//                Log.d("Tagss",jsonObject.get("iTag3")+"");
+//                Log.d("Tagss",jsonObject.get("iTag4")+"");
+//                Log.d("Tagss",jsonObject.get("iTag5")+"");
+//                Log.d("Tagss",jsonObject.get("iTag6")+"");
+//                Log.d("Tagss",jsonObject.get("iTag7")+"");
+//                Log.d("Tagss",jsonObject.get("iTag8")+"");
+//                Log.d("Tagss",jsonObject.get("iTag9")+"");
 
                 jsonObject.put("iProduct",bodyPartList.get(i).getiProduct());
                 jsonObject.put("fQty",bodyPartList.get(i).getQty());
@@ -513,7 +567,7 @@ public class PaymentReceiptFragment extends Fragment {
                 jsonObject.put("fAddCharges",bodyPartList.get(i).getAddCharges());
                 jsonObject.put("fVatPer",bodyPartList.get(i).getVatPer());
                 jsonObject.put("fVAT",bodyPartList.get(i).getVat());
-                jsonObject.put("sRemarks",bindingProduct.remarksProduct.getText().toString());
+                jsonObject.put("sRemarks",bodyPartList.get(i).getRemarks());
                 jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
 
 
@@ -528,22 +582,17 @@ public class PaymentReceiptFragment extends Fragment {
                 Log.d("jsonObjecttrema",jsonObject.get("sRemarks")+"");
                 Log.d("jsonObjecttrema",jsonObject.get("sUnits")+"");
 
-
-
-
                 jsonArray.put(jsonObject);
             }
             jsonObjectMain.put("Body",jsonArray);
 
             uploadToAPI(jsonObjectMain);
 
-
         } catch (JSONException e) {
+
             Log.d("exception",e.getMessage());
             e.printStackTrace();
         }
-
-
 
     }
 
@@ -724,7 +773,7 @@ public class PaymentReceiptFragment extends Fragment {
         bindingProduct.add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("bodypartListSize",mandatoryList_B.size()+"");
+                Log.d("mandatorytListSize",mandatoryList_B.size()+"");
                 boolean flag=true;
                 if(mandatoryList_B.size()<=0){
                     saveBodyPartProduct();
@@ -789,7 +838,7 @@ public class PaymentReceiptFragment extends Fragment {
 
                                 bodyPart.setRemarks(bindingProduct.remarksProduct.getText().toString());
 
-                                if(editMode) {
+                                if(editModeProduct) {
                                     bodyPartList.set(position_body_Edit,bodyPart);
 
                                 }else {
@@ -799,12 +848,12 @@ public class PaymentReceiptFragment extends Fragment {
                                 bodyPartAdapter.notifyDataSetChanged();
 
 
-                                if(bodyPartList.size()>0){
-                                    binding.frameEmpty.setVisibility(View.GONE);
-                                }
-                                else {
-                                    binding.frameEmpty.setVisibility(View.VISIBLE);
-                                }
+//                                if(bodyPartList.size()>0){
+//                                    binding.frameEmpty.setVisibility(View.GONE);
+//                                }
+//                                else {
+//                                    binding.frameEmpty.setVisibility(View.VISIBLE);
+//                                }
                                 binding.boyPartRV.setAdapter(bodyPartAdapter);
 
 
@@ -815,31 +864,8 @@ public class PaymentReceiptFragment extends Fragment {
                                 bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
                                     @Override
                                     public void onItemClick(BodyPart bodyPart, int position) {
-                                        alertDialog_product.show();
-                                        editMode=true;
-                                        position_body_Edit=position;
-//                                        bindingProduct.cardViewBody.setVisibility(View.VISIBLE);
-                                        bindingProduct.productName.setText(bodyPart.getProductName());
-                                        iProduct=bodyPart.getiProduct();
-                                        bindingProduct.qtyProduct.setText(String.valueOf(bodyPart.getQty()));
-                                        bindingProduct.rateProduct.setText(String.valueOf(bodyPart.getRate()));
-                                        bindingProduct.vatProduct.setText(String.valueOf(bodyPart.getVatPer()));
-                                        bindingProduct.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
-                                        bindingProduct.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
-                                        bindingProduct.remarksProduct.setText(bodyPart.getRemarks());
-                                        setUnit(helper.getProductUnitById(iProduct),position);
 
-                                        try {
-                                            for (int i = 0; i < autoText_B_list.size(); i++) {
-                                                int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
-                                                int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
-                                                Cursor cursor = helper.getTagName(tagId, tagDetails);
-                                                autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
-                                                hashMapBody.put(tagId, tagDetails);
-                                            }
-                                        }catch (Exception e){
-                                            e.printStackTrace();
-                                        }
+                                        editingProductField(bodyPart,position);
 
                                     }
                                 });
@@ -855,8 +881,37 @@ public class PaymentReceiptFragment extends Fragment {
 
     }
 
+    private void editingProductField(BodyPart bodyPart, int position) {
+        alertDialog_product.show();
+        editModeProduct =true;
+        position_body_Edit=position;
+//                                        bindingProduct.cardViewBody.setVisibility(View.VISIBLE);
+        bindingProduct.productName.setText(bodyPart.getProductName());
+        iProduct=bodyPart.getiProduct();
+        bindingProduct.qtyProduct.setText(String.valueOf(bodyPart.getQty()));
+        bindingProduct.rateProduct.setText(String.valueOf(bodyPart.getRate()));
+        bindingProduct.vatProduct.setText(String.valueOf(bodyPart.getVatPer()));
+        bindingProduct.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
+        bindingProduct.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
+        bindingProduct.remarksProduct.setText(bodyPart.getRemarks());
+        setUnit(helper.getProductUnitById(iProduct),position);
+
+        try {
+            for (int i = 0; i < autoText_B_list.size(); i++) {
+                int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
+                int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
+                Cursor cursor = helper.getTagName(tagId, tagDetails);
+                autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                hashMapBody.put(tagId, tagDetails);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     private void initialValueSettingBody() {
-        editMode=false;
+        editModeProduct =false;
         hashMapBody=new HashMap<>();
         bindingProduct.productName.setText("");
         bindingProduct.qtyProduct.setText("");
@@ -870,9 +925,9 @@ public class PaymentReceiptFragment extends Fragment {
             autoText_B_list.get(i).setText("");
         }
 
-        if(bodyPartList.size()==0) {
-            binding.frameEmpty.setVisibility(View.VISIBLE);
-        }
+//        if(bodyPartList.size()==0) {
+//            binding.frameEmpty.setVisibility(View.VISIBLE);
+//        }
 
     }
 
@@ -1189,55 +1244,177 @@ public class PaymentReceiptFragment extends Fragment {
 
     private void initialValueSettingHeader() {
         alertDialog.show();
-        StringDate=df.format(new Date());
+        List<String> list= Arrays.asList("Cash","Cheque");
+        UnitAdapter unitAdapter = new UnitAdapter(list, requireActivity());
+        binding.paymentSpinner.setAdapter(unitAdapter);
+        StringDate = df.format(new Date());
         binding.date.setText(StringDate);
         binding.checkDate.setText(StringDate);
 
-        String userCode = null;
-        Cursor cursor=helper.getUserCode(userIdS);
-        if(cursor.moveToFirst() && cursor.getCount()>0){
-            userCode=cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        if (iDocType == 1) {
+            toolTitle = "Payment Summary";
+        } else {
+            toolTitle = "Receipt Summary";
         }
-        final int[] arrayLength = new int[1];
-        String finalUserCode = userCode;
-        if(Tools.isConnected(requireActivity())) {
-            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransReceipt_PaymentSummary)
-                    .addQueryParameter("iDocType", String.valueOf(iDocType))
-                    .addQueryParameter("iUser", userIdS)
-                    .setPriority(Priority.MEDIUM)
-                    .build()
-                    .getAsJSONArray(new JSONArrayRequestListener() {
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            Log.d("responseHistory", response.toString());
-                            try {
-                                JSONArray jsonArray = new JSONArray(response.toString());
-                                arrayLength[0] = jsonArray.length() + 1;
-                                if (iDocType == 1) {
-                                    toolTitle = "Payment Summary";
-                                } else {
-                                    toolTitle = "Receipt Summary";
-                                }
-                                docNo = finalUserCode + "-" + DateFormat.format("MM", new Date()) + "-" +"000"+arrayLength[0];
-                                binding.docNo.setText(docNo);
-                                alertDialog.dismiss();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
 
-                        @Override
-                        public void onError(ANError anError) {
-                            Log.d("responseTotalNumber", anError.toString());
-                            alertDialog.dismiss();
-                        }
-                    });
+        if(Tools.isConnected(requireActivity())) {
+            if (EditMode) {
+                EditValueFromAPI();
+            }
+            else {
+                String userCode = null;
+                Cursor cursor = helper.getUserCode(userIdS);
+                if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+                }
+                final int[] arrayLength = new int[1];
+                String finalUserCode = userCode;
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransReceipt_PaymentSummary)
+                        .addQueryParameter("iDocType", String.valueOf(iDocType))
+                        .addQueryParameter("iUser", userIdS)
+                        .setPriority(Priority.MEDIUM)
+                        .build()
+                        .getAsJSONArray(new JSONArrayRequestListener() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+                                Log.d("responseHistory", response.toString());
+                                try {
+                                    JSONArray jsonArray = new JSONArray(response.toString());
+                                    arrayLength[0] = jsonArray.length() + 1;
+                                    docNo = finalUserCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
+                                    binding.docNo.setText(docNo);
+                                    alertDialog.dismiss();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onError(ANError anError) {
+                                Log.d("responseTotalNumber", anError.toString());
+                                alertDialog.dismiss();
+                            }
+                        });
+            }
         }
         else {
             Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
             alertDialog.dismiss();
         }
     }
+
+    private void EditValueFromAPI() {
+        if(Tools.isConnected(requireContext())){
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransReceipt_PaymentDetails)
+                    .addQueryParameter("iTransId",String.valueOf(iTransId))
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONObject(new JSONObjectRequestListener() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d("Response_loadEditValue",response.toString());
+                            loadAPIValue_for_Edit(response);
+
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            Log.d("Response_loadEditValue",anError.toString());
+                            alertDialog.dismiss();
+
+                        }
+                    });
+        }else {
+            Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
+            alertDialog.dismiss();
+        }
+    }
+
+    private void loadAPIValue_for_Edit(JSONObject response) {
+        try {
+            JSONArray jsonArray=new JSONArray(response.getString("Table"));
+            Log.d("resultArray",jsonArray.length()+"");
+
+            JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
+            Log.d("resultArray1",jsonArray1.length()+"");
+
+            for (int i=0;i<jsonArray.length();i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                binding.docNo.setText(jsonObject.getString("sDocNo"));
+                docNo=jsonObject.getString("sDocNo");
+                binding.date.setText(jsonObject.getString("sDate"));
+                iCustomer = jsonObject.getInt("iAccount1");
+                binding.customer.setText(jsonObject.getString("sAccount1"));
+                binding.description.setText(jsonObject.getString("sNarration"));
+                binding.amount.setText(jsonObject.getString("fAmount"));
+                iPaymentMethod = jsonObject.getInt("iPaymentMethod");
+                if(iPaymentMethod==2){
+                    binding.paymentSpinner.setSelection(1);
+                    iBank = jsonObject.getInt("iBank");
+                    binding.bankName.setText(jsonObject.getString("sBank"));
+                    binding.checkNo.setText(jsonObject.getString("iChequeNo"));
+                    binding.checkDate.setText(jsonObject.getString("sChequeDate"));
+                }
+            }
+            for (int j=0;j<jsonArray1.length();j++){
+                JSONObject jsonObjectInner = jsonArray1.getJSONObject(j);
+                for (int k = 0; k< headerListTags.size(); k++){
+//                    Log.d("iTagHeader", headerListTags.get(k)+"");
+                    hashMapHeader.put(headerListTags.get(k),jsonObjectInner.getInt("iTag"+ headerListTags.get(k)));
+                    autoText_H_list.get(k).setText(jsonObjectInner.getString("sTag"+ headerListTags.get(k)));
+//                        Log.d("iTag"+ headerListTags.get(k),jsonObjectInner.getString("iTag"+ headerListTags.get(k)));
+                }
+                Log.d("iTagHeader", bodyListTags.size() +"");
+
+                for(int k=0;k<bodyListTags.size();k++){
+                Log.d("iTagHeader", bodyListTags.get(k)+"");
+                    hashMapBody.put(bodyListTags.get(k),jsonObjectInner.getInt("iTag"+ bodyListTags.get(k)));
+                    Log.d("iTaggg"+ bodyListTags.get(k),jsonObjectInner.getString("iTag"+ bodyListTags.get(k)));
+
+                }
+
+
+                float gross=jsonObjectInner.getInt("fQty")*Float.parseFloat(jsonObjectInner.getString("fRate"));
+
+                BodyPart bodyPart=new BodyPart();
+                bodyPart.setiProduct(jsonObjectInner.getInt("iProduct"));
+                bodyPart.setProductName(jsonObjectInner.getString("sProduct"));
+                bodyPart.setQty(jsonObjectInner.getInt("fQty"));
+                bodyPart.setGross(gross);
+                bodyPart.setNet(0.0f);
+                bodyPart.setRate(Float.parseFloat(jsonObjectInner.getString("fRate")));
+                bodyPart.setDiscount(Float.parseFloat(jsonObjectInner.getString("fDiscount")));
+                bodyPart.setAddCharges(Float.parseFloat(jsonObjectInner.getString("fAddCharges")));
+                bodyPart.setVatPer(Float.parseFloat(jsonObjectInner.getString("fVatPer")));
+                bodyPart.setVat(jsonObjectInner.getInt("fVAT"));
+                bodyPart.setRemarks(jsonObjectInner.getString("sRemarks"));
+                bodyPart.setUnit(jsonObjectInner.getString("sUnits"));
+                bodyPart.setHashMapBody(hashMapBody);
+
+                bodyPartList.add(bodyPart);
+                bodyPartAdapter.notifyDataSetChanged();
+                hashMapBody=new HashMap<>();
+
+                if(jsonArray1.length()==j+1){
+                    binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    alertDialog.dismiss();
+
+                    bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(BodyPart bodyPart, int position) {
+                            productDialogue();
+
+                            editingProductField(bodyPart,position);
+                        }
+                    });
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private TextWatcher getTextWatcher(AutoCompleteTextView autocompleteView, int iTag, String iTagPosition) {
         return new TextWatcher() {
             @Override

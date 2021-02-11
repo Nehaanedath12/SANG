@@ -67,6 +67,10 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull BodyPartAdapter.ViewHolder holder, int position) {
 
+
+
+
+
         holder.productName.setText(list.get(position).productName);
         holder.unit.setText(list.get(position).unit);
         holder.qty.setText(String.valueOf(list.get(position).qty));

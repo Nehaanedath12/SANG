@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,13 +77,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import static java.nio.file.Paths.get;
 
 public class Sale_Purchase_Fragment extends Fragment {
     FragmentSalePurchaseBinding binding;
-    int iDocType;
+    int iDocType,iTransId;
+    boolean EditMode;
     String docNo;
     String StringDate;
     SimpleDateFormat df;
@@ -122,7 +123,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
 
     int position_body_Edit;
-    boolean editMode;
+    boolean editModeProduct;
 
     Cursor cursorTagNumber;
     int tagTotalNumber;
@@ -147,6 +148,11 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         assert getArguments() != null;
         iDocType = Sale_Purchase_FragmentArgs.fromBundle(getArguments()).getIDocType();
+        iTransId = Sale_Purchase_FragmentArgs.fromBundle(getArguments()).getITransId();
+        EditMode = Sale_Purchase_FragmentArgs.fromBundle(getArguments()).getEditMode();
+
+        Log.d("llllll","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +"");
+
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireActivity());
 
@@ -539,7 +545,6 @@ public class Sale_Purchase_Fragment extends Fragment {
         }
         bodyPartList.clear();
         bodyPartAdapter.notifyDataSetChanged();
-
     }
 
     private void saveMain() {
@@ -580,7 +585,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                             jsonObject.put("iTag"+j, bodyPartList.get(i).hashMapBody.get(j));
                     }
                     else {
-                        jsonObject.put("iTag"+j,-1);
+                        jsonObject.put("iTag"+j,0);
                     }
 
 
@@ -594,6 +599,8 @@ public class Sale_Purchase_Fragment extends Fragment {
                 jsonObject.put("fVatPer",bodyPartList.get(i).getVatPer());
                 jsonObject.put("fVAT",bodyPartList.get(i).getVat());
                 jsonObject.put("sRemarks",binding.remarksProduct.getText().toString());
+                jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
+
 
 
                 Log.d("jsonObjecttIproduct",jsonObject.get("iProduct")+"");
@@ -694,7 +701,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                         bodyPart.setRemarks(binding.remarksProduct.getText().toString());
 
-                        if(editMode) {
+                        if(editModeProduct) {
                             bodyPartList.set(position_body_Edit,bodyPart);
 
                         }else {
@@ -719,7 +726,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
                             @Override
                             public void onItemClick(BodyPart bodyPart, int position) {
-                                editMode=true;
+                                editModeProduct =true;
                                 position_body_Edit=position;
                                 binding.cardViewBody.setVisibility(View.VISIBLE);
                                 binding.productName.setText(bodyPart.getProductName());
@@ -760,7 +767,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void initialValueSettingBody() {
-        editMode=false;
+        editModeProduct =false;
         hashMapBody=new HashMap<>();
         binding.productName.setText("");
         binding.qtyProduct.setText("");

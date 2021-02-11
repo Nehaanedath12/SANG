@@ -20,10 +20,10 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.sangsolutions.sang.Adapter.SalesPurchaseHistory;
+import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
-import com.sangsolutions.sang.SalesPurchaseHistoryAdapter;
+import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 import com.sangsolutions.sang.databinding.FragmentSalesPurchaseHistoryBinding;
@@ -75,7 +75,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavDirections action=SalesPurchaseHistoryFragmentDirections
-                        .actionSalesPurchaseHistoryFragmentToSalePurchaseFragment2(toolTitle).setIDocType(iDocType);
+                        .actionSalesPurchaseHistoryFragmentToSalePurchaseFragment2(toolTitle).setIDocType(iDocType).setEditMode(false).setITransId(0);
 
                 navController.navigate(action);
             }
@@ -117,6 +117,10 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                         try {
                         JSONArray jsonArray = new JSONArray(response.getString("Data"));
 
+                        if(jsonArray.length()==0){
+                            alertDialog.dismiss();
+                        }
+
                         for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -136,6 +140,16 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                     if(i+1==jsonArray.length()){
                     alertDialog.dismiss();
                     binding.recyclerView.setAdapter(historyAdapter);
+
+                    historyAdapter.setOnClickListener(new SalesPurchaseHistoryAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(int iTransId, int position) {
+                            NavDirections action=SalesPurchaseHistoryFragmentDirections
+                                    .actionSalesPurchaseHistoryFragmentToSalePurchaseFragment2(toolTitle).setIDocType(iDocType).setEditMode(true).setITransId(iTransId);
+                            navController.navigate(action);
+                        }
+                    });
+
                     }
                     }
                     } catch (JSONException e) {

@@ -19,6 +19,7 @@ public class URLs {
     public static final String GetInvoiceList =domain+"GetInvoiceList";
     public static final String Post_Receipt_Payment =domain+"Post_Receipt_Payment";
     public static final String GetTransReceipt_PaymentSummary =domain+"GetTransReceipt_PaymentSummary";
+    public static final String GetTransReceipt_PaymentDetails =domain+"GetTransReceipt_PaymentDetails";
 
 
 

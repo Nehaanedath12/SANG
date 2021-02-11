@@ -1,4 +1,4 @@
-package com.sangsolutions.sang.Adapter;
+package com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter;
 
 public class SalesPurchaseHistory {
 
