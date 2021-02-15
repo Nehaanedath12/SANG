@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.google.android.gms.vision.CameraSource;
@@ -131,6 +132,9 @@ public class Sale_Purchase_Fragment extends Fragment {
     String toolTitle;
     String userIdS = null;
 
+    List<Integer> headerListTags;
+    List<Integer>bodyListTags;
+
 
     @Nullable
     @Override
@@ -145,6 +149,8 @@ public class Sale_Purchase_Fragment extends Fragment {
         hashMapBody=new HashMap<>();
         hashMapHeader=new HashMap<>();
 
+        headerListTags =new ArrayList<>();
+        bodyListTags =new ArrayList<>();
 
         assert getArguments() != null;
         iDocType = Sale_Purchase_FragmentArgs.fromBundle(getArguments()).getIDocType();
@@ -155,7 +161,6 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireActivity());
-
 
         AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
         View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
@@ -245,8 +250,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                 cursor1.moveToFirst();
                 if(iTagPosition.equals("1")){
 
-
-
+                    headerListTags.add(tagId);
                     LinearLayout ll = binding.linearHeader;
                     // add autocompleteTextView
                      AutoCompleteTextView autoTextHeader = new AutoCompleteTextView(requireActivity());
@@ -270,6 +274,8 @@ public class Sale_Purchase_Fragment extends Fragment {
 
 
                 }else if(iTagPosition.equals("2")){
+
+                    bodyListTags.add(tagId);
 
                     LinearLayout ll = binding.linearBody;
                     // add autocompleteTextView
@@ -480,47 +486,57 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void initialValueSettingHeader() {
         alertDialog.show();
-        String userCode = null;
-        Cursor cursor=helper.getUserCode(userIdS);
-        if(cursor.moveToFirst() && cursor.getCount()>0){
-            userCode=cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        numberOfLinesH =0;
+        numberOfLinesB =0;
+        StringDate=df.format(new Date());
+        binding.date.setText(StringDate);
+        if (iDocType == 1) {
+            toolTitle = "Purchase Summary";
+        } else {
+            toolTitle = "Sale Summary";
         }
-        final int[] arrayLength = new int[1];
-        ///////
 
-        String finalUserCode = userCode;
         if(Tools.isConnected(requireActivity())) {
-            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
-                    .addQueryParameter("iDocType", String.valueOf(iDocType))
-                    .addQueryParameter("iUser", userIdS)
-                    .setPriority(Priority.MEDIUM)
-                    .build()
-                    .getAsJSONObject(new JSONObjectRequestListener() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d("responseHistory", response.toString());
-                            try {
-                                JSONArray jsonArray = new JSONArray(response.getString("Data"));
-                                arrayLength[0] = jsonArray.length() + 1;
-                                if (iDocType == 1) {
-                                    toolTitle = "Purchase Summary";
-                                } else {
-                                    toolTitle = "Sale Summary";
-                                }
-                                docNo = finalUserCode + "-" + DateFormat.format("MM", new Date()) + "-" +"000"+arrayLength[0];
-                                binding.docNo.setText(docNo);
-                                alertDialog.dismiss();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
+            if (EditMode) {
+                EditValueFromAPI();
+            } else {
 
-                        @Override
-                        public void onError(ANError anError) {
-                            Log.d("responseTotalNumber", anError.toString());
-                            alertDialog.dismiss();
-                        }
-                    });
+                String userCode = null;
+                Cursor cursor = helper.getUserCode(userIdS);
+                if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+                }
+                final int[] arrayLength = new int[1];
+                ///////
+
+                String finalUserCode = userCode;
+                    AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
+                            .addQueryParameter("iDocType", String.valueOf(iDocType))
+                            .addQueryParameter("iUser", userIdS)
+                            .setPriority(Priority.MEDIUM)
+                            .build()
+                            .getAsJSONArray(new JSONArrayRequestListener() {
+                                @Override
+                                public void onResponse(JSONArray response) {
+                                    Log.d("responseHistory", response.toString());
+                                    try {
+                                        JSONArray jsonArray = new JSONArray(response.toString());
+                                        arrayLength[0] = jsonArray.length() + 1;
+                                        docNo = finalUserCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
+                                        binding.docNo.setText(docNo);
+                                        alertDialog.dismiss();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onError(ANError anError) {
+                                    Log.d("responseTotalNumber", anError.toString());
+                                    alertDialog.dismiss();
+                                }
+                            });
+                }
         }
         else {
             Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
@@ -529,13 +545,117 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         ///////
 
-        numberOfLinesH =0;
-        numberOfLinesB =0;
-        StringDate=df.format(new Date());
-        binding.date.setText(StringDate);
+
+    }
+
+    private void EditValueFromAPI() {
+        if(Tools.isConnected(requireContext())){
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransDetails)
+                    .addQueryParameter("iTransId",String.valueOf(iTransId))
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONObject(new JSONObjectRequestListener() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d("Response_loadEditValue",response.toString());
+                            loadAPIValue_for_Edit(response);
+
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            Log.d("Response_loadEditValue",anError.toString());
+                            alertDialog.dismiss();
+
+                        }
+                    });
+        }else {
+            Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
+            alertDialog.dismiss();
+        }
+    }
+
+    private void loadAPIValue_for_Edit(JSONObject response) {
+
+        JSONArray jsonArray= null;
+        try {
+            jsonArray = new JSONArray(response.getString("Table"));
+            Log.d("HeadArray",jsonArray.length()+"");
+            JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
+            Log.d("BodyArray1",jsonArray1.length()+"");
+
+            for (int i=0;i<jsonArray.length();i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                binding.docNo.setText(jsonObject.getString("sDocNo"));
+                docNo=jsonObject.getString("sDocNo");
+                binding.date.setText(jsonObject.getString("sDate"));
+                iCustomer = jsonObject.getInt("iAccount1");
+                binding.customer.setText(jsonObject.getString("sAccount1"));
+                binding.description.setText(jsonObject.getString("sNarration"));
+            }
+
+
+            for (int j=0;j<jsonArray1.length();j++){
+                JSONObject jsonObjectInner = jsonArray1.getJSONObject(j);
+                for (int k = 0; k< headerListTags.size(); k++){
+                    hashMapHeader.put(headerListTags.get(k),jsonObjectInner.getInt("iTag"+ headerListTags.get(k)));
+                    autoText_H_list.get(k).setText(jsonObjectInner.getString("sTag"+ headerListTags.get(k)));
+                }
+                for(int k=0;k<bodyListTags.size();k++){
+                    hashMapBody.put(bodyListTags.get(k),jsonObjectInner.getInt("iTag"+ bodyListTags.get(k)));
+
+                }
+                float gross=jsonObjectInner.getInt("fQty")*Float.parseFloat(jsonObjectInner.getString("fRate"));
+
+                BodyPart bodyPart=new BodyPart();
+                bodyPart.setiProduct(jsonObjectInner.getInt("iProduct"));
+                bodyPart.setProductName(jsonObjectInner.getString("sProduct"));
+                bodyPart.setQty(jsonObjectInner.getInt("fQty"));
+                bodyPart.setGross(gross);
+                bodyPart.setNet(Float.parseFloat(jsonObjectInner.getString("fNet")));
+                bodyPart.setRate(Float.parseFloat(jsonObjectInner.getString("fRate")));
+                bodyPart.setDiscount(Float.parseFloat(jsonObjectInner.getString("fDiscount")));
+                bodyPart.setAddCharges(Float.parseFloat(jsonObjectInner.getString("fAddCharges")));
+                bodyPart.setVatPer(Float.parseFloat(jsonObjectInner.getString("fVatPer")));
+                bodyPart.setVat(jsonObjectInner.getInt("fVAT"));
+                bodyPart.setRemarks(jsonObjectInner.getString("sRemarks"));
+                bodyPart.setUnit(jsonObjectInner.getString("sUnits"));
+                bodyPart.setHashMapBody(hashMapBody);
+
+                bodyPartList.add(bodyPart);
+                bodyPartAdapter.notifyDataSetChanged();
+                hashMapBody=new HashMap<>();
+
+
+                if(jsonArray1.length()==j+1){
+                    Log.d("Bodypartlistsize",bodyPartList.size()+" ");
+                    binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    alertDialog.dismiss();
+                    Log.d("Bodypartlistsize",bodyPartList.size()+" "+jsonObjectInner.getString("sProduct"));
+                    bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(BodyPart bodyPart, int position) {
+//                            productDialogue();
+
+                            editingProductField(bodyPart,position);
+                        }
+                    });
+                }
+            }
+
+
+
+
+        } catch (JSONException e) {
+            Log.d("exception",e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void deleteAll() {
+        EditMode=false;
+        editModeProduct=false;
         initialValueSettingHeader();
         initialValueSettingBody();
         binding.customer.setText("");
@@ -551,7 +671,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         JSONObject jsonObjectMain=new JSONObject();
         try{
-            jsonObjectMain.put("iTransId",0);
+            jsonObjectMain.put("iTransId",iTransId);
             jsonObjectMain.put("sDocNo",docNo);
             jsonObjectMain.put("sDate",Tools.dateFormat(StringDate));
             jsonObjectMain.put("iDocType",iDocType);
@@ -598,8 +718,13 @@ public class Sale_Purchase_Fragment extends Fragment {
                 jsonObject.put("fAddCharges",bodyPartList.get(i).getAddCharges());
                 jsonObject.put("fVatPer",bodyPartList.get(i).getVatPer());
                 jsonObject.put("fVAT",bodyPartList.get(i).getVat());
-                jsonObject.put("sRemarks",binding.remarksProduct.getText().toString());
+                if(bodyPartList.get(i).getRemarks().equals("")){
+                    jsonObject.put("sRemarks","");
+                }else {
+                    jsonObject.put("sRemarks",bodyPartList.get(i).getRemarks());
+                }
                 jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
+                jsonObject.put("fNet",bodyPartList.get(i).getNet());
 
 
 
@@ -710,12 +835,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                         }
                         bodyPartAdapter.notifyDataSetChanged();
 
-                        if(bodyPartList.size()>0){
-                            binding.frameEmpty.setVisibility(View.GONE);
-                        }
-                        else {
-                            binding.frameEmpty.setVisibility(View.VISIBLE);
-                        }
+//                        if(bodyPartList.size()>0){
+//                            binding.frameEmpty.setVisibility(View.GONE);
+//                        }
+//                        else {
+//                            binding.frameEmpty.setVisibility(View.VISIBLE);
+//                        }
                         binding.boyPartRV.setAdapter(bodyPartAdapter);
 
                         initialValueSettingBody();
@@ -726,30 +851,9 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
                             @Override
                             public void onItemClick(BodyPart bodyPart, int position) {
-                                editModeProduct =true;
-                                position_body_Edit=position;
-                                binding.cardViewBody.setVisibility(View.VISIBLE);
-                                binding.productName.setText(bodyPart.getProductName());
-                                iProduct=bodyPart.getiProduct();
-                                binding.qtyProduct.setText(String.valueOf(bodyPart.getQty()));
-                                binding.rateProduct.setText(String.valueOf(bodyPart.getRate()));
-                                binding.vatProduct.setText(String.valueOf(bodyPart.getVatPer()));
-                                binding.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
-                                binding.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
-                                binding.remarksProduct.setText(bodyPart.getRemarks());
-                                setUnit(helper.getProductUnitById(iProduct),position);
 
-                                try {
-                                    for (int i = 0; i < autoText_B_list.size(); i++) {
-                                        int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
-                                        int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
-                                        Cursor cursor = helper.getTagName(tagId, tagDetails);
-                                        autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
-                                        hashMapBody.put(tagId, tagDetails);
-                                    }
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
+                                editingProductField(bodyPart,position);
+
 
                             }
                         });
@@ -764,6 +868,33 @@ public class Sale_Purchase_Fragment extends Fragment {
         }else {binding.productName.setError("enter valid product");}
 
 
+    }
+
+    private void editingProductField(BodyPart bodyPart, int position) {
+        editModeProduct =true;
+        position_body_Edit=position;
+        binding.cardViewBody.setVisibility(View.VISIBLE);
+        binding.productName.setText(bodyPart.getProductName());
+        iProduct=bodyPart.getiProduct();
+        binding.qtyProduct.setText(String.valueOf(bodyPart.getQty()));
+        binding.rateProduct.setText(String.valueOf(bodyPart.getRate()));
+        binding.vatProduct.setText(String.valueOf(bodyPart.getVatPer()));
+        binding.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
+        binding.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
+        binding.remarksProduct.setText(bodyPart.getRemarks());
+        setUnit(helper.getProductUnitById(iProduct),position);
+
+        try {
+            for (int i = 0; i < autoText_B_list.size(); i++) {
+                int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
+                int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
+                Cursor cursor = helper.getTagName(tagId, tagDetails);
+                autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                hashMapBody.put(tagId, tagDetails);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void initialValueSettingBody() {
@@ -782,9 +913,9 @@ public class Sale_Purchase_Fragment extends Fragment {
             autoText_B_list.get(i).setText("");
         }
         binding.remarksProduct.setText("");
-        if(bodyPartList.size()==0) {
-            binding.frameEmpty.setVisibility(View.VISIBLE);
-        }
+//        if(bodyPartList.size()==0) {
+//            binding.frameEmpty.setVisibility(View.VISIBLE);
+//        }
 
 
     }

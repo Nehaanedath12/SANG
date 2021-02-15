@@ -44,7 +44,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class ReportFragment extends Fragment {
+public class S_P_ReportFragment extends Fragment {
     FragmentReportBinding binding;
     String StringDate,iType;
     SimpleDateFormat df;
@@ -76,7 +76,7 @@ public class ReportFragment extends Fragment {
 
 
         assert getArguments() != null;
-        iType=ReportFragmentArgs.fromBundle(getArguments()).getIDocType();
+        iType=S_P_ReportFragmentArgs.fromBundle(getArguments()).getIDocType();
 
         Cursor cursor_userId=helper.getUserId();
         if(cursor_userId!=null && cursor_userId.moveToFirst()){

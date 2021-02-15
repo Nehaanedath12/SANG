@@ -6,10 +6,27 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="50dp">
+        <TextView
+            android:id="@+id/purchase_report"
+            android:padding="20dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@color/purple_500"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:text="Purchase Report"/>
+    </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         app:cardCornerRadius="50dp">
     <TextView
         android:id="@+id/sale_report"
@@ -23,21 +40,38 @@
         android:text="Sales Report"/>
     </androidx.cardview.widget.CardView>
 
+
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         app:cardCornerRadius="50dp">
-    <TextView
-        android:id="@+id/purchase_report"
-        android:padding="20dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:background="@color/purple_500"
-        android:layout_width="300dp"
+        <TextView
+            android:id="@+id/Payment_report"
+            android:padding="20dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@color/purple_500"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:text="Payment Report"/>
+    </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAllCaps="true"
-        android:text="Purchase Report"/>
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="50dp">
+        <TextView
+            android:id="@+id/receipt_report"
+            android:padding="20dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@color/purple_500"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:text="Receipt Report"/>
     </androidx.cardview.widget.CardView>
 
 

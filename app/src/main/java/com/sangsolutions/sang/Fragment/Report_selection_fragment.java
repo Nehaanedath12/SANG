@@ -42,6 +42,20 @@ public class Report_selection_fragment extends Fragment {
                 navController.navigate(actions);
             }
         });
+        binding.PaymentReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("1","Payment Report");
+                navController.navigate(action);
+            }
+        });
+        binding.receiptReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("2","Receipt Report");
+                navController.navigate(action);
+            }
+        });
         return binding.getRoot();
     }
 }

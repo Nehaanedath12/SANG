@@ -34,11 +34,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
+import com.sangsolutions.sang.Fragment.P_R_ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.ReportFragment;
-import com.sangsolutions.sang.Fragment.ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
+import com.sangsolutions.sang.Fragment.S_P_ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
 import com.sangsolutions.sang.databinding.ActivityMainBinding;
@@ -78,6 +78,9 @@ public class Home extends AppCompatActivity {
             navController.navigate(action);
         }
         else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
+            backAlert();
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.p_R_ReportFragment){
             backAlert();
         }
         else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptHistoryFragment){
@@ -146,7 +149,12 @@ public class Home extends AppCompatActivity {
                     navController.navigate(actions);
                 }
                 else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
-                    NavDirections action= ReportFragmentDirections.actionReportFragmentToHomeFragment();
+                    NavDirections action= S_P_ReportFragmentDirections.actionReportFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+
+                else  if(navController.getCurrentDestination().getId()==R.id.p_R_ReportFragment){
+                    NavDirections action= P_R_ReportFragmentDirections.actionPRReportFragmentToHomeFragment();
                     navController.navigate(action);
                 }
                 else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptHistoryFragment){
@@ -157,7 +165,6 @@ public class Home extends AppCompatActivity {
                     NavDirections action= PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToHomeFragment();
                     navController.navigate(action);
                 }
-
                 }
                 });
                     binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {

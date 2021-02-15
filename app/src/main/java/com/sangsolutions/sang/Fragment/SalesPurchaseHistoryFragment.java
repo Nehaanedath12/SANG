@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Database.DatabaseHelper;
@@ -94,28 +95,29 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                         .addQueryParameter("iUser",userIdS)
                         .setPriority(Priority.MEDIUM)
                         .build()
-                        .getAsJSONObject(new JSONObjectRequestListener() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                        Log.d("responseHistory",response.toString());
-                        loadDatas(response);
-                        }
+                        .getAsJSONArray(new JSONArrayRequestListener() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+                                Log.d("responseHistory",response.toString());
+                                loadDatas(response);
 
-                        @Override
-                        public void onError(ANError anError) {
-                        Log.d("responseHistory",anError.toString());
-                        alertDialog.dismiss();
-                    }
-                    });
+                            }
+
+                            @Override
+                            public void onError(ANError anError) {
+                                Log.d("responseHistory",anError.toString());
+
+                            }
+                        });
 
         return binding.getRoot();
 
     }
 
-    private void loadDatas(JSONObject response) {
+    private void loadDatas(JSONArray response) {
 
                         try {
-                        JSONArray jsonArray = new JSONArray(response.getString("Data"));
+                        JSONArray jsonArray = new JSONArray(response.toString());
 
                         if(jsonArray.length()==0){
                             alertDialog.dismiss();

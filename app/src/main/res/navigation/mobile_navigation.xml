@@ -85,10 +85,13 @@
         <action
             android:id="@+id/action_report_selection_fragment_to_reportFragment"
             app:destination="@id/reportFragment" />
+        <action
+            android:id="@+id/action_report_selection_fragment_to_p_R_ReportFragment"
+            app:destination="@id/p_R_ReportFragment" />
     </fragment>
     <fragment
         android:id="@+id/reportFragment"
-        android:name="com.sangsolutions.sang.Fragment.ReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.S_P_ReportFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_report">
         <action
@@ -152,6 +155,24 @@
             app:argType="integer" />
         <action
             android:id="@+id/action_paymentReceiptHistoryFragment_to_homeFragment2"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/p_R_ReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.P_R_ReportFragment"
+        android:label="{tool_title}"
+        tools:layout="@layout/fragment_report_receipt_payment">
+        <argument
+            android:name="iDocType"
+            app:argType="string" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_p_R_ReportFragment_to_report_selection_fragment"
+            app:destination="@id/report_selection_fragment" />
+        <action
+            android:id="@+id/action_p_R_ReportFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 </navigation>
