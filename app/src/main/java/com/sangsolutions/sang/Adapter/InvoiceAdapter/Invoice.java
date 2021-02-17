@@ -3,12 +3,15 @@ package com.sangsolutions.sang.Adapter.InvoiceAdapter;
 public class Invoice {
 
     int iTransId;
-    String DocDate,DocNo,Amount,Customer,CustomerCode;
+    String InvDate, InvNo,Amount,Customer,CustomerCode;
 
-    public Invoice(int iTransId, String docDate, String docNo, String amount, String customer, String customerCode) {
+    public Invoice() {
+    }
+
+    public Invoice(int iTransId, String invDate, String invNo, String amount, String customer, String customerCode) {
         this.iTransId = iTransId;
-        DocDate = docDate;
-        DocNo = docNo;
+        InvDate = invDate;
+        InvNo = invNo;
         Amount = amount;
         Customer = customer;
         CustomerCode = customerCode;
@@ -22,20 +25,20 @@ public class Invoice {
         this.iTransId = iTransId;
     }
 
-    public String getDocDate() {
-        return DocDate;
+    public String getInvDate() {
+        return InvDate;
     }
 
-    public void setDocDate(String docDate) {
-        DocDate = docDate;
+    public void setInvDate(String invDate) {
+        InvDate = invDate;
     }
 
-    public String getDocNo() {
-        return DocNo;
+    public String getInvNo() {
+        return InvNo;
     }
 
-    public void setDocNo(String docNo) {
-        DocNo = docNo;
+    public void setInvNo(String invNo) {
+        InvNo = invNo;
     }
 
     public String getAmount() {
@@ -62,8 +65,8 @@ public class Invoice {
         CustomerCode = customerCode;
     }
 
-    public  static  String DOC_DATE="DocDate";
-    public  static  String DOC_NO="DocNo";
+    public  static  String INV_DATE ="InvDate";
+    public  static  String INV_NO ="InvNo";
     public  static  String AMOUNT="Amount";
     public  static  String CUSTOMER="Customer";
     public  static  String CUSTOMER_CODE="CustomerCode";

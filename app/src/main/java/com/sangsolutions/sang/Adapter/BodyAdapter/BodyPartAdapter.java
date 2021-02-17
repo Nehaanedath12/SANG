@@ -103,15 +103,19 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
                     l_tags.addView(textView);
                     textView.setGravity(Gravity.CENTER);
                     textView.setWidth(150);
-                    textView.setText("null");
+                    textView.setText("");
 
                     for (int i=0;i<list.get(position).hashMapBody.size();i++) {
                         int tagId_map = (int) list.get(position).hashMapBody.keySet().toArray()[i];
                         int tagDetails_map = (int) list.get(position).hashMapBody.values().toArray()[i];
 
-                        if( tagId_map == tagId){
-                            Cursor cursor_map = helper.getTagName(tagId, tagDetails_map);
-                            textView.setText(cursor_map.getString(cursor_map.getColumnIndex(TagDetails.S_NAME)));
+                        try {
+                            if (tagId_map == tagId) {
+                                Cursor cursor_map = helper.getTagName(tagId, tagDetails_map);
+                                textView.setText(cursor_map.getString(cursor_map.getColumnIndex(TagDetails.S_NAME)));
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
 
                     }

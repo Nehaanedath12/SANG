@@ -41,7 +41,7 @@ public class GetAccountsService extends JobService {
     }
 
     private void GetAccounts() {
-        AndroidNetworking.get("http://"+ new Tools().getIP(GetAccountsService.this) + URLs.GetAccounts)
+        AndroidNetworking.get("http://"+ URLs.GetAccounts)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {

@@ -1,8 +1,10 @@
 package com.sangsolutions.sang;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -13,12 +15,15 @@ public class SettingsActivity extends AppCompatActivity {
 
     ActivitySettingsBinding binding;
     Tools tools;
+    SchedulerJob schedulerJob;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding=ActivitySettingsBinding.inflate(getLayoutInflater());
         View view=binding.getRoot();
         setContentView(view);
+        schedulerJob=new SchedulerJob();
         tools=new Tools();
 
         if(!tools.getIP(SettingsActivity.this).isEmpty()){
@@ -26,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         binding.save.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
                 if(!Tools.isValidIP(binding.ipAddress.getText().toString())){
@@ -38,4 +44,5 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
     }
+
 }

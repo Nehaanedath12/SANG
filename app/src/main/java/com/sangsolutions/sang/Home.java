@@ -57,6 +57,8 @@ public class Home extends AppCompatActivity {
     NavigationView navigationView;
     DrawerLayout drawer;
     String userName;
+    Cursor tagCursor;
+    SchedulerJob schedulerJob;
 
     @Override
     public void onBackPressed() {
@@ -167,27 +169,37 @@ public class Home extends AppCompatActivity {
                 }
                 }
                 });
+
+
                     binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                     switch(menuItem.getItemId()){
 
+
+
                     case R.id.purchaseFragment:
                     {
-                        if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1).setToolTitle("Purchase Summary");
-                            navController.navigate(R.id.homeFragment);
-                            navController.navigate(action);
-                        }
-                        else {
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1);
-                            navController.navigateUp();
-                            navController.navigate(action);
+                        tagCursor=helper.getTagDetails();
+                        if(tagCursor.moveToFirst() && tagCursor.getCount()>0) {
+                            if (navController.getCurrentDestination().getId() != R.id.salesPurchaseHistoryFragment) {
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1).setToolTitle("Purchase Summary");
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+                            } else {
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1);
+                                navController.navigateUp();
+                                navController.navigate(action);
+                            }
+                        }else {
+                            Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
                         }
                     }
                     break;
                     case R.id.salesPurchaseHistoryFragment:
                     {
+                        tagCursor=helper.getTagDetails();
+                        if(tagCursor.getCount()>0) {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
                             NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(2);
                             navController.navigate(R.id.homeFragment);
@@ -198,10 +210,15 @@ public class Home extends AppCompatActivity {
                             navController.navigateUp();
                             navController.navigate(action);
                         }
+                        }else {
+                            Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
 
                         case R.id.paymentReceiptHistoryFragment:    {
+                            tagCursor=helper.getTagDetails();
+                            if(tagCursor.getCount()>0) {
                             if(navController.getCurrentDestination().getId()!=R.id.paymentReceiptHistoryFragment){
                                 NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",1);
                                 navController.navigate(R.id.homeFragment);
@@ -211,12 +228,17 @@ public class Home extends AppCompatActivity {
                                 NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",1);
                                 navController.navigateUp();
                                 navController.navigate(action);
+                            }
+                            }else {
+                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
                             }
                         }
                         break;
 
 
                         case R.id.ReceiptHistoryFragment:    {
+                            tagCursor=helper.getTagDetails();
+                            if(tagCursor.getCount()>0) {
                             if(navController.getCurrentDestination().getId()!=R.id.paymentReceiptHistoryFragment){
                                 NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",2);
                                 navController.navigate(R.id.homeFragment);
@@ -226,6 +248,9 @@ public class Home extends AppCompatActivity {
                                 NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",2);
                                 navController.navigateUp();
                                 navController.navigate(action);
+                            }
+                            }else {
+                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
                             }
                         }
                         break;
@@ -240,7 +265,8 @@ public class Home extends AppCompatActivity {
                         break;
 
                         case R.id.report_selection_fragment:{
-
+                            tagCursor=helper.getTagDetails();
+                            if(tagCursor.getCount()>0) {
                             if(navController.getCurrentDestination().getId()!=R.id.report_selection_fragment){
                                 NavDirections action= HomeFragmentDirections.actionHomeFragmentToReportSelectionFragment();
                                 navController.navigate(R.id.homeFragment);
@@ -250,6 +276,9 @@ public class Home extends AppCompatActivity {
                                 NavDirections action= HomeFragmentDirections.actionHomeFragmentToReportSelectionFragment();
                                 navController.navigateUp();
                                 navController.navigate(action);
+                            }
+                            }else {
+                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
                             }
                         }
                         break;
@@ -292,7 +321,7 @@ public class Home extends AppCompatActivity {
     }
 
     private void GetTag_Details(int iType) {
-        AndroidNetworking.get("http://"+new Tools().getIP(Home.this) + URLs.GetMasterTagDetails)
+        AndroidNetworking.get("http://"+URLs.GetMasterTagDetails)
                 .addQueryParameter("iType",String.valueOf(iType))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -381,7 +410,7 @@ public class Home extends AppCompatActivity {
                 builder.setTitle("Close!")
                 .setMessage("Do you want to close without saving ?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
+                          @Override
                             public void onClick(DialogInterface dialog, int which) {
 //                        action= Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment().setIDocType(1);
 //                        navController.navigate(action);

@@ -41,29 +41,33 @@
             android:id="@+id/unit"
             android:layout_width="50dp"
             android:layout_weight="1"
+            android:layout_gravity="center"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:text="Unit"/>
         <TextView
             android:id="@+id/qty"
             android:layout_width="50dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="Qty"/>
         <TextView
             android:id="@+id/rate"
             android:layout_width="50dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="Rate"/>
         <TextView
             android:id="@+id/gross"
             android:layout_width="50dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="Gross"/>
 
         <TextView
@@ -71,21 +75,24 @@
             android:layout_width="55dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="VAT PER"/>
         <TextView
             android:id="@+id/discount"
             android:layout_width="70dp"
             android:layout_weight="2"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="DISCOUNT"/>
         <TextView
             android:id="@+id/add_charges"
             android:layout_width="70dp"
             android:layout_weight="2"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="ADD CHARGES"/>
         <LinearLayout
             android:id="@+id/linear_tags"
@@ -101,21 +108,24 @@
             android:layout_width="50dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="Vat"/>
         <TextView
             android:id="@+id/net"
             android:layout_width="50dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="Net"/>
         <TextView
             android:id="@+id/remarks"
             android:layout_width="70dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
             android:text="REMARKS"/>
     </LinearLayout>
         </androidx.cardview.widget.CardView>

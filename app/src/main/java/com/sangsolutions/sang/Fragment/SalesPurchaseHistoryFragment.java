@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,8 +90,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
         alertDialog = builder.create();
         alertDialog.show();
 
-
-        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
+        AndroidNetworking.get("http://"+  URLs.GetTransSummary)
                         .addQueryParameter("iDocType",String.valueOf(iDocType))
                         .addQueryParameter("iUser",userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -107,6 +107,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                             public void onError(ANError anError) {
                                 Log.d("responseHistory",anError.toString());
 
+                                alertDialog.dismiss();
                             }
                         });
 
@@ -146,9 +147,13 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                     historyAdapter.setOnClickListener(new SalesPurchaseHistoryAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(int iTransId, int position) {
-                            NavDirections action=SalesPurchaseHistoryFragmentDirections
-                                    .actionSalesPurchaseHistoryFragmentToSalePurchaseFragment2(toolTitle).setIDocType(iDocType).setEditMode(true).setITransId(iTransId);
-                            navController.navigate(action);
+                            if(Tools.isConnected(requireContext())) {
+                                NavDirections action = SalesPurchaseHistoryFragmentDirections
+                                        .actionSalesPurchaseHistoryFragmentToSalePurchaseFragment2(toolTitle).setIDocType(iDocType).setEditMode(true).setITransId(iTransId);
+                                navController.navigate(action);
+                            }else {
+                                Toast.makeText(requireContext(), "no Internet", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
 

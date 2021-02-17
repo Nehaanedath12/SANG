@@ -62,12 +62,15 @@ public class Login extends AppCompatActivity {
         binding.save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        schedulerJob.SyncBank(Login.this);
+                        schedulerJob.SyncUser(Login.this);
                         syncData();
 
                     if(!binding.userName.getText().toString().isEmpty()){
                     if(!binding.password.getText().toString().isEmpty()){
 
-                            if(!new Tools().getIP(Login.this).isEmpty()) {
+//                        Log.d("ipppp",new Tools().getIP(Login.this));
+//                            if((new Tools().getIP(Login.this))!=null) {
                             User u = new User();
                             u.setsLoginName(binding.userName.getText().toString().trim());
                             u.setsPassword(binding.password.getText().toString().trim());
@@ -80,7 +83,6 @@ public class Login extends AppCompatActivity {
                                             if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
                                             startActivity(new Intent(Login.this, Home.class));
                                             finish();
-
 
                                             } else
                                             {
@@ -96,9 +98,9 @@ public class Login extends AppCompatActivity {
                                         } else {
                                         Toast.makeText(Login.this, "Check your network or IP", Toast.LENGTH_SHORT).show();
                                 }
-                                } else {
-                                Toast.makeText(Login.this, "Please enter IP Address", Toast.LENGTH_SHORT).show();
-                                }
+//                                } else {
+//                                Toast.makeText(Login.this, "Please enter IP Address", Toast.LENGTH_SHORT).show();
+//                                }
                                 }
                                 else {
                                 binding.password.setError("enter Password");
@@ -115,13 +117,12 @@ public class Login extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void syncData() {
-        schedulerJob.SyncTransSalePurchase(this);
         schedulerJob.SyncUser(this);
+        schedulerJob.SyncBank(this);
+        schedulerJob.SyncTransSalePurchase(this);
         schedulerJob.SyncMasterSettings(this);
         schedulerJob.SyncAccounts(this);
         schedulerJob.SyncProduct(this);
-        schedulerJob.SyncBank(this);
-
 
     }
 }

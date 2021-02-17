@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,7 +92,7 @@ public class PaymentReceiptHistoryFragment extends Fragment {
         alertDialog = builder.create();
         alertDialog.show();
 
-        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetTransReceipt_PaymentSummary)
+        AndroidNetworking.get("http://"+ URLs.GetTransReceipt_PaymentSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
@@ -145,8 +146,12 @@ public class PaymentReceiptHistoryFragment extends Fragment {
                     historyAdapter.setOnClickListener(new PaymentReceiptHistoryAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(int iTransId, int position) {
-                            NavDirections action=PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToPaymentReceiptFragment(toolTitle,iDocType).setITransId(iTransId).setEditMode(true);
-                            navController.navigate(action);
+                            if(Tools.isConnected(requireContext())) {
+                                NavDirections action = PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToPaymentReceiptFragment(toolTitle, iDocType).setITransId(iTransId).setEditMode(true);
+                                navController.navigate(action);
+                            }else {
+                                Toast.makeText(requireContext(), "no Internet", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                 }

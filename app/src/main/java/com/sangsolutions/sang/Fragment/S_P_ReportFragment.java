@@ -193,7 +193,7 @@ public class S_P_ReportFragment extends Fragment {
         String fromDate=Tools.dateFormat(binding.fromDate.getText().toString().trim());
         String toDate=Tools.dateFormat(binding.toDate.getText().toString().trim());
 
-        AndroidNetworking.get("http://"+ new Tools().getIP(requireContext()) + URLs.GetSales_PurchaseReport)
+        AndroidNetworking.get("http://"+ URLs.GetSales_PurchaseReport)
                 .addQueryParameter("UserId",userId)
                 .addQueryParameter("FromDate",fromDate)
                 .addQueryParameter("ToDate",toDate)

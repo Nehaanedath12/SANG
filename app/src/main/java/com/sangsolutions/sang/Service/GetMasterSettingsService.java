@@ -41,7 +41,7 @@ public class GetMasterSettingsService extends JobService {
 
     private void GetMaster() {
 
-        AndroidNetworking.get("http://"+new Tools().getIP(GetMasterSettingsService.this) + URLs.GetMasterSettings)
+        AndroidNetworking.get("http://"+URLs.GetMasterSettings)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {

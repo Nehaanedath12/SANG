@@ -50,7 +50,7 @@ public class GetTransactionSettingService extends JobService {
 
     private void GetTransSetting(String iDocType) {
 
-        AndroidNetworking.get("http://"+new Tools().getIP(GetTransactionSettingService.this) + URLs.GetTransSettings)
+        AndroidNetworking.get("http://"+ URLs.GetTransSettings)
                 .addQueryParameter("iDocType",iDocType)
                 .setPriority(Priority.MEDIUM)
                 .build()

@@ -74,35 +74,8 @@ public class SchedulerJob {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void SyncUser(Context context) {
-        Log.d("Userr","User");
-        JobScheduler js =
-                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        JobInfo job = new JobInfo.Builder(
-                4,
-                new ComponentName(context, GetUserService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .build();
-        assert js != null;
-        js.schedule(job);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void syncMasterTagDetails(Context context) {
-            JobScheduler js =
-                    (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            JobInfo job = new JobInfo.Builder(
-                    5,
-                    new ComponentName(context, GetMasterTagDetails.class))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .build();
-            assert js != null;
-            js.schedule(job);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void SyncBank(Context context) {
-        Log.d("Userr","User");
+        Log.d("bankk","bankk");
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobInfo job = new JobInfo.Builder(
@@ -113,4 +86,32 @@ public class SchedulerJob {
         assert js != null;
         js.schedule(job);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void SyncUser(Context context) {
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                5,
+                new ComponentName(context, GetUserService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        assert js != null;
+        js.schedule(job);
+    }
+
+//    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//    public void syncMasterTagDetails(Context context) {
+//            JobScheduler js =
+//                    (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//            JobInfo job = new JobInfo.Builder(
+//                    5,
+//                    new ComponentName(context, GetMasterTagDetails.class))
+//                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//                    .build();
+//            assert js != null;
+//            js.schedule(job);
+//    }
+
+
 }

@@ -134,7 +134,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     List<Integer> headerListTags;
     List<Integer>bodyListTags;
-
+    String userCode;
 
     @Nullable
     @Override
@@ -143,8 +143,6 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding=FragmentSalePurchaseBinding.inflate(getLayoutInflater());
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-
-
 
         hashMapBody=new HashMap<>();
         hashMapHeader=new HashMap<>();
@@ -291,6 +289,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                     autoTextBody.setLongClickable(false);
                     autoTextBody.cancelLongPress();
                     autoTextBody.setHint(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)));
+//                    Log.d("hinttt",cursor1.getColumnIndex(MasterSettings.S_NAME)));
                     autoTextBody.setId(numberOfLinesB +1);
                     autoTextBody.setTag("tag"+autoTextBody.getId()+"Body");
                     ll.addView(autoTextBody);
@@ -500,49 +499,54 @@ public class Sale_Purchase_Fragment extends Fragment {
             if (EditMode) {
                 EditValueFromAPI();
             } else {
-
-                String userCode = null;
                 Cursor cursor = helper.getUserCode(userIdS);
-                if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                if (cursor!=null) {
                     userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+                    Log.d("docnoo",cursor.getCount()+""+userCode);
                 }
+                else {
+                    Log.d("docnoo",userIdS);
+                }
+
+
                 final int[] arrayLength = new int[1];
                 ///////
 
-                String finalUserCode = userCode;
-                    AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
-                            .addQueryParameter("iDocType", String.valueOf(iDocType))
-                            .addQueryParameter("iUser", userIdS)
-                            .setPriority(Priority.MEDIUM)
-                            .build()
-                            .getAsJSONArray(new JSONArrayRequestListener() {
-                                @Override
-                                public void onResponse(JSONArray response) {
-                                    Log.d("responseHistory", response.toString());
-                                    try {
-                                        JSONArray jsonArray = new JSONArray(response.toString());
-                                        arrayLength[0] = jsonArray.length() + 1;
-                                        docNo = finalUserCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
-                                        binding.docNo.setText(docNo);
-                                        alertDialog.dismiss();
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-
-                                @Override
-                                public void onError(ANError anError) {
-                                    Log.d("responseTotalNumber", anError.toString());
+                AndroidNetworking.get("http://" + URLs.GetTransSummary)
+                        .addQueryParameter("iDocType", String.valueOf(iDocType))
+                        .addQueryParameter("iUser", userIdS)
+                        .setPriority(Priority.MEDIUM)
+                        .build()
+                        .getAsJSONArray(new JSONArrayRequestListener() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+                                Log.d("responseHistory", response.toString());
+                                try {
+                                    JSONArray jsonArray = new JSONArray(response.toString());
+                                    arrayLength[0] = jsonArray.length() + 1;
+                                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
+                                    binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            });
-                }
-        }
-        else {
-            Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
-            alertDialog.dismiss();
-        }
+                            }
 
+                            @Override
+                            public void onError(ANError anError) {
+                                Log.d("responseTotalNumber", anError.toString());
+                                alertDialog.dismiss();
+                                NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                                navController.navigate(actions);
+                            }
+                        });
+            }
+        }else {
+            alertDialog.dismiss();
+            Toast.makeText(requireActivity(),"No Internet", Toast.LENGTH_SHORT).show();
+            NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+            navController.navigate(actions);
+        }
         ///////
 
 
@@ -550,7 +554,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void EditValueFromAPI() {
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransDetails)
+            AndroidNetworking.get("http://" + URLs.GetTransDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -566,7 +570,9 @@ public class Sale_Purchase_Fragment extends Fragment {
                         public void onError(ANError anError) {
                             Log.d("Response_loadEditValue",anError.toString());
                             alertDialog.dismiss();
-
+                            Toast.makeText(requireActivity(), anError.getMessage(), Toast.LENGTH_SHORT).show();
+                            NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                            navController.navigate(actions);
                         }
                     });
         }else {
@@ -755,7 +761,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     private void uploadToAPI(JSONObject jsonObjectMain) {
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity()) + URLs.PostProductStock)
+            AndroidNetworking.post("http://"+ URLs.PostProductStock)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -789,26 +795,36 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void saveBodyPartProduct() {
 
-        float rate,gross,net,vatPer,vat,discount,addCharges;
+        float rate,gross,net,vatPer = 0,vat=0,discount = 0,addCharges = 0;
         int qty;
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("")){
                 if(!binding.rateProduct.getText().toString().equals("")){
-                    if(!binding.vatProduct.getText().toString().equals("")){
-                        if(!binding.disProduct.getText().toString().equals("")){
-                            if(!binding.addChargesProduct.getText().toString().equals("")){
+//                    if(!binding.vatProduct.getText().toString().equals("")){
+//                        if(!binding.disProduct.getText().toString().equals("")){
+//                            if(!binding.addChargesProduct.getText().toString().equals("")){
 
                         BodyPart bodyPart=new BodyPart();
 
                         qty=Integer.parseInt(binding.qtyProduct.getText().toString());
                         rate=Float.parseFloat(binding.rateProduct.getText().toString());
-                        vatPer=Float.parseFloat(binding.vatProduct.getText().toString());
-                        discount=Float.parseFloat(binding.disProduct.getText().toString());
-                        addCharges=Float.parseFloat(binding.addChargesProduct.getText().toString());
 
                         gross=qty*rate;
+
+
+                    if(!binding.disProduct.getText().toString().equals("")){
+                        discount=Float.parseFloat(binding.disProduct.getText().toString());
+                    }
+
+
+                    if(!binding.addChargesProduct.getText().toString().equals("")){
+                        addCharges=Float.parseFloat(binding.addChargesProduct.getText().toString());
+                    }
+                    if(!binding.vatPerProduct.getText().toString().equals("")){
+                            vatPer=Float.parseFloat(binding.vatPerProduct.getText().toString());
                         vat=((vatPer/100)*(gross-discount+addCharges));
+                        }
                         net=gross-discount+addCharges+vat;
 
                         bodyPart.setGross(gross);
@@ -860,9 +876,9 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                         ////////////////////////////////////////editProduct
 
-                            }else {binding.addChargesProduct.setError("no addChargesProduct");}
-                        }else {binding.disProduct.setError("no disProduct");}
-                    }else {binding.vatProduct.setError("no Vat");}
+//                            }else {binding.addChargesProduct.setError("no addChargesProduct");}
+//                        }else {binding.disProduct.setError("no discount");}
+//                    }else {binding.vatProduct.setError("no Vat");}
                 }else {binding.rateProduct.setError("no Rate");}
             }else {binding.qtyProduct.setError("no qty");}
         }else {binding.productName.setError("enter valid product");}
@@ -878,7 +894,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         iProduct=bodyPart.getiProduct();
         binding.qtyProduct.setText(String.valueOf(bodyPart.getQty()));
         binding.rateProduct.setText(String.valueOf(bodyPart.getRate()));
-        binding.vatProduct.setText(String.valueOf(bodyPart.getVatPer()));
+        binding.vatPerProduct.setText(String.valueOf(bodyPart.getVatPer()));
         binding.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
         binding.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
         binding.remarksProduct.setText(bodyPart.getRemarks());
@@ -903,7 +919,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.productName.setText("");
         binding.qtyProduct.setText("");
         binding.rateProduct.setText("");
-        binding.vatProduct.setText("");
+        binding.vatPerProduct.setText("");
         binding.disProduct.setText("");
         binding.addChargesProduct.setText("");
         binding.cardViewBody.setVisibility(View.GONE);

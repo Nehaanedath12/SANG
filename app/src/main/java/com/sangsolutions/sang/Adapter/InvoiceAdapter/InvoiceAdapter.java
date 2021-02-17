@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -98,8 +97,8 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHold
     public void onBindViewHolder(@NonNull InvoiceAdapter.ViewHolder holder, int position) {
 
         holder.amount.setText(list.get(position).Amount);
-        holder.date.setText(list.get(position).DocDate);
-        holder.number.setText(list.get(position).DocNo);
+        holder.date.setText(list.get(position).InvDate);
+        holder.number.setText(String.valueOf(list.get(position).InvNo));
         holder.parent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

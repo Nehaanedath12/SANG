@@ -101,7 +101,7 @@ public class HomeFragment extends Fragment {
 
     private void getDataFromAPI(String iDoc, List<BarEntry> barEntryList, BarChart barChart) {
         barEntryList.clear();
-        AndroidNetworking.get("http://"+new Tools().getIP(getContext()) + URLs.GetDashTransactionData)
+        AndroidNetworking.get("http://"+URLs.GetDashTransactionData)
                 .addQueryParameter("iDoc",iDoc)
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)

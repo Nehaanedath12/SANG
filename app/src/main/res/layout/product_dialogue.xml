@@ -85,7 +85,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <EditText
-                android:id="@+id/vat_product"
+                android:id="@+id/vatPer_product"
                 android:hint="Vat per"
                 android:inputType="numberDecimal"
                 android:layout_width="match_parent"

@@ -42,7 +42,7 @@ public class GetUserService extends JobService {
     }
 
     private void GetUsers() {
-        AndroidNetworking.get("http://"+new Tools().getIP(GetUserService.this)+ URLs.GetUserLogin)
+        AndroidNetworking.get("http://"+ URLs.GetUserLogin)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {

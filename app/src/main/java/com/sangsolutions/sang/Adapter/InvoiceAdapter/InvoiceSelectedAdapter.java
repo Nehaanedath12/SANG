@@ -2,7 +2,7 @@ package com.sangsolutions.sang.Adapter.InvoiceAdapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
-import com.sangsolutions.sang.Home;
-import com.sangsolutions.sang.Login;
 import com.sangsolutions.sang.R;
-import com.sangsolutions.sang.databinding.DialogueInvoiceAmountBinding;
 
 import java.util.List;
 
@@ -52,8 +47,9 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
     @Override
     public void onBindViewHolder(@NonNull InvoiceSelectedAdapter.ViewHolder holder, int position) {
         holder.amount.setText(list.get(position).Amount);
-        holder.date.setText(list.get(position).DocDate);
-        holder.number.setText(list.get(position).DocNo);
+        holder.date.setText(list.get(position).InvDate);
+        holder.number.setText(String.valueOf(list.get(position).InvNo));
+        Log.d("invoicenumber",list.get(position).iTransId+"");
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override

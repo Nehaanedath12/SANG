@@ -33,14 +33,16 @@ public class GetBankService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
+        Log.d("bankk","bankk");
         this.params=params;
         GetBanks();
         AndroidNetworking.initialize(this);
-        return true;    }
+        return true;
+    }
 
     private void GetBanks() {
 
-        AndroidNetworking.get("http://"+ new Tools().getIP(GetBankService.this) + URLs.GetBanks)
+        AndroidNetworking.get("http://"+ URLs.GetBanks)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {

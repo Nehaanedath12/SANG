@@ -619,4 +619,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             return null;
         }    }
+
+    public Cursor getTagDetails() {
+        this.db=getWritableDatabase();
+        Cursor cursor=db.rawQuery("select "+TagDetails.I_ID +" from "+TABLE_TAG_DETAILS,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
 }
