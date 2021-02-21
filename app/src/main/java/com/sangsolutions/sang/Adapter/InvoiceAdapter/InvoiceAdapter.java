@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.sangsolutions.sang.R;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,10 +96,12 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull InvoiceAdapter.ViewHolder holder, int position) {
-
-        holder.amount.setText(list.get(position).Amount);
+        DecimalFormat df = new DecimalFormat("0.00");
+        String amount=df.format(list.get(position).Amount);
+        holder.amount.setText(amount);
         holder.date.setText(list.get(position).InvDate);
         holder.number.setText(String.valueOf(list.get(position).InvNo));
+
         holder.parent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

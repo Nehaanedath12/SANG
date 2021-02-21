@@ -1,7 +1,9 @@
 package com.sangsolutions.sang.Fragment;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,12 +18,14 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -52,13 +56,16 @@ import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
+import com.sangsolutions.sang.databinding.CameraLayoutBinding;
 import com.sangsolutions.sang.databinding.FragmentPaymentReceiptBinding;
 import com.sangsolutions.sang.databinding.InvoiceDialogeLayoutBinding;
+import com.sangsolutions.sang.databinding.ViewImageBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +73,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import io.fotoapparat.Fotoapparat;
+import io.fotoapparat.result.BitmapPhoto;
+import io.fotoapparat.result.PhotoResult;
+import io.fotoapparat.result.WhenDoneListener;
+import io.fotoapparat.view.CameraView;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PaymentReceiptFragment extends Fragment {
     FragmentPaymentReceiptBinding binding;
@@ -98,11 +112,12 @@ public class PaymentReceiptFragment extends Fragment {
     InvoiceAdapter invoiceAdapter;
 
     List<Invoice>invoiceSecondList;
+    List<Invoice>invoiceEditList;
 
     List<Invoice>invoiceSelectedList;
     InvoiceSelectedAdapter invoiceSelectedAdapter;
 
-    int iCustomer,iTagDetail,iBank,iPaymentMethod;
+    int iCustomer=0,iTagDetail,iBank,iPaymentMethod;
     AlertDialog alertDialog_invoice;
 
     boolean selectionActive = false;
@@ -116,6 +131,12 @@ public class PaymentReceiptFragment extends Fragment {
     List<Integer> headerListTags;
     String userCode;
 
+    BitmapPhoto bitmapPhotoMain = null;
+    DecimalFormat decimalFormat ;
+
+    String Api_invoice_response;
+
+
 
     @Nullable
     @Override
@@ -124,6 +145,7 @@ public class PaymentReceiptFragment extends Fragment {
        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireContext());
+        decimalFormat= new DecimalFormat("0.00");
 
         assert getArguments() != null;
         iDocType = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getIDocType();
@@ -154,9 +176,10 @@ public class PaymentReceiptFragment extends Fragment {
         invoiceAdapter =new InvoiceAdapter(requireContext(),invoiceList);
 
         invoiceSecondList=new ArrayList<>();
+        invoiceEditList=new ArrayList<>();
 
         invoiceSelectedList=new ArrayList<>();
-        invoiceSelectedAdapter=new InvoiceSelectedAdapter(requireContext(),invoiceSelectedList);
+        invoiceSelectedAdapter=new InvoiceSelectedAdapter(requireContext(),invoiceSelectedList,invoiceSecondList);
 
         tagList =new ArrayList<>();
         tagDetailsAdapter =new TagDetailsAdapter(requireActivity(),tagList);
@@ -247,6 +270,17 @@ public class PaymentReceiptFragment extends Fragment {
                 settingDate(binding.checkDate);
             }
         });
+        binding.imgAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, 100);
+                } else {
+                    addCaptureImage();
+
+                }
+            }
+        });
 
         binding.bankName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -286,6 +320,8 @@ public class PaymentReceiptFragment extends Fragment {
         });
         binding.customer.setThreshold(1);
         binding.customer.setAdapter(customerAdapter);
+
+
 
         binding.invoiceB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -329,6 +365,69 @@ public class PaymentReceiptFragment extends Fragment {
        return binding.getRoot();
     }
 
+    private void addCaptureImage() {
+
+        CameraLayoutBinding camBinding=CameraLayoutBinding.inflate(getLayoutInflater());
+        Fotoapparat fotoapparat = new Fotoapparat(requireContext(), camBinding.cameraView);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext()).setView(camBinding.getRoot());
+        AlertDialog dialogue = builder.create();
+        dialogue.show();
+        fotoapparat.start();
+        camBinding.cancelImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogue.dismiss();
+                fotoapparat.stop();
+            }
+        });
+
+        camBinding.captureImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PhotoResult photoResult = fotoapparat.takePicture();
+                photoResult.toBitmap().whenDone(new WhenDoneListener<BitmapPhoto>() {
+                    @Override
+                    public void whenDone(BitmapPhoto bitmapPhoto) {
+                        if (bitmapPhoto != null) {
+                            bitmapPhotoMain=bitmapPhoto;
+                            binding.imgFrame.setVisibility(View.VISIBLE);
+                            binding.image.setImageBitmap(bitmapPhoto.bitmap);
+                            binding.image.setRotation(-bitmapPhoto.rotationDegrees);
+                            fotoapparat.stop();
+                            dialogue.dismiss();
+
+
+                            binding.imgDelete.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    binding.imgFrame.setVisibility(View.GONE);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+
+        binding.image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewImageBinding viewImageBinding=ViewImageBinding.inflate(getLayoutInflater());
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(),android.R.style.Theme_Light_NoTitleBar_Fullscreen).setView(viewImageBinding.getRoot());
+                AlertDialog dialogue = builder.create();
+                dialogue.show();
+                viewImageBinding.viewImage.setImageBitmap(bitmapPhotoMain.bitmap);
+                viewImageBinding.viewImage.setRotation(-bitmapPhotoMain.rotationDegrees);
+                PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(viewImageBinding.viewImage);
+                photoViewAttacher.canZoom();
+
+            }
+        });
+
+
+    }
+
     private void deleteAll() {
         EditMode=false;
         initialValueSettingHeader();
@@ -358,31 +457,7 @@ public class PaymentReceiptFragment extends Fragment {
                         else {
                             iPaymentMethod=1;
                         }
-                        if (!binding.customer.getText().toString().equals("") && helper.getCustomerNameValid(binding.customer.getText().toString().trim())) {
-//                            Log.d("invoiceli",invoiceSelectedList.size()+"hh");
-
-                            float amount=0;
-                            if(binding.linearInvoice.getVisibility()==View.VISIBLE){
-                                Log.d("invoiceli",invoiceSelectedList.size()+"hh");
-                                for(int i=0;i<invoiceSelectedList.size();i++){
-                                    amount+=Float.parseFloat(invoiceSelectedList.get(i).getAmount());
-                                }
-                                Log.d("invoiceli",amount+"hh");
-
-                                if(Float.parseFloat(binding.amount.getText().toString().trim())>amount){
-                                    binding.amount.setError("Not greater than selected invoice");
-                                }
-                                else {
-                                    fieldsChecking(iPaymentMethod);
-                                }
-                            }
-                            else {
-                                fieldsChecking(iPaymentMethod);
-                            }
-
-                        }
-                        else { binding.customer.setError("Enter valid customer!");}
-
+                        SAVE();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -393,6 +468,28 @@ public class PaymentReceiptFragment extends Fragment {
                 }).create().show();
 
 
+    }
+
+    private void SAVE() {
+        if (!binding.customer.getText().toString().equals("") && helper.getCustomerNameValid(binding.customer.getText().toString().trim())) {
+            Double amount=0.0;
+            if(binding.linearInvoice.getVisibility()==View.VISIBLE){
+                for(int i=0;i<invoiceSelectedList.size();i++){
+                    amount+=invoiceSelectedList.get(i).getAmount();
+                }
+                if(Double.parseDouble(binding.amount.getText().toString().trim())!=amount){
+                    binding.amount.setError("amount incorrect");
+                }
+                else {
+                    fieldsChecking(iPaymentMethod);
+                }
+            }
+            else {
+                fieldsChecking(iPaymentMethod);
+            }
+
+        }
+        else { binding.customer.setError("Enter valid customer!");}
     }
 
     private void fieldsChecking(int iPaymentMethod) {
@@ -478,9 +575,6 @@ public class PaymentReceiptFragment extends Fragment {
             if(invoiceSelectedList.size()>0) {
                 for (int i = 0; i < invoiceSelectedList.size(); i++) {
                     JSONObject jsonObject = new JSONObject();
-                    Log.d("bodyPartListsize", invoiceSelectedList.size() + "" + invoiceSelectedList.get(i).getiTransId());
-
-                    Log.d("bodyPartListsize", invoiceSelectedList.size() + "");
 
                     for (int j = 1; j <= tagTotalNumber; j++) {
                         if (hashMapHeader.containsKey(j)) {
@@ -542,7 +636,6 @@ public class PaymentReceiptFragment extends Fragment {
                                 alertDialog.dismiss();
                                 Log.d("responsePost_R_P", "successfully");
                                 Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
-//                                bodyPartList.clear();
                                 NavDirections actions = PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToPaymentReceiptHistoryFragment(toolTitle,iDocType);
                                 navController.navigate(actions);
                             }
@@ -627,20 +720,31 @@ public class PaymentReceiptFragment extends Fragment {
             alertDialog_invoice=builder.create();
             alertDialog_invoice.setCancelable(false);
             bindingInvoice.recyclerViewInvoice.setAdapter(invoiceAdapter);
+
             API_Invoice();
+
+
             invoiceAdapter.setOnClickListener(new InvoiceAdapter.OnClickListener() {
                 @Override
                 public void OnItemClick(Invoice invoice, int position) {
-                    enableActionMode(position);
-                    selectionActive = true;
+                    if(invoice.getAmount()==0.0){
+                        Toast.makeText(requireContext(), "No Amount", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        enableActionMode(position);
+                        selectionActive = true;
+                    }
                 }
             });
 
             bindingInvoice.apply.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    loadSelectedInvoice();
+
                     alertDialog_invoice.dismiss();
+                    loadSelectedInvoice();
+
+
                 }
             });
 
@@ -657,54 +761,86 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void loadSelectedInvoice() {
-        invoiceSelectedList.clear();
-        float totalAmount = 0;
+//        .clear();
+        Double totalAmount = 0.0;
         List<Integer> listSelectedItem = invoiceAdapter.getSelectedItems();
         for (int i=0;i<listSelectedItem.size();i++) {
-            for (int j=0;j<invoiceList.size();j++) {
-                if (listSelectedItem.get(i) == j) {
-                   Invoice invoice=new Invoice(invoiceList.get(j).getiTransId(),
-                           invoiceList.get(j).getInvDate(),
-                           invoiceList.get(j).getInvNo(),
-                           invoiceList.get(j).getAmount(),
-                           invoiceList.get(j).getCustomer(),
-                           invoiceList.get(j).getCustomerCode()
-                           );
-                   invoiceSelectedList.add(invoice);
-                   invoiceSelectedAdapter.notifyDataSetChanged();
-                   totalAmount+=  Float.parseFloat(invoiceList.get(j).getAmount());
-                }
-                if(invoiceSelectedList.size()>0) {
-                    binding.linearInvoice.setVisibility(View.VISIBLE);
-                }
-            }
 
+            for (int j = 0; j< invoiceList.size(); j++) {
+                if (listSelectedItem.get(i) == j) {
+                    try {
+                        if (invoiceSelectedList.size() ==listSelectedItem.size() && invoiceSelectedList.get(i).getiTransId() == invoiceList.get(j).getiTransId()) {
+
+                            Double re_amount = invoiceSelectedList.get(i).getAmount() +
+                                    invoiceList.get(j).getAmount();
+                            Invoice invoice1 = new Invoice(invoiceList.get(j).getiTransId(),
+                                    invoiceList.get(j).getInvDate(),
+                                    invoiceList.get(j).getInvNo(),
+                                    re_amount,
+                                    invoiceList.get(j).getCustomer(),
+                                    invoiceList.get(j).getCustomerCode()
+                            );
+                            invoiceSelectedList.set(i, invoice1);
+                        } else {
+                            Invoice invoice = new Invoice(invoiceList.get(j).getiTransId(),
+                                    invoiceList.get(j).getInvDate(),
+                                    invoiceList.get(j).getInvNo(),
+                                    invoiceList.get(j).getAmount(),
+                                    invoiceList.get(j).getCustomer(),
+                                    invoiceList.get(j).getCustomerCode()
+                            );
+                            invoiceSelectedList.add(invoice);
+                        }
+                    }catch (Exception e){
+                        Log.d("exeception",e.getMessage()+e.getLocalizedMessage()+"size");
+                    }
+                        invoiceSelectedAdapter.notifyDataSetChanged();
+                }
+
+            }
             if (i + 1 == listSelectedItem.size()) {
+                binding.linearInvoice.setVisibility(View.VISIBLE);
                 binding.recycleInvoiceHome.setLayoutManager(new LinearLayoutManager(requireContext()));
                 binding.recycleInvoiceHome.setAdapter(invoiceSelectedAdapter);
-                binding.amount.setText(totalAmount+"");
+
+                for(int a=0;a<invoiceSelectedList.size();a++) {
+
+                    for (int b=a+1;b<invoiceSelectedList.size();b++){
+                        if(invoiceSelectedList.get(a).getiTransId()==invoiceSelectedList.get(b).getiTransId()){
+
+                            invoiceSelectedList.get(a).setAmount(invoiceSelectedList.get(a).getAmount()+
+                                    invoiceSelectedList.get(b).getAmount());
+                            invoiceSelectedList.remove(b);
+                            invoiceSelectedAdapter.notifyDataSetChanged();
+
+                        }
+
+                    }
+                    totalAmount += invoiceSelectedList.get(a).getAmount();
+
+                }
+                binding.amount.setText(decimalFormat.format(totalAmount));
+                Log.d("amountttttt",String.valueOf(totalAmount));
 
                invoiceSelectedAdapter.setOnClickListener(new InvoiceSelectedAdapter.OnClickListener() {
                    @Override
                    public void onItemClick(List<Invoice> list, int position) {
-
                        onItemClickInvoice(list,position);
 
                    }
                });
             }
         }
+
     }
 
     private void onItemClickInvoice(List<Invoice> list, int position) {
-        float total_Amount=0;
+        Double total_Amount=0.0;
         for (int i=0;i<list.size();i++) {
-            total_Amount += Float.parseFloat(list.get(i).getAmount());
+            total_Amount += list.get(i).getAmount();
             Log.d("total_Amount",total_Amount+"  "+list.get(i).getAmount());
-            if (i + 1 == list.size()) {
-                binding.amount.setText(total_Amount + "");
-            }
         }
+        binding.amount.setText(decimalFormat.format(total_Amount));
     }
 
     private void enableActionMode(int position) {
@@ -746,28 +882,92 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void load_API_Invoice(JSONArray response) {
-        invoiceList.clear();
-        alertDialog_invoice.show();
-        try {
-            JSONArray jsonArray=new JSONArray(response.toString());
-            for (int i=0;i<jsonArray.length();i++){
-                JSONObject jsonObject=jsonArray.getJSONObject(i);
-                Invoice invoice=new Invoice(jsonObject.getInt(Invoice.I_TRANS_ID),
-                        jsonObject.getString(Invoice.INV_DATE),
-                        jsonObject.getString(Invoice.INV_NO),
-                        jsonObject.getString(Invoice.AMOUNT),
-                        jsonObject.getString(Invoice.CUSTOMER),
-                        jsonObject.getString(Invoice.CUSTOMER_CODE));
+            invoiceList.clear();
+        List<Integer>transId=new ArrayList<>();
+            alertDialog_invoice.show();
+            try {
+                JSONArray jsonArray = new JSONArray(response.toString());
+                for (int i = 0; i < jsonArray.length(); i++) {
 
-                invoiceList.add(invoice);
-                invoiceAdapter.notifyDataSetChanged();
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Invoice invoice = new Invoice(jsonObject.getInt(Invoice.I_TRANS_ID),
+                            jsonObject.getString(Invoice.INV_DATE),
+                            jsonObject.getString(Invoice.INV_NO),
+                            jsonObject.getDouble(Invoice.AMOUNT),
+                            jsonObject.getString(Invoice.CUSTOMER),
+                            jsonObject.getString(Invoice.CUSTOMER_CODE));
+                    invoiceList.add(invoice);
+                    invoiceSecondList.add(invoice);
 
-                Log.d("invoiceList",invoiceList.size()+"");
+                    if (EditMode) {
+                        for (int sel = 0; sel < invoiceEditList.size(); sel++) {
+                            if (invoiceEditList.get(sel).getiTransId() == jsonObject.getInt(Invoice.I_TRANS_ID)) {
+                                Double amount = jsonObject.getDouble(Invoice.AMOUNT) +
+                                        invoiceEditList.get(sel).getAmount();
+                                Invoice invoice1 = new Invoice(jsonObject.getInt(Invoice.I_TRANS_ID),
+                                        jsonObject.getString(Invoice.INV_DATE),
+                                        jsonObject.getString(Invoice.INV_NO),
+                                        amount,
+                                        jsonObject.getString(Invoice.CUSTOMER),
+                                        jsonObject.getString(Invoice.CUSTOMER_CODE));
+                                invoiceList.set(i, invoice1);
+                                invoiceSecondList.set(i, invoice1);
+                                invoiceAdapter.notifyDataSetChanged();
+                            }
+                        }
 
+                        if(i+1==jsonArray.length()){
+                            for (int edit=0;edit<invoiceEditList.size();edit++){
+                                boolean flag=false;
+                                for (int jArry=0;jArry<jsonArray.length();jArry++){
+                                    if(jsonObject.getInt(Invoice.I_TRANS_ID)==invoiceEditList.get(edit).getiTransId()){
+                                        flag=true;
+                                    }
+                                }
+                                if(!flag){
+                                    transId.add(invoiceEditList.get(edit).getiTransId());
+                                }
+                            }
+                        }
+
+                        for (int trans_id=0;trans_id<transId.size();trans_id++){
+                            for (int inVedit=0;inVedit<invoiceEditList.size();inVedit++){
+                                if(invoiceEditList.get(inVedit).getiTransId()==transId.get(trans_id)){
+                                    invoiceList.add(invoiceEditList.get(inVedit));
+                                    invoiceSecondList.add(invoiceEditList.get(inVedit));
+                                }
+                            }
+                        }
+                    }
+
+
+                    if(i+1==jsonArray.length()){
+                        for (int i1=0;i1<invoiceList.size();i1++){
+                            for (int j = 0; j < invoiceSelectedList.size(); j++) {
+                                if (invoiceSelectedList.get(j).getiTransId() == invoiceList.get(i1).getiTransId()) {
+                                    double remain_amount = invoiceList.get(i1).getAmount() -
+                                            invoiceSelectedList.get(j).getAmount();
+                                    Invoice invoice1 = new Invoice(invoiceList.get(i1).getiTransId(),
+                                            invoiceList.get(i1).getInvDate(),
+                                            invoiceList.get(i1).getInvNo(),
+                                            remain_amount,
+                                            invoiceList.get(i1).getCustomer(),
+                                            invoiceList.get(i1).getCustomerCode());
+                                    invoiceList.set(i1, invoice1);
+                                    invoiceAdapter.notifyDataSetChanged();
+                                }
+
+                                invoiceAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
+
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -793,6 +993,17 @@ public class PaymentReceiptFragment extends Fragment {
                 customerAdapter.setOnClickListener(new CustomerAdapter.OnClickListener() {
                     @Override
                     public void onItemClick(Customer customer, int position) {
+                        if(iCustomer!=0){
+                            if(iCustomer!=customer.getiId()){
+                                binding.linearInvoice.setVisibility(View.GONE);
+                                    EditMode=false;
+                                    invoiceEditList.clear();
+                                    invoiceList.clear();
+                                    invoiceSelectedList.clear();
+                                    invoiceSecondList.clear();
+                                    binding.amount.setText("");
+                            }
+                        }
                         iCustomer=customer.getiId();
                         binding.customer.setText(customer.getsName());
                         binding.customer.dismissDropDown();
@@ -924,18 +1135,26 @@ public class PaymentReceiptFragment extends Fragment {
                     autoText_H_list.get(k).setText(jsonObjectInner.getString("sTag" + headerListTags.get(k)));
                 }
 
-
                 Invoice invoice=new Invoice();
                 invoice.setiTransId(jsonObjectInner.getInt("iRefDocId"));
-                invoice.setAmount(jsonObjectInner.getString("fAmount"));
+                invoice.setAmount(jsonObjectInner.getDouble("fAmount"));
                 invoice.setInvDate(jsonObjectInner.getString("InvDate"));
                 invoice.setInvNo(jsonObjectInner.getString("InvNo"));
+
+                Invoice invoice1=new Invoice();
+                invoice1.setiTransId(jsonObjectInner.getInt("iRefDocId"));
+                invoice1.setAmount(jsonObjectInner.getDouble("fAmount"));
+                invoice1.setInvDate(jsonObjectInner.getString("InvDate"));
+                invoice1.setInvNo(jsonObjectInner.getString("InvNo"));
 
                 Log.d("invoice",jsonObjectInner.getString("iRefDocId"));
                 if(jsonObjectInner.getInt("iRefDocId")!=0){
                     binding.linearInvoice.setVisibility(View.VISIBLE);
                 }
                 invoiceSelectedList.add(invoice);
+                invoiceEditList.add(invoice1);
+                Log.d("invoice",invoiceEditList.get(j).getAmount()+"");
+
                 invoiceSelectedAdapter.notifyDataSetChanged();
                 if(j+1==jsonArray1.length()) {
                     binding.recycleInvoiceHome.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -1001,11 +1220,7 @@ public class PaymentReceiptFragment extends Fragment {
 
                             autocompleteView.setText(tagDetails.getsName());
                             iTagDetail=tagDetails.getiId();
-                            if(iTagPosition.equals("Body")){
-//                                hashMapBody.put(iTag,iTagDetail);
-
-                            }
-                            else if(iTagPosition.equals("Header"))
+                        if(iTagPosition.equals("Header"))
                             {
                                 hashMapHeader.put(iTag,iTagDetail);
                             }

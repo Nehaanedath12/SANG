@@ -5,8 +5,13 @@
     android:layout_gravity="center"
     android:layout_height="wrap_content"
     android:orientation="vertical">
+    <TextView
+        android:id="@+id/actualAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"/>
     <EditText
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:id="@+id/amountEdit"
         android:inputType="numberDecimal"
         android:layout_width="match_parent"

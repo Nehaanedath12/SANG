@@ -3,12 +3,13 @@ package com.sangsolutions.sang.Adapter.InvoiceAdapter;
 public class Invoice {
 
     int iTransId;
-    String InvDate, InvNo,Amount,Customer,CustomerCode;
+    String InvDate, InvNo,Customer,CustomerCode;
+    Double Amount;
 
     public Invoice() {
     }
 
-    public Invoice(int iTransId, String invDate, String invNo, String amount, String customer, String customerCode) {
+    public Invoice(int iTransId, String invDate, String invNo, Double amount, String customer, String customerCode) {
         this.iTransId = iTransId;
         InvDate = invDate;
         InvNo = invNo;
@@ -41,11 +42,11 @@ public class Invoice {
         InvNo = invNo;
     }
 
-    public String getAmount() {
+    public Double getAmount() {
         return Amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Double amount) {
         Amount = amount;
     }
 

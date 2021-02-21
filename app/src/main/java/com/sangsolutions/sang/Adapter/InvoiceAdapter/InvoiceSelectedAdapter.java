@@ -1,5 +1,6 @@
 package com.sangsolutions.sang.Adapter.InvoiceAdapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
@@ -17,11 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.sangsolutions.sang.R;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelectedAdapter.ViewHolder> {
     Context context;
     List<Invoice>list;
+    List<Invoice>invoiceSecondList;
     private OnClickListener onClickListener;
 
     public void setOnClickListener(OnClickListener onClickListener) {
@@ -32,9 +35,10 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
         void onItemClick( List<Invoice> list, int position);
     }
 
-    public InvoiceSelectedAdapter(Context context, List<Invoice> list) {
+    public InvoiceSelectedAdapter(Context context, List<Invoice> list, List<Invoice> invoiceSecondList) {
         this.context=context;
         this.list=list;
+        this.invoiceSecondList=invoiceSecondList;
     }
 
     @NonNull
@@ -46,7 +50,9 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
 
     @Override
     public void onBindViewHolder(@NonNull InvoiceSelectedAdapter.ViewHolder holder, int position) {
-        holder.amount.setText(list.get(position).Amount);
+        DecimalFormat df = new DecimalFormat("0.00");
+        String amount=df.format(list.get(position).Amount);
+        holder.amount.setText(amount);
         holder.date.setText(list.get(position).InvDate);
         holder.number.setText(String.valueOf(list.get(position).InvNo));
         Log.d("invoicenumber",list.get(position).iTransId+"");
@@ -79,18 +85,22 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
         holder.parent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DecimalFormat df = new DecimalFormat("0.00");
                 View view = LayoutInflater.from(context).inflate(R.layout.dialogue_invoice_amount, null, false);
                 AlertDialog.Builder builderMain=new AlertDialog.Builder(context);
                 builderMain.setView(view);
                 builderMain.setCancelable(false);
                 AlertDialog alertDialog_Main = builderMain.create();
                 alertDialog_Main.show();
-                TextView cancel,apply;
+
+                TextView cancel,apply,actualAmount;
                 EditText edit;
                 cancel=view.findViewById(R.id.cancel);
                 apply=view.findViewById(R.id.apply);
                 edit=view.findViewById(R.id.amountEdit);
-                edit.setText(list.get(position).Amount);
+                actualAmount=view.findViewById(R.id.actualAmount);
+                String amount=df.format(list.get(position).Amount);
+                edit.setText(amount);
 
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -100,12 +110,29 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
                 });
 
                 apply.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View v) {
-                        list.get(position).Amount=edit.getText().toString();
-                        notifyDataSetChanged();
-                        alertDialog_Main.dismiss();
-                        onClickListener.onItemClick( list,position);
+                        Log.d("invoicenumberrrrrrrr",list.get(position).iTransId+" "+invoiceSecondList.size());
+
+                        for (int i=0;i<invoiceSecondList.size();i++){
+                            if(list.get(position).getiTransId()==invoiceSecondList.get(i).getiTransId())
+                            {
+                                if(!edit.getText().toString().equals("")) {
+                                    if (Double.parseDouble(edit.getText().toString()) > invoiceSecondList.get(i).getAmount()) {
+                                        edit.setError("should not greater than Total amount ");
+                                        actualAmount.setText("Total Amount: " + invoiceSecondList.get(i).getAmount() + "");
+                                    } else {
+                                        list.get(position).Amount = Double.parseDouble(edit.getText().toString());
+                                        notifyDataSetChanged();
+                                        alertDialog_Main.dismiss();
+                                        onClickListener.onItemClick(list, position);
+                                    }
+                                }else {
+                                    alertDialog_Main.dismiss();
+                                }
+                            }
+                        }
                     }
                 });
 
