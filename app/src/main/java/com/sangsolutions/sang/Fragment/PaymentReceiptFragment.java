@@ -5,9 +5,14 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -18,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -31,6 +35,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -41,6 +46,7 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.BankAdapter.Bank;
 import com.sangsolutions.sang.Adapter.BankAdapter.BankAdapter;
+import com.sangsolutions.sang.Adapter.CheckImageAdapter.CheckImageAdapter;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
 import com.sangsolutions.sang.Adapter.InvoiceAdapter.Invoice;
@@ -60,11 +66,17 @@ import com.sangsolutions.sang.databinding.CameraLayoutBinding;
 import com.sangsolutions.sang.databinding.FragmentPaymentReceiptBinding;
 import com.sangsolutions.sang.databinding.InvoiceDialogeLayoutBinding;
 import com.sangsolutions.sang.databinding.ViewImageBinding;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,8 +90,6 @@ import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.result.BitmapPhoto;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.result.WhenDoneListener;
-import io.fotoapparat.view.CameraView;
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class PaymentReceiptFragment extends Fragment {
     FragmentPaymentReceiptBinding binding;
@@ -131,10 +141,13 @@ public class PaymentReceiptFragment extends Fragment {
     List<Integer> headerListTags;
     String userCode;
 
-    BitmapPhoto bitmapPhotoMain = null;
     DecimalFormat decimalFormat ;
 
     String Api_invoice_response;
+    List<String> imageList;
+    CheckImageAdapter imageAdapter;
+
+    String Image;
 
 
 
@@ -183,6 +196,11 @@ public class PaymentReceiptFragment extends Fragment {
 
         tagList =new ArrayList<>();
         tagDetailsAdapter =new TagDetailsAdapter(requireActivity(),tagList);
+
+        imageList =new ArrayList<>();
+        imageAdapter=new CheckImageAdapter(requireContext(), imageList);
+        binding.rvImage.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL,false));
+        binding.rvImage.setAdapter(imageAdapter);
 
         hashMapHeader=new HashMap<>();
 
@@ -334,6 +352,8 @@ public class PaymentReceiptFragment extends Fragment {
         binding.saveMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 saveMain();
             }
         });
@@ -362,6 +382,22 @@ public class PaymentReceiptFragment extends Fragment {
 
         /////
 
+
+        imageAdapter.setOnClickListener(new CheckImageAdapter.OnClickListener() {
+            @Override
+            public void onImageClickListener(String photo, int position) {
+                ViewImageBinding viewImageBinding=ViewImageBinding.inflate(getLayoutInflater());
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(),android.R.style.Theme_Light_NoTitleBar_Fullscreen).setView(viewImageBinding.getRoot());
+                AlertDialog dialogue = builder.create();
+                dialogue.show();
+                Picasso.get().load(photo).into(viewImageBinding.viewImage);
+//                PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(viewImageBinding.viewImage);
+//                photoViewAttacher.canZoom();
+            }
+        });
+
+
+
        return binding.getRoot();
     }
 
@@ -389,44 +425,19 @@ public class PaymentReceiptFragment extends Fragment {
                     @Override
                     public void whenDone(BitmapPhoto bitmapPhoto) {
                         if (bitmapPhoto != null) {
-                            bitmapPhotoMain=bitmapPhoto;
-                            binding.imgFrame.setVisibility(View.VISIBLE);
-                            binding.image.setImageBitmap(bitmapPhoto.bitmap);
-                            binding.image.setRotation(-bitmapPhoto.rotationDegrees);
+                            File f=new File(Tools.savePhoto(requireContext(),photoResult));
+                            imageList.add(Uri.fromFile(f)+"");
+//                            Log.d("ImageList",photoResult.saveToFile(new File()));
+                            imageAdapter.notifyDataSetChanged();
                             fotoapparat.stop();
                             dialogue.dismiss();
-
-
-                            binding.imgDelete.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    binding.imgFrame.setVisibility(View.GONE);
-                                }
-                            });
                         }
                     }
                 });
             }
         });
-
-
-        binding.image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ViewImageBinding viewImageBinding=ViewImageBinding.inflate(getLayoutInflater());
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(),android.R.style.Theme_Light_NoTitleBar_Fullscreen).setView(viewImageBinding.getRoot());
-                AlertDialog dialogue = builder.create();
-                dialogue.show();
-                viewImageBinding.viewImage.setImageBitmap(bitmapPhotoMain.bitmap);
-                viewImageBinding.viewImage.setRotation(-bitmapPhotoMain.rotationDegrees);
-                PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(viewImageBinding.viewImage);
-                photoViewAttacher.canZoom();
-
-            }
-        });
-
-
     }
+
 
     private void deleteAll() {
         EditMode=false;
@@ -534,6 +545,34 @@ public class PaymentReceiptFragment extends Fragment {
 
     private void uploadToJson() {
 
+        List<File> file = new ArrayList<>();
+        Image = TextUtils.join(",", imageList);
+
+        for (int i = 0; i < imageList.size(); i++) {
+            if(imageList.get(i).contains("file://")){
+                Log.d("fileC",  imageList.get(i).substring(7)+"");
+                imageList.set(i,imageList.get(i).substring(7));
+            }
+            else if(imageList.get(i).contains("http")){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imageList.get(i));
+                String image=Tools.savePhotoURL(requireContext(),myBitmap);
+                imageList.set(i, image);
+                Log.d("fileI",  image+"");
+            }
+            Log.d("imagelist_size",  imageList.size()+" "+imageList.get(i));
+
+            File file1 = new File(imageList.get(i));
+            if (file1.exists()) {
+                file.add(file1);
+                Log.d("file1",  file.get(i)+"");
+            }
+        }
+        String imageName=Tools.getFileList(Image);
+        Log.d("Imagee",Image+"       "+imageName);
+
+
+
+
         JSONObject jsonObjectMain=new JSONObject();
         try{
             jsonObjectMain.put("iTransId",iTransId);
@@ -548,14 +587,17 @@ public class PaymentReceiptFragment extends Fragment {
             if(iPaymentMethod==2) {
                 jsonObjectMain.put("iBank", iBank);
                 jsonObjectMain.put("iChequeNo", Float.parseFloat(binding.checkNo.getText().toString()));
+                jsonObjectMain.put("sAttachment",imageName);
             }else if(iPaymentMethod==1){
                 jsonObjectMain.put("iBank", 0);
                 jsonObjectMain.put("iChequeNo", 0);
+                jsonObjectMain.put("sAttachment","");
             }
             jsonObjectMain.put("sChequeDate", Tools.dateFormat(binding.checkDate.getText().toString()));
 
             assert userIdS != null;
             jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
+
 
             Log.d("jsonObjecMain",jsonObjectMain.get("iTransId")+"");
             Log.d("jsonObjecMain",jsonObjectMain.get("sDocNo")+"");
@@ -612,7 +654,7 @@ public class PaymentReceiptFragment extends Fragment {
             jsonObjectMain.put("Body",jsonArray);
 
             Log.d("jsonnn",jsonObjectMain.toString());
-            uploadToAPI(jsonObjectMain);
+            uploadToAPI(jsonObjectMain,file);
 
         } catch (JSONException e) {
 
@@ -622,11 +664,15 @@ public class PaymentReceiptFragment extends Fragment {
 
     }
 
-    private void uploadToAPI(JSONObject jsonObjectMain) {
+    private void uploadToAPI(JSONObject jsonObjectMain, List<File> files) {
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+URLs.Post_Receipt_Payment)
-                    .addJSONObjectBody(jsonObjectMain)
+//            AndroidNetworking.post("http://"+URLs.Post_Receipt_Payment)
+//                    .addJSONObjectBody(jsonObjectMain)
+            AndroidNetworking.upload("http://"+URLs.Post_Receipt_Payment)
+                    .addMultipartParameter("json_content",jsonObjectMain.toString())
+                    .setContentType("multipart/form-data")
+                    .addMultipartFileList("file",files)
                     .setPriority(Priority.MEDIUM)
                     .build()
                     .getAsString(new StringRequestListener() {
@@ -718,7 +764,7 @@ public class PaymentReceiptFragment extends Fragment {
 
             builder.setView(bindingInvoice.getRoot());
             alertDialog_invoice=builder.create();
-            alertDialog_invoice.setCancelable(false);
+//            alertDialog_invoice.setCancelable(false);
             bindingInvoice.recyclerViewInvoice.setAdapter(invoiceAdapter);
 
             API_Invoice();
@@ -1104,11 +1150,15 @@ public class PaymentReceiptFragment extends Fragment {
 
     private void loadAPIValue_for_Edit(JSONObject response) {
         try {
+            String sAttachment = null;
             JSONArray jsonArray=new JSONArray(response.getString("Table"));
             Log.d("resultArray",jsonArray.length()+"");
 
             JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
             Log.d("resultArray1",jsonArray1.length()+"");
+
+            JSONArray jsonArray2=new JSONArray(response.getString("Table2"));
+            Log.d("resultArray2",jsonArray2.length()+"");
 
             for (int i=0;i<jsonArray.length();i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -1120,14 +1170,32 @@ public class PaymentReceiptFragment extends Fragment {
                 binding.description.setText(jsonObject.getString("sNarration"));
                 binding.amount.setText(jsonObject.getString("fAmount"));
                 iPaymentMethod = jsonObject.getInt("iPaymentMethod");
-                if(iPaymentMethod==2){
+                if(iPaymentMethod==2) {
                     binding.paymentSpinner.setSelection(1);
                     iBank = jsonObject.getInt("iBank");
                     binding.bankName.setText(jsonObject.getString("sBank"));
                     binding.checkNo.setText(jsonObject.getString("iChequeNo"));
                     binding.checkDate.setText(jsonObject.getString("sChequeDate"));
+                    sAttachment=jsonObject.getString("sAttachment");
+                    Log.d("sAttachments",sAttachment);
                 }
             }
+
+            if(iPaymentMethod==2 && !sAttachment.equals("")){
+                Log.d("resultArray2",jsonArray2.length()+" "+iPaymentMethod);
+                for(int k=0;k<jsonArray2.length();k++){
+                    JSONObject jsonObject2 = jsonArray2.getJSONObject(k);
+                    String sAttachment2=jsonObject2.getString("sAttachment");
+                    Log.d("sAttachments",sAttachment2);
+                    imageList.add(sAttachment2);
+                    imageAdapter.notifyDataSetChanged();
+                }
+            }
+
+
+
+
+
             for (int j=0;j<jsonArray1.length();j++) {
                 JSONObject jsonObjectInner = jsonArray1.getJSONObject(j);
                 for (int k = 0; k < headerListTags.size(); k++) {

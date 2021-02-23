@@ -85,7 +85,7 @@
 
            <EditText
                android:id="@+id/description"
-               android:hint="Description"
+               android:hint="Narration"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"/>
        </LinearLayout>

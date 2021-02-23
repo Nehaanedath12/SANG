@@ -182,8 +182,11 @@
                         android:layout_height="wrap_content"/>
                         <LinearLayout
                             android:id="@+id/minor_damage_linear"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="130dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:background="@drawable/border_black"
                             android:orientation="horizontal"
                             >
                             <ImageView
@@ -196,34 +199,13 @@
                                 android:maxHeight="200dp"
                                 />
 
-                            <FrameLayout
-                                android:id="@+id/img_frame"
-                                android:visibility="gone"
-                                android:layout_width="70dp"
-                                android:layout_height="90dp"
-                                android:layout_gravity="center"
-                                android:layout_marginEnd="10dp"
-                                >
-                                <ImageView
-                                    android:id="@+id/image"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="center"
-                                    android:cropToPadding="true" />
-
-                                <ImageView
-                                    android:id="@+id/img_delete"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="top|left"
-                                    android:src="@drawable/ic_cancel" />
-                            </FrameLayout>
-<!--                            <androidx.recyclerview.widget.RecyclerView-->
-<!--                                android:id="@+id/rv_image"-->
-<!--                                android:layout_width="match_parent"-->
-<!--                                android:layout_height="match_parent" />-->
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rv_image"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
                         </LinearLayout>
                     <EditText
+                        android:layout_marginTop="10dp"
                         android:longClickable="false"
                         android:id="@+id/check_date"
                         android:hint="CheckDate"
@@ -250,7 +232,7 @@
 
                     <EditText
                         android:id="@+id/description"
-                        android:hint="Description"
+                        android:hint="Narration"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 <!--                    <Button-->
