@@ -26,13 +26,14 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
     List<Invoice>list;
     List<Invoice>invoiceSecondList;
     private OnClickListener onClickListener;
+    String status;
 
     public void setOnClickListener(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
     public interface OnClickListener {
 
-        void onItemClick( List<Invoice> list, int position);
+        void onItemClick(List<Invoice> list, int position);
     }
 
     public InvoiceSelectedAdapter(Context context, List<Invoice> list, List<Invoice> invoiceSecondList) {
@@ -69,7 +70,7 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
                                list.remove(position);
                                notifyDataSetChanged();
                                dialog.dismiss();
-                                onClickListener.onItemClick( list,position);
+                               onClickListener.onItemClick( list,position);
 
                             }
                         })
@@ -113,23 +114,27 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onClick(View v) {
-                        Log.d("invoicenumberrrrrrrr",list.get(position).iTransId+" "+invoiceSecondList.size());
 
                         for (int i=0;i<invoiceSecondList.size();i++){
                             if(list.get(position).getiTransId()==invoiceSecondList.get(i).getiTransId())
                             {
                                 if(!edit.getText().toString().equals("")) {
-                                    if (Double.parseDouble(edit.getText().toString()) > invoiceSecondList.get(i).getAmount()) {
+                                    Log.d("amountt",Double.parseDouble(edit.getText().toString())+"");
+                                    Log.d("amountts", invoiceSecondList.get(i).getAmount()+"");
+                                    if ((Double.parseDouble(edit.getText().toString())) > invoiceSecondList.get(i).getAmount()) {
                                         edit.setError("should not greater than Total amount ");
-                                        actualAmount.setText("Total Amount: " + invoiceSecondList.get(i).getAmount() + "");
+                                        Log.d("amountts", "if");
+//                                        actualAmount.setText("Total Amount: " + invoiceSecondList.get(i).getAmount() + "");
                                     } else {
                                         list.get(position).Amount = Double.parseDouble(edit.getText().toString());
                                         notifyDataSetChanged();
+                                        Log.d("amountts", "else");
                                         alertDialog_Main.dismiss();
                                         onClickListener.onItemClick(list, position);
                                     }
                                 }else {
                                     alertDialog_Main.dismiss();
+                                    Log.d("amountts", "else else");
                                 }
                             }
                         }

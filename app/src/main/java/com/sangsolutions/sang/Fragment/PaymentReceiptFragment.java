@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -73,10 +72,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -344,6 +339,7 @@ public class PaymentReceiptFragment extends Fragment {
         binding.invoiceB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 invoiceDialogue();
             }
         });
@@ -766,8 +762,11 @@ public class PaymentReceiptFragment extends Fragment {
             alertDialog_invoice=builder.create();
 //            alertDialog_invoice.setCancelable(false);
             bindingInvoice.recyclerViewInvoice.setAdapter(invoiceAdapter);
+            alertDialog_invoice.show();
 
             API_Invoice();
+
+
 
 
             invoiceAdapter.setOnClickListener(new InvoiceAdapter.OnClickListener() {
@@ -866,12 +865,17 @@ public class PaymentReceiptFragment extends Fragment {
 
                 }
                 binding.amount.setText(decimalFormat.format(totalAmount));
-                Log.d("amountttttt",String.valueOf(totalAmount));
 
                invoiceSelectedAdapter.setOnClickListener(new InvoiceSelectedAdapter.OnClickListener() {
                    @Override
                    public void onItemClick(List<Invoice> list, int position) {
-                       onItemClickInvoice(list,position);
+                       if(list.size()==0){
+                           binding.linearInvoice.setVisibility(View.GONE);
+                           binding.amount.setText("");
+                       }else {
+                           onItemClickInvoice(list,position);
+                       }
+
 
                    }
                });
@@ -930,7 +934,7 @@ public class PaymentReceiptFragment extends Fragment {
     private void load_API_Invoice(JSONArray response) {
             invoiceList.clear();
         List<Integer>transId=new ArrayList<>();
-            alertDialog_invoice.show();
+
             try {
                 JSONArray jsonArray = new JSONArray(response.toString());
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -944,8 +948,11 @@ public class PaymentReceiptFragment extends Fragment {
                             jsonObject.getString(Invoice.CUSTOMER_CODE));
                     invoiceList.add(invoice);
                     invoiceSecondList.add(invoice);
+                    invoiceAdapter.notifyDataSetChanged();
 
                     if (EditMode) {
+                        Log.d("invoiceEditList",jsonObject.getInt(Invoice.I_TRANS_ID)+"");
+
                         for (int sel = 0; sel < invoiceEditList.size(); sel++) {
                             if (invoiceEditList.get(sel).getiTransId() == jsonObject.getInt(Invoice.I_TRANS_ID)) {
                                 Double amount = jsonObject.getDouble(Invoice.AMOUNT) +
@@ -958,6 +965,7 @@ public class PaymentReceiptFragment extends Fragment {
                                         jsonObject.getString(Invoice.CUSTOMER_CODE));
                                 invoiceList.set(i, invoice1);
                                 invoiceSecondList.set(i, invoice1);
+                                Log.d("invoiceSecondList11",invoiceSecondList.get(i).getAmount()+"");
                                 invoiceAdapter.notifyDataSetChanged();
                             }
                         }
@@ -965,8 +973,12 @@ public class PaymentReceiptFragment extends Fragment {
                         if(i+1==jsonArray.length()){
                             for (int edit=0;edit<invoiceEditList.size();edit++){
                                 boolean flag=false;
+
                                 for (int jArry=0;jArry<jsonArray.length();jArry++){
-                                    if(jsonObject.getInt(Invoice.I_TRANS_ID)==invoiceEditList.get(edit).getiTransId()){
+                                    JSONObject jsonObject1 = jsonArray.getJSONObject(jArry);
+                                    Log.d("invoiceEditList2",jsonObject1.getInt(Invoice.I_TRANS_ID)+"  "+
+                                            invoiceEditList.get(edit).getiTransId());
+                                    if(jsonObject1.getInt(Invoice.I_TRANS_ID)==invoiceEditList.get(edit).getiTransId()){
                                         flag=true;
                                     }
                                 }
@@ -975,12 +987,12 @@ public class PaymentReceiptFragment extends Fragment {
                                 }
                             }
                         }
-
                         for (int trans_id=0;trans_id<transId.size();trans_id++){
                             for (int inVedit=0;inVedit<invoiceEditList.size();inVedit++){
                                 if(invoiceEditList.get(inVedit).getiTransId()==transId.get(trans_id)){
                                     invoiceList.add(invoiceEditList.get(inVedit));
                                     invoiceSecondList.add(invoiceEditList.get(inVedit));
+                                    invoiceAdapter.notifyDataSetChanged();
                                 }
                             }
                         }
@@ -989,6 +1001,7 @@ public class PaymentReceiptFragment extends Fragment {
 
                     if(i+1==jsonArray.length()){
                         for (int i1=0;i1<invoiceList.size();i1++){
+                            Log.d("invoiceSecondList",invoiceSecondList.get(i1).getAmount()+"");
                             for (int j = 0; j < invoiceSelectedList.size(); j++) {
                                 if (invoiceSelectedList.get(j).getiTransId() == invoiceList.get(i1).getiTransId()) {
                                     double remain_amount = invoiceList.get(i1).getAmount() -
@@ -1014,7 +1027,7 @@ public class PaymentReceiptFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
+//        Log.d("invoiceSecondListt",invoiceSecondList.get(0).getAmount()+"");
     }
 
     private void GetCustomer(String customerKeyword) {
@@ -1230,12 +1243,20 @@ public class PaymentReceiptFragment extends Fragment {
                     invoiceSelectedAdapter.setOnClickListener(new InvoiceSelectedAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(List<Invoice> list, int position) {
-                            onItemClickInvoice(list,position);
+                            if(list.size()==0){
+                                binding.linearInvoice.setVisibility(View.GONE);
+                                binding.amount.setText("");
+                            }else {
+                                onItemClickInvoice(list,position);
+                            }
+
                         }
                     });
                 }
 
             }
+
+                API_Invoice();
 
                 alertDialog.dismiss();
 
