@@ -54,6 +54,7 @@ import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.Products.ProductsAdapter;
+import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetailsAdapter;
@@ -382,13 +383,14 @@ public class Sale_Purchase_Fragment extends Fragment {
                     }
 
                         for (int i = 0; i < mandatoryList_B.size(); i++) {
-                            if (!mandatoryList_B.get(i).getText().toString().equals("")) {
+                            if (!mandatoryList_B.get(i).getText().toString().equals("") &&
+                                    helper.isTagValid(mandatoryList_B.get(i).getText().toString().trim())) {
                                 if (i + 1 == mandatoryList_B.size() && flag ) {
                                    saveBodyPartProduct();
                                 }
 
                             } else {
-                                Toast.makeText(requireContext(), "Mandatory fields are not filled", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), "Mandatory fields are not filled properly", Toast.LENGTH_SHORT).show();
                                 mandatoryList_B.get(i).setError("Mandatory");
                                 flag = false;
                             }
@@ -415,7 +417,8 @@ public class Sale_Purchase_Fragment extends Fragment {
                                                     }
 
                                                     for (int i = 0; i < mandatoryList_H.size(); i++) {
-                                                        if (!mandatoryList_H.get(i).getText().toString().equals("")) {
+                                                        if (!mandatoryList_H.get(i).getText().toString().equals("")
+                                                                && helper.isTagValid(mandatoryList_H.get(i).getText().toString().trim())) {
                                                             if (i + 1 == mandatoryList_H.size() && flag) {
 //                                                                if(mandatoryList_H.size()==hashMapHeader.size()){
                                                                     saveMain();
@@ -459,22 +462,26 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.deleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                            AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
-                            builder.setTitle("delete!")
-                            .setMessage("Do you want to delete all ?")
+                if(EditMode) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+                    builder.setTitle("delete!")
+                            .setMessage("Do you want to delete ?")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                deleteAll();
-
-                                }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
+                                    deleteAll();
+
                                 }
-                                }).create().show();
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).create().show();
+                }else {
+                    Toast.makeText(requireActivity(), "Only existing document can delete", Toast.LENGTH_SHORT).show();
+                }
 
 
             }
@@ -523,8 +530,16 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 Log.d("responseHistory", response.toString());
                                 try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
-                                    arrayLength[0] = jsonArray.length() + 1;
-                                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
+//                                    if(jsonArray.length()==0) {
+                                        arrayLength[0] = jsonArray.length() + 1;
+                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
+//                                    }
+//                                    else {
+//                                        JSONObject jsonObject=jsonArray.getJSONObject(jsonArray.length()-1);
+//                                        Log.d("docNumber",docNo = userCode + "-" +
+//                                                DateFormat.format("MM", new Date()) + "-" + "000" + (jsonObject.getInt("iTransId")+1));
+//
+//                                    }
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
                                 } catch (JSONException e) {
@@ -660,17 +675,41 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void deleteAll() {
-        EditMode=false;
-        editModeProduct=false;
-        initialValueSettingHeader();
-        initialValueSettingBody();
-        binding.customer.setText("");
-        binding.description.setText("");
-        for (int i=0;i<autoText_H_list.size();i++){
-            autoText_H_list.get(i).setText("");
-        }
-        bodyPartList.clear();
-        bodyPartAdapter.notifyDataSetChanged();
+
+            AndroidNetworking.get("http://"+  URLs.DeleteTrans)
+                    .addQueryParameter("iTransId", String.valueOf(iTransId))
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsString(new StringRequestListener() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("response_delete",response);
+                            NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                            navController.navigate(actions);
+                            Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            Log.d("response_delete",anError.toString()+ anError.getErrorDetail()+anError.getErrorBody());
+
+                        }
+                    });
+
+
+//        EditMode=false;
+//        editModeProduct=false;
+//        initialValueSettingHeader();
+//        initialValueSettingBody();
+//        binding.customer.setText("");
+//        binding.description.setText("");
+//        for (int i=0;i<autoText_H_list.size();i++){
+//            autoText_H_list.get(i).setText("");
+//        }
+//        bodyPartList.clear();
+//        bodyPartAdapter.notifyDataSetChanged();
+
     }
 
     private void saveMain() {

@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -550,7 +551,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor.getCount() > 0;
     }
 
-    public boolean getTagNameValid(String tagName) {
+    public boolean isTagValid(String tagName) {
         this.db=getWritableDatabase();
         this.db=getReadableDatabase();
         Cursor cursor=db.rawQuery("select "+TagDetails.I_ID+" from "+TABLE_TAG_DETAILS+" where "+TagDetails.S_NAME
@@ -625,6 +626,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor=db.rawQuery("select "+TagDetails.I_ID +" from "+TABLE_TAG_DETAILS,null);
         cursor.moveToFirst();
         return cursor;
-
     }
+
 }

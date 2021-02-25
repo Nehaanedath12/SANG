@@ -119,16 +119,13 @@ public class InvoiceSelectedAdapter extends RecyclerView.Adapter<InvoiceSelected
                             if(list.get(position).getiTransId()==invoiceSecondList.get(i).getiTransId())
                             {
                                 if(!edit.getText().toString().equals("")) {
-                                    Log.d("amountt",Double.parseDouble(edit.getText().toString())+"");
-                                    Log.d("amountts", invoiceSecondList.get(i).getAmount()+"");
+
                                     if ((Double.parseDouble(edit.getText().toString())) > invoiceSecondList.get(i).getAmount()) {
                                         edit.setError("should not greater than Total amount ");
-                                        Log.d("amountts", "if");
 //                                        actualAmount.setText("Total Amount: " + invoiceSecondList.get(i).getAmount() + "");
                                     } else {
                                         list.get(position).Amount = Double.parseDouble(edit.getText().toString());
                                         notifyDataSetChanged();
-                                        Log.d("amountts", "else");
                                         alertDialog_Main.dismiss();
                                         onClickListener.onItemClick(list, position);
                                     }

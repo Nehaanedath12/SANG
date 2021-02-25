@@ -59,20 +59,39 @@
         app:fabCustomSize="50dp"
         app:tint="@color/white"
         app:useCompatPadding="true"/>
-<!--    <FrameLayout-->
-<!--        android:id="@+id/frameEmpty"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent">-->
-<!--        <TextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:text=" No Products yet.."-->
-<!--            android:gravity="center"-->
-<!--            android:textSize="20dp"-->
-<!--            android:textStyle="bold"-->
-<!--            android:textColor="@color/purple_500"-->
-<!--            />-->
-<!--    </FrameLayout>-->
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_delete"
+            app:backgroundTint="@color/red"
+            app:fabCustomSize="50dp"
+            app:tint="@color/white"
+            app:useCompatPadding="true" />
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_close"
+            app:backgroundTint="@color/green"
+            app:fabCustomSize="50dp"
+            app:tint="@color/white"
+            app:useCompatPadding="true" />
+
+    </LinearLayout>
 
 </RelativeLayout>

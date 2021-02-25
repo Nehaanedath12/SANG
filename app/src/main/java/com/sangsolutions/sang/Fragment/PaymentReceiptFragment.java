@@ -348,8 +348,6 @@ public class PaymentReceiptFragment extends Fragment {
         binding.saveMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 saveMain();
             }
         });
@@ -357,22 +355,26 @@ public class PaymentReceiptFragment extends Fragment {
         binding.deleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
-                builder.setTitle("delete!")
-                        .setMessage("Do you want to delete all ?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                deleteAll();
+                if(EditMode) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+                    builder.setTitle("delete!")
+                            .setMessage("Do you want to delete all ?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    deleteAll();
 
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).create().show();
+                }else {
+                    Toast.makeText(requireActivity(), "Only existing document can delete", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -436,18 +438,26 @@ public class PaymentReceiptFragment extends Fragment {
 
 
     private void deleteAll() {
-        EditMode=false;
-        initialValueSettingHeader();
-        binding.customer.setText("");
-        binding.description.setText("");
-        binding.amount.setText("");
-        binding.bankName.setText("");
-        binding.checkNo.setText("");
-        binding.linearInvoice.setVisibility(View.GONE);
-        for (int i=0;i<autoText_H_list.size();i++){
-            autoText_H_list.get(i).setText("");
-        }
+        AndroidNetworking.get("http://"+  URLs.DeleteTransReceipt_Payment)
+                .addQueryParameter("iTransId", String.valueOf(iTransId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("response_delete",response);
+                        NavDirections actions = PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToPaymentReceiptHistoryFragment(toolTitle,iDocType);
+                        navController.navigate(actions);
+                        Toast.makeText(requireContext(), "Deleted!!", Toast.LENGTH_SHORT).show();
 
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("response_delete",anError.toString()+ anError.getErrorDetail()+anError.getErrorBody());
+
+                    }
+                });
 
     }
 
@@ -479,7 +489,7 @@ public class PaymentReceiptFragment extends Fragment {
 
     private void SAVE() {
         if (!binding.customer.getText().toString().equals("") && helper.getCustomerNameValid(binding.customer.getText().toString().trim())) {
-            Double amount=0.0;
+            Double amount = 0.0;
             if(binding.linearInvoice.getVisibility()==View.VISIBLE){
                 for(int i=0;i<invoiceSelectedList.size();i++){
                     amount+=invoiceSelectedList.get(i).getAmount();
@@ -565,7 +575,6 @@ public class PaymentReceiptFragment extends Fragment {
         }
         String imageName=Tools.getFileList(Image);
         Log.d("Imagee",Image+"       "+imageName);
-
 
 
 
@@ -752,7 +761,7 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void invoiceDialogue() {
-        if(!binding.customer.getText().toString().equals(""))
+        if(!binding.customer.getText().toString().equals("") && iCustomer!=0)
         {
             AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
             bindingInvoice=InvoiceDialogeLayoutBinding.inflate(getLayoutInflater());
@@ -765,9 +774,6 @@ public class PaymentReceiptFragment extends Fragment {
             alertDialog_invoice.show();
 
             API_Invoice();
-
-
-
 
             invoiceAdapter.setOnClickListener(new InvoiceAdapter.OnClickListener() {
                 @Override
@@ -789,7 +795,6 @@ public class PaymentReceiptFragment extends Fragment {
                     alertDialog_invoice.dismiss();
                     loadSelectedInvoice();
 
-
                 }
             });
 
@@ -801,7 +806,7 @@ public class PaymentReceiptFragment extends Fragment {
             });
         }
         else {
-            binding.customer.setError("select customer");
+            binding.customer.setError("select Valid customer");
         }
     }
 
@@ -810,11 +815,11 @@ public class PaymentReceiptFragment extends Fragment {
         Double totalAmount = 0.0;
         List<Integer> listSelectedItem = invoiceAdapter.getSelectedItems();
         for (int i=0;i<listSelectedItem.size();i++) {
-
             for (int j = 0; j< invoiceList.size(); j++) {
                 if (listSelectedItem.get(i) == j) {
                     try {
-                        if (invoiceSelectedList.size() ==listSelectedItem.size() && invoiceSelectedList.get(i).getiTransId() == invoiceList.get(j).getiTransId()) {
+                        if (invoiceSelectedList.size() ==listSelectedItem.size() &&
+                                invoiceSelectedList.get(i).getiTransId() == invoiceList.get(j).getiTransId()) {
 
                             Double re_amount = invoiceSelectedList.get(i).getAmount() +
                                     invoiceList.get(j).getAmount();
@@ -885,7 +890,7 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void onItemClickInvoice(List<Invoice> list, int position) {
-        Double total_Amount=0.0;
+        Double total_Amount = 0.0;
         for (int i=0;i<list.size();i++) {
             total_Amount += list.get(i).getAmount();
             Log.d("total_Amount",total_Amount+"  "+list.get(i).getAmount());
@@ -932,9 +937,9 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void load_API_Invoice(JSONArray response) {
-            invoiceList.clear();
+        invoiceList.clear();
         List<Integer>transId=new ArrayList<>();
-
+        Log.d("invoiceSecondList4",invoiceEditList.size()+" j ");
             try {
                 JSONArray jsonArray = new JSONArray(response.toString());
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -949,11 +954,10 @@ public class PaymentReceiptFragment extends Fragment {
                     invoiceList.add(invoice);
                     invoiceSecondList.add(invoice);
                     invoiceAdapter.notifyDataSetChanged();
-
+                    Log.d("invoiceSecondList",invoiceSecondList.get(i).getAmount()+"");
                     if (EditMode) {
-                        Log.d("invoiceEditList",jsonObject.getInt(Invoice.I_TRANS_ID)+"");
-
                         for (int sel = 0; sel < invoiceEditList.size(); sel++) {
+                            Log.d("invoiceSecondList3",invoiceEditList.size()+" j "+invoiceEditList.get(sel).getAmount());
                             if (invoiceEditList.get(sel).getiTransId() == jsonObject.getInt(Invoice.I_TRANS_ID)) {
                                 Double amount = jsonObject.getDouble(Invoice.AMOUNT) +
                                         invoiceEditList.get(sel).getAmount();
@@ -992,6 +996,7 @@ public class PaymentReceiptFragment extends Fragment {
                                 if(invoiceEditList.get(inVedit).getiTransId()==transId.get(trans_id)){
                                     invoiceList.add(invoiceEditList.get(inVedit));
                                     invoiceSecondList.add(invoiceEditList.get(inVedit));
+                                    Log.d("invoiceSecondList3",invoiceSecondList.get(i).getAmount()+"");
                                     invoiceAdapter.notifyDataSetChanged();
                                 }
                             }
@@ -1001,7 +1006,6 @@ public class PaymentReceiptFragment extends Fragment {
 
                     if(i+1==jsonArray.length()){
                         for (int i1=0;i1<invoiceList.size();i1++){
-                            Log.d("invoiceSecondList",invoiceSecondList.get(i1).getAmount()+"");
                             for (int j = 0; j < invoiceSelectedList.size(); j++) {
                                 if (invoiceSelectedList.get(j).getiTransId() == invoiceList.get(i1).getiTransId()) {
                                     double remain_amount = invoiceList.get(i1).getAmount() -
@@ -1020,8 +1024,6 @@ public class PaymentReceiptFragment extends Fragment {
                             }
                         }
                     }
-
-
                 }
 
             } catch (JSONException e) {
@@ -1217,26 +1219,30 @@ public class PaymentReceiptFragment extends Fragment {
                 }
 
                 Invoice invoice=new Invoice();
-                invoice.setiTransId(jsonObjectInner.getInt("iRefDocId"));
-                invoice.setAmount(jsonObjectInner.getDouble("fAmount"));
-                invoice.setInvDate(jsonObjectInner.getString("InvDate"));
-                invoice.setInvNo(jsonObjectInner.getString("InvNo"));
+                Invoice invoice1 = new Invoice();
+                if(jsonObjectInner.getInt("iRefDocId")!=0) {
+                    invoice.setiTransId(jsonObjectInner.getInt("iRefDocId"));
+                    invoice.setAmount(jsonObjectInner.getDouble("fAmount"));
+                    invoice.setInvDate(jsonObjectInner.getString("InvDate"));
+                    invoice.setInvNo(jsonObjectInner.getString("InvNo"));
 
-                Invoice invoice1=new Invoice();
-                invoice1.setiTransId(jsonObjectInner.getInt("iRefDocId"));
-                invoice1.setAmount(jsonObjectInner.getDouble("fAmount"));
-                invoice1.setInvDate(jsonObjectInner.getString("InvDate"));
-                invoice1.setInvNo(jsonObjectInner.getString("InvNo"));
-
-                Log.d("invoice",jsonObjectInner.getString("iRefDocId"));
-                if(jsonObjectInner.getInt("iRefDocId")!=0){
-                    binding.linearInvoice.setVisibility(View.VISIBLE);
+                    invoice1.setiTransId(jsonObjectInner.getInt("iRefDocId"));
+                    invoice1.setAmount(jsonObjectInner.getDouble("fAmount"));
+                    invoice1.setInvDate(jsonObjectInner.getString("InvDate"));
+                    invoice1.setInvNo(jsonObjectInner.getString("InvNo"));
+                    Log.d("invoice",jsonObjectInner.getString("iRefDocId"));
+                    if(jsonObjectInner.getInt("iRefDocId")!=0){
+                        binding.linearInvoice.setVisibility(View.VISIBLE);
+                    }
+                    invoiceSelectedList.add(invoice);
+                    invoiceEditList.add(invoice1);
+                    Log.d("invoice",invoiceEditList.get(j).getAmount()+"");
+                    invoiceSelectedAdapter.notifyDataSetChanged();
                 }
-                invoiceSelectedList.add(invoice);
-                invoiceEditList.add(invoice1);
-                Log.d("invoice",invoiceEditList.get(j).getAmount()+"");
 
-                invoiceSelectedAdapter.notifyDataSetChanged();
+
+
+
                 if(j+1==jsonArray1.length()) {
                     binding.recycleInvoiceHome.setLayoutManager(new LinearLayoutManager(requireContext()));
                     binding.recycleInvoiceHome.setAdapter(invoiceSelectedAdapter);

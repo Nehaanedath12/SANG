@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_homeFragment_to_paymentReceiptHistoryFragment"
             app:destination="@id/paymentReceiptHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_salesPurchaseReturnHistoryFragment"
+            app:destination="@id/salesPurchaseReturnHistoryFragment" />
 
 
     </fragment>
@@ -173,6 +176,42 @@
             app:destination="@id/report_selection_fragment" />
         <action
             android:id="@+id/action_p_R_ReportFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salesPurchaseReturnFragment"
+        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseReturnFragment"
+        android:label="{tool_title}"
+        tools:layout="@layout/fragment_sales_purchase_return">
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+        <argument
+            android:name="iDocType"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_salesPurchaseReturnFragment_to_salesPurchaseReturnHistoryFragment"
+            app:destination="@id/salesPurchaseReturnHistoryFragment" />
+        <action
+            android:id="@+id/action_salesPurchaseReturnFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salesPurchaseReturnHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseReturnHistoryFragment"
+        android:label="{tool_title}"
+        tools:layout="@layout/fragment_history_sales_purchase_return">
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+        <argument
+            android:name="iDocType"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_salesPurchaseReturnHistoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_salesPurchaseReturnHistoryFragment_to_homeFragment2"
             app:destination="@id/homeFragment" />
     </fragment>
 </navigation>

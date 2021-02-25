@@ -47,6 +47,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Home extends AppCompatActivity {
     ActivityMainBinding binding;
@@ -59,6 +62,7 @@ public class Home extends AppCompatActivity {
     String userName;
     Cursor tagCursor;
     SchedulerJob schedulerJob;
+    List<Integer>tagList;
 
     @Override
     public void onBackPressed() {
@@ -102,6 +106,7 @@ public class Home extends AppCompatActivity {
         View view=binding.getRoot();
         setContentView(view);
         helper=new DatabaseHelper(this);
+
 
         toolbar=binding.toolbar;
         drawer=binding.drawerLayout;
@@ -188,7 +193,7 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(action);
                             } else {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1);
-                                navController.navigateUp();
+                                navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }
                         }else {
@@ -207,7 +212,7 @@ public class Home extends AppCompatActivity {
                         }
                         else{
                             NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(2);
-                            navController.navigateUp();
+                            navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
                         }else {
@@ -226,12 +231,27 @@ public class Home extends AppCompatActivity {
                             }
                             else {
                                 NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",1);
-                                navController.navigateUp();
+                                navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }
                             }else {
                                 Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
                             }
+                        }
+                        break;
+
+
+                        case R.id.salesPurchaseReturnHistoryFragment:{
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Sales Return History",2);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+
+                        }
+                        break;
+                        case R.id.PurchaseReturnHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Purchase Return History",1);
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
                         }
                         break;
 
@@ -246,7 +266,7 @@ public class Home extends AppCompatActivity {
                             }
                             else {
                                 NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",2);
-                                navController.navigateUp();
+                                navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }
                             }else {
@@ -340,7 +360,7 @@ public class Home extends AppCompatActivity {
     }
 
     private void loadTagData(JSONObject response, String iType) {
-
+        tagList=new ArrayList<>();
         try {
             JSONArray jsonArray = new JSONArray(response.getString("Data"));
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -351,6 +371,7 @@ public class Home extends AppCompatActivity {
                         jsonObject.getString(TagDetails.S_ALT_NAME),
                         jsonObject.getInt(TagDetails.I_ID),
                         iType);
+                tagList.add(jsonObject.getInt(TagDetails.I_ID));
 
                 if (helper.checkTagDetailsById(jsonObject.getString(TagDetails.I_ID), iType)) {
                     if (helper.checkAllDataMasterTag(details)) {

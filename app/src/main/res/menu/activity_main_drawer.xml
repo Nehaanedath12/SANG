@@ -27,6 +27,16 @@
             android:icon="@drawable/ic_sales"
             android:title="Receipt" />
         <item
+            android:id="@+id/salesPurchaseReturnHistoryFragment"
+            android:icon="@drawable/ic_sales"
+            android:title="Sales Return" />
+        <item
+            android:id="@+id/PurchaseReturnHistoryFragment"
+            android:icon="@drawable/ic_sales"
+            android:title="Purchase Return" />
+
+
+        <item
             android:id="@+id/syncNav"
             android:icon="@drawable/ic_sync"
             android:title="Sync" />
