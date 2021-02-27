@@ -306,6 +306,9 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         Log.d("response_delete",response);
+                        if(response.equals("-1")){
+                            Toast.makeText(requireContext(), "Can't delete.Its invoice has used.", Toast.LENGTH_SHORT).show();
+                        }
                         getHistoryDatas();
                     }
 

@@ -497,6 +497,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
         if (iDocType == 1) {
+            binding.customer.setHint("Select Vendor");
             toolTitle = "Purchase Summary";
         } else {
             toolTitle = "Sale Summary";
@@ -509,14 +510,9 @@ public class Sale_Purchase_Fragment extends Fragment {
                 Cursor cursor = helper.getUserCode(userIdS);
                 if (cursor!=null) {
                     userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
-                    Log.d("docnoo",cursor.getCount()+""+userCode);
-                }
-                else {
-                    Log.d("docnoo",userIdS);
                 }
 
 
-                final int[] arrayLength = new int[1];
                 ///////
 
                 AndroidNetworking.get("http://" + URLs.GetTransSummary)
@@ -530,16 +526,8 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 Log.d("responseHistory", response.toString());
                                 try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
-//                                    if(jsonArray.length()==0) {
-                                        arrayLength[0] = jsonArray.length() + 1;
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
-//                                    }
-//                                    else {
-//                                        JSONObject jsonObject=jsonArray.getJSONObject(jsonArray.length()-1);
-//                                        Log.d("docNumber",docNo = userCode + "-" +
-//                                                DateFormat.format("MM", new Date()) + "-" + "000" + (jsonObject.getInt("iTransId")+1));
-//
-//                                    }
+                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
+
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
                                 } catch (JSONException e) {

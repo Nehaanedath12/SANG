@@ -25,7 +25,8 @@ public class URLs {
     public static final String GetReceipt_PaymentReport =domain+"GetReceipt_PaymentReport";
     public static final String DeleteTrans =domain+"DeleteTrans";
     public static final String DeleteTransReceipt_Payment =domain+"DeleteTransReceipt_Payment";
-
+    public static final String GetTransReturnSummary =domain+"GetTransReturnSummary";
+    public static final String DeleteTransReturn =domain+"DeleteTransReturn";
 
 
 }

@@ -14,25 +14,24 @@
             android:title="Sales" />
         <item
             android:id="@+id/purchaseFragment"
-            android:icon="@drawable/ic_purchase"
-            android:title="Purchase"
-            tools:ignore="DuplicateIds" />
+            android:icon="@drawable/ic_sales"
+            android:title="Purchase" />
 
         <item
             android:id="@+id/paymentReceiptHistoryFragment"
-            android:icon="@drawable/ic_sales"
+            android:icon="@drawable/ic_purchase"
             android:title="Payment" />
         <item
             android:id="@+id/ReceiptHistoryFragment"
-            android:icon="@drawable/ic_sales"
+            android:icon="@drawable/ic_purchase"
             android:title="Receipt" />
         <item
             android:id="@+id/salesPurchaseReturnHistoryFragment"
-            android:icon="@drawable/ic_sales"
+            android:icon="@drawable/ic_return"
             android:title="Sales Return" />
         <item
             android:id="@+id/PurchaseReturnHistoryFragment"
-            android:icon="@drawable/ic_sales"
+            android:icon="@drawable/ic_return"
             android:title="Purchase Return" />
 
 

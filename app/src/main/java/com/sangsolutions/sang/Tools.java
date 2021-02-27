@@ -12,15 +12,20 @@ import android.util.Log;
 import android.util.Patterns;
 import android.util.TypedValue;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +40,8 @@ public class Tools {
     public static boolean isValidIP(CharSequence target) {
         return (!TextUtils.isEmpty(target) && Patterns.IP_ADDRESS.matcher(target).matches());
     }
+
+
 
     public String getIP(Context context){
         preferences = context.getSharedPreferences("Settings",Context.MODE_PRIVATE);
@@ -169,5 +176,27 @@ public class Tools {
         return file;
     }
 
+    public static int getDocNo(JSONArray jsonArray) {
+        List<Integer>num=new ArrayList<>();
+        for (int i=0;i<jsonArray.length();i++){
+            try {
+                Log.d("responseee",jsonArray.toString());
+                JSONObject jsonObject=jsonArray.getJSONObject(i);
+                String sDocNo=jsonObject.getString("sDocNo");
+                String result[] = sDocNo.split("-");
+                String returnValue = result[result.length - 1];
+                num.add(Integer.parseInt(returnValue));
+                Log.d("docNumbers",num.get(i).toString());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        Collections.sort(num);
+
+        int value=num.get(num.size() - 1);
+        Log.d("docNumberr",num.get(num.size() - 1).toString());
+        return value+1;
+    }
 
 }

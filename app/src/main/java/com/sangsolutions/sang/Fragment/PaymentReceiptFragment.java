@@ -242,7 +242,6 @@ public class PaymentReceiptFragment extends Fragment {
                 Cursor cursor1=helper.getTagNamebyId(tagId);
                 cursor1.moveToFirst();
                 if(iTagPosition.equals("1")) {
-
                     headerListTags.add(tagId);
                     LinearLayout ll = binding.linearHeader;
                     AutoCompleteTextView autoTextHeader = new AutoCompleteTextView(requireActivity());
@@ -527,23 +526,23 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void mandatoryChecking() {
-        boolean flag = true;
-            if (!binding.amount.getText().toString().equals("")) {
-                if (mandatoryList_H.size() <= 0) {
-                    uploadToJson();
-                }
-                for (int i = 0; i < mandatoryList_H.size(); i++) {
-                    if (!mandatoryList_H.get(i).getText().toString().equals("")) {
+                        boolean flag = true;
+                        if (!binding.amount.getText().toString().equals("")) {
+                        if (mandatoryList_H.size() <= 0) {
+                        uploadToJson();
+                        }
+                        for (int i = 0; i < mandatoryList_H.size(); i++) {
+                        if (!mandatoryList_H.get(i).getText().toString().equals("")) {
                         if (i + 1 == mandatoryList_H.size() && flag) {
                             uploadToJson();
                         }
-                    } else {
+                        } else {
                         Toast.makeText(requireContext(), "Mandatory fields are not filled", Toast.LENGTH_SHORT).show();
                         mandatoryList_H.get(i).setError("Mandatory");
                         flag = false;
-                    }
-                }
-            }
+                        }
+                        }
+                        }
             else {
                 binding.amount.setError("Empty!");
             }
@@ -555,28 +554,26 @@ public class PaymentReceiptFragment extends Fragment {
         Image = TextUtils.join(",", imageList);
 
         for (int i = 0; i < imageList.size(); i++) {
-            if(imageList.get(i).contains("file://")){
+                if(imageList.get(i).contains("file://")){
                 Log.d("fileC",  imageList.get(i).substring(7)+"");
                 imageList.set(i,imageList.get(i).substring(7));
-            }
-            else if(imageList.get(i).contains("http")){
+                }
+                else if(imageList.get(i).contains("http")){
                 Bitmap myBitmap = BitmapFactory.decodeFile(imageList.get(i));
                 String image=Tools.savePhotoURL(requireContext(),myBitmap);
                 imageList.set(i, image);
                 Log.d("fileI",  image+"");
-            }
-            Log.d("imagelist_size",  imageList.size()+" "+imageList.get(i));
+                }
+                Log.d("imagelist_size",  imageList.size()+" "+imageList.get(i));
 
-            File file1 = new File(imageList.get(i));
-            if (file1.exists()) {
+                File file1 = new File(imageList.get(i));
+                if (file1.exists()) {
                 file.add(file1);
                 Log.d("file1",  file.get(i)+"");
-            }
-        }
+                }
+                }
         String imageName=Tools.getFileList(Image);
         Log.d("Imagee",Image+"       "+imageName);
-
-
 
         JSONObject jsonObjectMain=new JSONObject();
         try{
@@ -617,10 +614,10 @@ public class PaymentReceiptFragment extends Fragment {
             Log.d("jsonObjecMainche",jsonObjectMain.get("iChequeNo")+"");
             Log.d("jsonObjecMainda",jsonObjectMain.get("sChequeDate")+"");
 
-            JSONArray jsonArray=new JSONArray();
+                    JSONArray jsonArray=new JSONArray();
 
-            if(invoiceSelectedList.size()>0) {
-                for (int i = 0; i < invoiceSelectedList.size(); i++) {
+                    if(invoiceSelectedList.size()>0) {
+                    for (int i = 0; i < invoiceSelectedList.size(); i++) {
                     JSONObject jsonObject = new JSONObject();
 
                     for (int j = 1; j <= tagTotalNumber; j++) {
@@ -639,7 +636,7 @@ public class PaymentReceiptFragment extends Fragment {
 
                     jsonArray.put(jsonObject);
                 }
-            }
+                }
             else {
                 invoiceSelectedList.size();
                 JSONObject jsonObject = new JSONObject();
@@ -650,16 +647,15 @@ public class PaymentReceiptFragment extends Fragment {
                         jsonObject.put("iTag" + j, 0);
                     }
                     Log.d("Tags" + j, jsonObject.get("iTag" + j) + "");
-                }
+                    }
 
-                jsonObject.put("iRefDocId",0);
-                jsonObject.put("fAmount", 0);
-                jsonArray.put(jsonObject);
-            }
-            jsonObjectMain.put("Body",jsonArray);
-
-            Log.d("jsonnn",jsonObjectMain.toString());
-            uploadToAPI(jsonObjectMain,file);
+                    jsonObject.put("iRefDocId",0);
+                    jsonObject.put("fAmount", 0);
+                    jsonArray.put(jsonObject);
+                    }
+                    jsonObjectMain.put("Body",jsonArray);
+                    Log.d("jsonnn",jsonObjectMain.toString());
+                    uploadToAPI(jsonObjectMain,file);
 
         } catch (JSONException e) {
 
@@ -670,34 +666,32 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain, List<File> files) {
-        if(Tools.isConnected(requireActivity())) {
-            alertDialog.show();
-//            AndroidNetworking.post("http://"+URLs.Post_Receipt_Payment)
-//                    .addJSONObjectBody(jsonObjectMain)
-            AndroidNetworking.upload("http://"+URLs.Post_Receipt_Payment)
+                    if(Tools.isConnected(requireActivity())) {
+                    alertDialog.show();
+                    AndroidNetworking.upload("http://"+URLs.Post_Receipt_Payment)
                     .addMultipartParameter("json_content",jsonObjectMain.toString())
                     .setContentType("multipart/form-data")
                     .addMultipartFileList("file",files)
                     .setPriority(Priority.MEDIUM)
                     .build()
                     .getAsString(new StringRequestListener() {
-                        @Override
-                        public void onResponse(String response) {
-                            if (response.contains(docNo)) {
+                                @Override
+                                public void onResponse(String response) {
+                                if (response.contains(docNo)) {
                                 alertDialog.dismiss();
                                 Log.d("responsePost_R_P", "successfully");
                                 Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
                                 NavDirections actions = PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToPaymentReceiptHistoryFragment(toolTitle,iDocType);
                                 navController.navigate(actions);
-                            }
-                        }
+                                }
+                                }
 
-                        @Override
-                        public void onError(ANError anError) {
+                            @Override
+                            public void onError(ANError anError) {
                             alertDialog.dismiss();
                             Log.d("responsePost_R_P", anError.getErrorDetail() + anError.getErrorBody() + anError.toString());
-                        }
-                    });
+                            }
+                            });
         }
         else {
             Snackbar snackbar=Snackbar.make(binding.getRoot(),"No Internet",Snackbar.LENGTH_LONG);
@@ -708,12 +702,12 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void GetBank(String bankKeyword) {
-        customerList.clear();
-        Cursor cursor=helper.getBankyKeyword(bankKeyword);
-        if(cursor!=null && !bankKeyword.equals("")) {
+            customerList.clear();
+            Cursor cursor=helper.getBankyKeyword(bankKeyword);
+            if(cursor!=null && !bankKeyword.equals("")) {
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {
-                for (int i = 0; i < cursor.getCount(); i++) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
                     Bank bank = new Bank();
                     bank.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Bank.I_ID))));
                     bank.setsCode(cursor.getString(cursor.getColumnIndex(Bank.S_CODE)));
@@ -724,7 +718,7 @@ public class PaymentReceiptFragment extends Fragment {
                     if (i + 1 == cursor.getCount()) {
                         bankAdapter.notifyDataSetChanged();
                     }
-                }
+                    }
 
                 bankAdapter.setOnClickListener(new BankAdapter.OnClickListener() {
                     @Override
@@ -739,19 +733,17 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void settingDate(EditText date) {
-        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-
+                DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 StringDate = Tools.checkDigit(dayOfMonth)+
                         "-" +
                         Tools.checkDigit(month + 1) +
                         "-"+
                         year;
                 date.setText(StringDate);
-            }
-        };
+                }
+                };
         Calendar now = Calendar.getInstance();
         int year = now.get(Calendar.YEAR);
         int month = now.get(Calendar.MONTH);
@@ -776,126 +768,114 @@ public class PaymentReceiptFragment extends Fragment {
             API_Invoice();
 
             invoiceAdapter.setOnClickListener(new InvoiceAdapter.OnClickListener() {
-                @Override
-                public void OnItemClick(Invoice invoice, int position) {
-                    if(invoice.getAmount()==0.0){
+                        @Override
+                        public void OnItemClick(Invoice invoice, int position) {
+                        if(invoice.getAmount()==0.0){
                         Toast.makeText(requireContext(), "No Amount", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                        }
+                        else {
                         enableActionMode(position);
                         selectionActive = true;
-                    }
-                }
-            });
+                        }
+                        }
+                });
 
             bindingInvoice.apply.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
+                    @Override
+                    public void onClick(View v) {
                     alertDialog_invoice.dismiss();
                     loadSelectedInvoice();
-
-                }
-            });
+                    }
+                    });
 
             bindingInvoice.cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     alertDialog_invoice.dismiss();
                 }
-            });
-        }
-        else {
+                });
+                }
+            else {
             binding.customer.setError("select Valid customer");
-        }
-    }
+            }
+            }
 
     private void loadSelectedInvoice() {
-//        .clear();
-        Double totalAmount = 0.0;
-        List<Integer> listSelectedItem = invoiceAdapter.getSelectedItems();
-        for (int i=0;i<listSelectedItem.size();i++) {
-            for (int j = 0; j< invoiceList.size(); j++) {
-                if (listSelectedItem.get(i) == j) {
-                    try {
+                        Double totalAmount = 0.0;
+                        List<Integer> listSelectedItem = invoiceAdapter.getSelectedItems();
+                        for (int i=0;i<listSelectedItem.size();i++) {
+                        for (int j = 0; j< invoiceList.size(); j++) {
+                        if (listSelectedItem.get(i) == j) {
+                        try {
                         if (invoiceSelectedList.size() ==listSelectedItem.size() &&
                                 invoiceSelectedList.get(i).getiTransId() == invoiceList.get(j).getiTransId()) {
 
-                            Double re_amount = invoiceSelectedList.get(i).getAmount() +
+                                    Double re_amount = invoiceSelectedList.get(i).getAmount() +
                                     invoiceList.get(j).getAmount();
-                            Invoice invoice1 = new Invoice(invoiceList.get(j).getiTransId(),
+                                    Invoice invoice1 = new Invoice(invoiceList.get(j).getiTransId(),
                                     invoiceList.get(j).getInvDate(),
                                     invoiceList.get(j).getInvNo(),
                                     re_amount,
                                     invoiceList.get(j).getCustomer(),
                                     invoiceList.get(j).getCustomerCode()
-                            );
-                            invoiceSelectedList.set(i, invoice1);
-                        } else {
-                            Invoice invoice = new Invoice(invoiceList.get(j).getiTransId(),
+                                    );
+                                    invoiceSelectedList.set(i, invoice1);
+                                    } else {
+                                    Invoice invoice = new Invoice(invoiceList.get(j).getiTransId(),
                                     invoiceList.get(j).getInvDate(),
                                     invoiceList.get(j).getInvNo(),
                                     invoiceList.get(j).getAmount(),
                                     invoiceList.get(j).getCustomer(),
                                     invoiceList.get(j).getCustomerCode()
-                            );
-                            invoiceSelectedList.add(invoice);
-                        }
-                    }catch (Exception e){
-                        Log.d("exeception",e.getMessage()+e.getLocalizedMessage()+"size");
-                    }
-                        invoiceSelectedAdapter.notifyDataSetChanged();
-                }
-
-            }
+                                    );
+                                    invoiceSelectedList.add(invoice);
+                            }
+                            }catch (Exception e){
+                            Log.d("exeception",e.getMessage()+e.getLocalizedMessage()+"size");
+                            }
+                            invoiceSelectedAdapter.notifyDataSetChanged();
+                            }
+                            }
             if (i + 1 == listSelectedItem.size()) {
                 binding.linearInvoice.setVisibility(View.VISIBLE);
                 binding.recycleInvoiceHome.setLayoutManager(new LinearLayoutManager(requireContext()));
                 binding.recycleInvoiceHome.setAdapter(invoiceSelectedAdapter);
 
-                for(int a=0;a<invoiceSelectedList.size();a++) {
-
-                    for (int b=a+1;b<invoiceSelectedList.size();b++){
+                        for(int a=0;a<invoiceSelectedList.size();a++) {
+                        for (int b=a+1;b<invoiceSelectedList.size();b++){
                         if(invoiceSelectedList.get(a).getiTransId()==invoiceSelectedList.get(b).getiTransId()){
-
                             invoiceSelectedList.get(a).setAmount(invoiceSelectedList.get(a).getAmount()+
                                     invoiceSelectedList.get(b).getAmount());
                             invoiceSelectedList.remove(b);
                             invoiceSelectedAdapter.notifyDataSetChanged();
+                            }
+                            }
+                            totalAmount += invoiceSelectedList.get(a).getAmount();
+                            }
+                            binding.amount.setText(decimalFormat.format(totalAmount));
 
+                            invoiceSelectedAdapter.setOnClickListener(new InvoiceSelectedAdapter.OnClickListener() {
+                            @Override
+                            public void onItemClick(List<Invoice> list, int position) {
+                            if(list.size()==0){
+                            binding.linearInvoice.setVisibility(View.GONE);
+                            binding.amount.setText("");
+                            }else {
+                            onItemClickInvoice(list,position);
                         }
-
-                    }
-                    totalAmount += invoiceSelectedList.get(a).getAmount();
-
-                }
-                binding.amount.setText(decimalFormat.format(totalAmount));
-
-               invoiceSelectedAdapter.setOnClickListener(new InvoiceSelectedAdapter.OnClickListener() {
-                   @Override
-                   public void onItemClick(List<Invoice> list, int position) {
-                       if(list.size()==0){
-                           binding.linearInvoice.setVisibility(View.GONE);
-                           binding.amount.setText("");
-                       }else {
-                           onItemClickInvoice(list,position);
-                       }
-
-
-                   }
-               });
+                        }
+                        });
             }
-        }
-
-    }
+            }
+            }
 
     private void onItemClickInvoice(List<Invoice> list, int position) {
-        Double total_Amount = 0.0;
-        for (int i=0;i<list.size();i++) {
+            Double total_Amount = 0.0;
+            for (int i=0;i<list.size();i++) {
             total_Amount += list.get(i).getAmount();
             Log.d("total_Amount",total_Amount+"  "+list.get(i).getAmount());
-        }
-        binding.amount.setText(decimalFormat.format(total_Amount));
+            }
+            binding.amount.setText(decimalFormat.format(total_Amount));
     }
 
     private void enableActionMode(int position) {
@@ -916,36 +896,35 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void API_Invoice() {
-        AndroidNetworking.get("http://"+ URLs.GetInvoiceList)
+                AndroidNetworking.get("http://"+ URLs.GetInvoiceList)
                 .addQueryParameter("iCustomer",String.valueOf(iCustomer))
                 .addQueryParameter("iType",String.valueOf(iDocType))
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
-                    @Override
-                    public void onResponse(JSONArray response) {
+                        @Override
+                        public void onResponse(JSONArray response) {
                         Log.d("responseInvoice",response.toString());
                         load_API_Invoice(response);
-                    }
-
-                    @Override
-                    public void onError(ANError anError) {
+                        }
+                        @Override
+                        public void onError(ANError anError) {
                         Log.d("responseInvoice",anError.toString());
 
-                    }
-                });
-    }
+                        }
+                        });
+                        }
 
     private void load_API_Invoice(JSONArray response) {
         invoiceList.clear();
         List<Integer>transId=new ArrayList<>();
         Log.d("invoiceSecondList4",invoiceEditList.size()+" j ");
             try {
-                JSONArray jsonArray = new JSONArray(response.toString());
-                for (int i = 0; i < jsonArray.length(); i++) {
-
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    Invoice invoice = new Invoice(jsonObject.getInt(Invoice.I_TRANS_ID),
+                            JSONArray jsonArray = new JSONArray(response.toString());
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            Invoice invoice = new Invoice(
+                            jsonObject.getInt(Invoice.I_TRANS_ID),
                             jsonObject.getString(Invoice.INV_DATE),
                             jsonObject.getString(Invoice.INV_NO),
                             jsonObject.getDouble(Invoice.AMOUNT),
@@ -957,11 +936,12 @@ public class PaymentReceiptFragment extends Fragment {
                     Log.d("invoiceSecondList",invoiceSecondList.get(i).getAmount()+"");
                     if (EditMode) {
                         for (int sel = 0; sel < invoiceEditList.size(); sel++) {
-                            Log.d("invoiceSecondList3",invoiceEditList.size()+" j "+invoiceEditList.get(sel).getAmount());
-                            if (invoiceEditList.get(sel).getiTransId() == jsonObject.getInt(Invoice.I_TRANS_ID)) {
+                                Log.d("invoiceSecondList3",invoiceEditList.size()+" j "+invoiceEditList.get(sel).getAmount());
+                                if (invoiceEditList.get(sel).getiTransId() == jsonObject.getInt(Invoice.I_TRANS_ID)) {
                                 Double amount = jsonObject.getDouble(Invoice.AMOUNT) +
                                         invoiceEditList.get(sel).getAmount();
-                                Invoice invoice1 = new Invoice(jsonObject.getInt(Invoice.I_TRANS_ID),
+                                        Invoice invoice1 = new Invoice(
+                                        jsonObject.getInt(Invoice.I_TRANS_ID),
                                         jsonObject.getString(Invoice.INV_DATE),
                                         jsonObject.getString(Invoice.INV_NO),
                                         amount,
@@ -972,12 +952,11 @@ public class PaymentReceiptFragment extends Fragment {
                                 Log.d("invoiceSecondList11",invoiceSecondList.get(i).getAmount()+"");
                                 invoiceAdapter.notifyDataSetChanged();
                             }
-                        }
+                            }
 
                         if(i+1==jsonArray.length()){
                             for (int edit=0;edit<invoiceEditList.size();edit++){
                                 boolean flag=false;
-
                                 for (int jArry=0;jArry<jsonArray.length();jArry++){
                                     JSONObject jsonObject1 = jsonArray.getJSONObject(jArry);
                                     Log.d("invoiceEditList2",jsonObject1.getInt(Invoice.I_TRANS_ID)+"  "+
@@ -985,12 +964,12 @@ public class PaymentReceiptFragment extends Fragment {
                                     if(jsonObject1.getInt(Invoice.I_TRANS_ID)==invoiceEditList.get(edit).getiTransId()){
                                         flag=true;
                                     }
-                                }
-                                if(!flag){
+                                    }
+                                    if(!flag){
                                     transId.add(invoiceEditList.get(edit).getiTransId());
-                                }
-                            }
-                        }
+                                    }
+                                    }
+                                    }
                         for (int trans_id=0;trans_id<transId.size();trans_id++){
                             for (int inVedit=0;inVedit<invoiceEditList.size();inVedit++){
                                 if(invoiceEditList.get(inVedit).getiTransId()==transId.get(trans_id)){
@@ -1010,35 +989,34 @@ public class PaymentReceiptFragment extends Fragment {
                                 if (invoiceSelectedList.get(j).getiTransId() == invoiceList.get(i1).getiTransId()) {
                                     double remain_amount = invoiceList.get(i1).getAmount() -
                                             invoiceSelectedList.get(j).getAmount();
-                                    Invoice invoice1 = new Invoice(invoiceList.get(i1).getiTransId(),
+                                            Invoice invoice1 = new Invoice(
+                                            invoiceList.get(i1).getiTransId(),
                                             invoiceList.get(i1).getInvDate(),
                                             invoiceList.get(i1).getInvNo(),
                                             remain_amount,
                                             invoiceList.get(i1).getCustomer(),
                                             invoiceList.get(i1).getCustomerCode());
-                                    invoiceList.set(i1, invoice1);
+                                            invoiceList.set(i1, invoice1);
+                                            invoiceAdapter.notifyDataSetChanged();
+                                    }
                                     invoiceAdapter.notifyDataSetChanged();
-                                }
-
-                                invoiceAdapter.notifyDataSetChanged();
                             }
-                        }
-                    }
+                            }
+                            }
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-//        Log.d("invoiceSecondListt",invoiceSecondList.get(0).getAmount()+"");
     }
 
     private void GetCustomer(String customerKeyword) {
-        customerList.clear();
-        Cursor cursor=helper.getCustomerbyKeyword(customerKeyword);
-        if(cursor!=null && !customerKeyword.equals("")) {
-            cursor.moveToFirst();
-            if (cursor.getCount() > 0) {
-                for (int i = 0; i < cursor.getCount(); i++) {
+                    customerList.clear();
+                    Cursor cursor=helper.getCustomerbyKeyword(customerKeyword);
+                    if(cursor!=null && !customerKeyword.equals("")) {
+                    cursor.moveToFirst();
+                    if (cursor.getCount() > 0) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
                     Customer customer = new Customer();
                     customer.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Customer.I_ID))));
                     customer.setsCode(cursor.getString(cursor.getColumnIndex(Customer.S_CODE)));
@@ -1049,7 +1027,7 @@ public class PaymentReceiptFragment extends Fragment {
                     if (i + 1 == cursor.getCount()) {
                         customerAdapter.notifyDataSetChanged();
                     }
-                }
+                    }
 
                 customerAdapter.setOnClickListener(new CustomerAdapter.OnClickListener() {
                     @Override
@@ -1063,16 +1041,16 @@ public class PaymentReceiptFragment extends Fragment {
                                     invoiceSelectedList.clear();
                                     invoiceSecondList.clear();
                                     binding.amount.setText("");
-                            }
-                        }
+                                    }
+                                    }
                         iCustomer=customer.getiId();
                         binding.customer.setText(customer.getsName());
                         binding.customer.dismissDropDown();
                     }
                 });
             }
-        }
-    }
+            }
+            }
 
     private void initialValueSettingHeader() {
         alertDialog.show();
@@ -1084,40 +1062,38 @@ public class PaymentReceiptFragment extends Fragment {
         binding.checkDate.setText(StringDate);
 
         if (iDocType == 1) {
+            binding.customer.setHint("Select Vendor");
             toolTitle = "Payment Summary";
         } else {
             toolTitle = "Receipt Summary";
         }
 
         if(Tools.isConnected(requireActivity())) {
-            if (EditMode) {
+                if (EditMode) {
                 EditValueFromAPI();
-            }
-            else {
-
-                Cursor cursor = helper.getUserCode(userIdS);
-                if (cursor.moveToFirst() && cursor.getCount() > 0) {
-                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
                 }
-                final int[] arrayLength = new int[1];
-                AndroidNetworking.get("http://" +URLs.GetTransReceipt_PaymentSummary)
-                        .addQueryParameter("iDocType", String.valueOf(iDocType))
-                        .addQueryParameter("iUser", userIdS)
-                        .setPriority(Priority.MEDIUM)
-                        .build()
-                        .getAsJSONArray(new JSONArrayRequestListener() {
-                            @Override
-                            public void onResponse(JSONArray response) {
-                                Log.d("responseHistory", response.toString());
-                                try {
+                else {
+                    Cursor cursor = helper.getUserCode(userIdS);
+                    if (cursor.moveToFirst() && cursor.getCount() > 0) {
+                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+                    }
+                                    AndroidNetworking.get("http://" +URLs.GetTransReceipt_PaymentSummary)
+                                    .addQueryParameter("iDocType", String.valueOf(iDocType))
+                                    .addQueryParameter("iUser", userIdS)
+                                    .setPriority(Priority.MEDIUM)
+                                    .build()
+                                    .getAsJSONArray(new JSONArrayRequestListener() {
+                                    @Override
+                                    public void onResponse(JSONArray response) {
+                                    Log.d("responseHistory", response.toString());
+                                    try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
-                                    arrayLength[0] = jsonArray.length() + 1;
-                                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + arrayLength[0];
+                                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" +Tools.getDocNo(response);
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
-                                } catch (JSONException e) {
+                                    } catch (JSONException e) {
                                     e.printStackTrace();
-                                }
+                                    }
                             }
 
                             @Override
@@ -1138,54 +1114,48 @@ public class PaymentReceiptFragment extends Fragment {
 
     private void EditValueFromAPI() {
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" +URLs.GetTransReceipt_PaymentDetails)
-                    .addQueryParameter("iTransId",String.valueOf(iTransId))
-                    .setPriority(Priority.MEDIUM)
-                    .build()
-                    .getAsJSONObject(new JSONObjectRequestListener() {
-                        @Override
-                        public void onResponse(JSONObject response) {
+                            AndroidNetworking.get("http://" +URLs.GetTransReceipt_PaymentDetails)
+                            .addQueryParameter("iTransId",String.valueOf(iTransId))
+                            .setPriority(Priority.MEDIUM)
+                            .build()
+                            .getAsJSONObject(new JSONObjectRequestListener() {
+                            @Override
+                            public void onResponse(JSONObject response) {
                             Log.d("Response_loadEditValue",response.toString());
                             loadAPIValue_for_Edit(response);
+                            }
 
-                        }
-
-                        @Override
-                        public void onError(ANError anError) {
+                            @Override
+                            public void onError(ANError anError) {
                             Log.d("Response_loadEditValue",anError.toString());
                             alertDialog.dismiss();
 
-                        }
-                    });
-        }else {
+                            }
+                            });
+            }else {
             Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
             alertDialog.dismiss();
-        }
-    }
+            }
+            }
 
     private void loadAPIValue_for_Edit(JSONObject response) {
         try {
             String sAttachment = null;
             JSONArray jsonArray=new JSONArray(response.getString("Table"));
-            Log.d("resultArray",jsonArray.length()+"");
-
             JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
-            Log.d("resultArray1",jsonArray1.length()+"");
-
             JSONArray jsonArray2=new JSONArray(response.getString("Table2"));
-            Log.d("resultArray2",jsonArray2.length()+"");
 
             for (int i=0;i<jsonArray.length();i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                binding.docNo.setText(jsonObject.getString("sDocNo"));
-                docNo=jsonObject.getString("sDocNo");
-                binding.date.setText(jsonObject.getString("sDate"));
-                iCustomer = jsonObject.getInt("iAccount1");
-                binding.customer.setText(jsonObject.getString("sAccount1"));
-                binding.description.setText(jsonObject.getString("sNarration"));
-                binding.amount.setText(jsonObject.getString("fAmount"));
-                iPaymentMethod = jsonObject.getInt("iPaymentMethod");
-                if(iPaymentMethod==2) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    binding.docNo.setText(jsonObject.getString("sDocNo"));
+                    docNo=jsonObject.getString("sDocNo");
+                    binding.date.setText(jsonObject.getString("sDate"));
+                    iCustomer = jsonObject.getInt("iAccount1");
+                    binding.customer.setText(jsonObject.getString("sAccount1"));
+                    binding.description.setText(jsonObject.getString("sNarration"));
+                    binding.amount.setText(jsonObject.getString("fAmount"));
+                    iPaymentMethod = jsonObject.getInt("iPaymentMethod");
+                    if(iPaymentMethod==2) {
                     binding.paymentSpinner.setSelection(1);
                     iBank = jsonObject.getInt("iBank");
                     binding.bankName.setText(jsonObject.getString("sBank"));
@@ -1193,33 +1163,31 @@ public class PaymentReceiptFragment extends Fragment {
                     binding.checkDate.setText(jsonObject.getString("sChequeDate"));
                     sAttachment=jsonObject.getString("sAttachment");
                     Log.d("sAttachments",sAttachment);
-                }
-            }
+                    }
+                    }
 
             if(iPaymentMethod==2 && !sAttachment.equals("")){
-                Log.d("resultArray2",jsonArray2.length()+" "+iPaymentMethod);
-                for(int k=0;k<jsonArray2.length();k++){
+                    Log.d("resultArray2",jsonArray2.length()+" "+iPaymentMethod);
+                    for(int k=0;k<jsonArray2.length();k++){
                     JSONObject jsonObject2 = jsonArray2.getJSONObject(k);
                     String sAttachment2=jsonObject2.getString("sAttachment");
                     Log.d("sAttachments",sAttachment2);
                     imageList.add(sAttachment2);
                     imageAdapter.notifyDataSetChanged();
-                }
-            }
-
-
+                    }
+                    }
 
 
 
             for (int j=0;j<jsonArray1.length();j++) {
-                JSONObject jsonObjectInner = jsonArray1.getJSONObject(j);
-                for (int k = 0; k < headerListTags.size(); k++) {
+                    JSONObject jsonObjectInner = jsonArray1.getJSONObject(j);
+                    for (int k = 0; k < headerListTags.size(); k++) {
                     hashMapHeader.put(headerListTags.get(k), jsonObjectInner.getInt("iTag" + headerListTags.get(k)));
                     autoText_H_list.get(k).setText(jsonObjectInner.getString("sTag" + headerListTags.get(k)));
-                }
+                    }
+                    Invoice invoice=new Invoice();
+                    Invoice invoice1 = new Invoice();
 
-                Invoice invoice=new Invoice();
-                Invoice invoice1 = new Invoice();
                 if(jsonObjectInner.getInt("iRefDocId")!=0) {
                     invoice.setiTransId(jsonObjectInner.getInt("iRefDocId"));
                     invoice.setAmount(jsonObjectInner.getDouble("fAmount"));
@@ -1239,26 +1207,21 @@ public class PaymentReceiptFragment extends Fragment {
                     Log.d("invoice",invoiceEditList.get(j).getAmount()+"");
                     invoiceSelectedAdapter.notifyDataSetChanged();
                 }
-
-
-
-
                 if(j+1==jsonArray1.length()) {
-                    binding.recycleInvoiceHome.setLayoutManager(new LinearLayoutManager(requireContext()));
-                    binding.recycleInvoiceHome.setAdapter(invoiceSelectedAdapter);
-                    invoiceSelectedAdapter.setOnClickListener(new InvoiceSelectedAdapter.OnClickListener() {
-                        @Override
-                        public void onItemClick(List<Invoice> list, int position) {
-                            if(list.size()==0){
+                                binding.recycleInvoiceHome.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                binding.recycleInvoiceHome.setAdapter(invoiceSelectedAdapter);
+                                invoiceSelectedAdapter.setOnClickListener(new InvoiceSelectedAdapter.OnClickListener() {
+                                @Override
+                                public void onItemClick(List<Invoice> list, int position) {
+                                if(list.size()==0){
                                 binding.linearInvoice.setVisibility(View.GONE);
                                 binding.amount.setText("");
-                            }else {
-                                onItemClickInvoice(list,position);
-                            }
-
-                        }
-                    });
-                }
+                                }else {
+                                    onItemClickInvoice(list,position);
+                                }
+                                }
+                                });
+                                }
 
             }
 
@@ -1273,35 +1236,31 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private TextWatcher getTextWatcher(AutoCompleteTextView autocompleteView, int iTag, String iTagPosition) {
-        return new TextWatcher() {
+            return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-
             }
-
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 autocompleteView.setThreshold(1);
                 autocompleteView.setAdapter(tagDetailsAdapter);
             }
-
             @Override
             public void afterTextChanged(Editable editable) {
                 GetTagDetails(editable.toString(),iTag,autocompleteView,iTagPosition);
 
             }
-        };
-    }
+            };
+            }
 
     private void GetTagDetails(String s, int iTag, AutoCompleteTextView autocompleteView, String iTagPosition) {
 
-        tagList.clear();
-        Cursor cursor=helper.getTagbyKeyword(s,iTag);
-        if(cursor!=null && !s.equals("")) {
-            cursor.moveToFirst();
-            if (cursor.getCount() > 0) {
-                for (int i = 0; i < cursor.getCount(); i++) {
+                    tagList.clear();
+                    Cursor cursor=helper.getTagbyKeyword(s,iTag);
+                    if(cursor!=null && !s.equals("")) {
+                    cursor.moveToFirst();
+                    if   (cursor.getCount() > 0) {
+                    for (int i = 0; i < cursor.getCount(); i++) {
                     TagDetails details=new TagDetails();
                     details.setsName(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
                     details.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(TagDetails.I_ID))));
@@ -1309,27 +1268,25 @@ public class PaymentReceiptFragment extends Fragment {
                     tagDetailsAdapter.notifyDataSetChanged();
                     cursor.moveToNext();
 
-                    tagDetailsAdapter.setOnClickListener(new TagDetailsAdapter.OnClickListener() {
-                        @Override
-                        public void onItemClick(TagDetails tagDetails, int position) {
+                            tagDetailsAdapter.setOnClickListener(new TagDetailsAdapter.OnClickListener() {
+                            @Override
+                            public void onItemClick(TagDetails tagDetails, int position) {
 
                             autocompleteView.setText(tagDetails.getsName());
                             iTagDetail=tagDetails.getiId();
-                        if(iTagPosition.equals("Header"))
+                            if(iTagPosition.equals("Header"))
                             {
                                 hashMapHeader.put(iTag,iTagDetail);
                             }
                             autocompleteView.dismissDropDown();
-                        }
-                    });
-
-                }
-
-            }
-        }
-        else {
-
-            tagList.clear();
-        }
-    }
+                            }
+                            });
+                    }
+                    }
+                    }
+                    else
+                    {
+                    tagList.clear();
+                    }
+                    }
 }

@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:layout_marginTop="5dp"
+    android:paddingTop="3dp"
+    android:paddingBottom="3dp"
     android:id="@+id/parent">
     <ImageView
         android:id="@+id/check"
