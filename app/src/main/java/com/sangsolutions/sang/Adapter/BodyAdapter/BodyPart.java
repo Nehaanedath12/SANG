@@ -7,13 +7,29 @@ public class BodyPart {
     String productName,unit,remarks;
     Float gross,net,rate,vat,vatPer,discount,addCharges;
     int qty;
-    int iProduct;
+    int iProduct,iTransReturnId;
     public HashMap<Integer, Integer> hashMapBody;
+    String docNoText;
 
     public BodyPart() {
     }
 
 
+    public int getiTransReturnId() {
+        return iTransReturnId;
+    }
+
+    public void setiTransReturnId(int iTransReturnId) {
+        this.iTransReturnId = iTransReturnId;
+    }
+
+    public String getDocNoText() {
+        return docNoText;
+    }
+
+    public void setDocNoText(String docNoText) {
+        this.docNoText = docNoText;
+    }
 
     public String getRemarks() {
         return remarks;

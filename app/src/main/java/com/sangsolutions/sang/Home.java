@@ -1,6 +1,7 @@
 package com.sangsolutions.sang;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -38,6 +40,8 @@ import com.sangsolutions.sang.Fragment.P_R_ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
+import com.sangsolutions.sang.Fragment.S_P_OrderFragmentDirections;
+import com.sangsolutions.sang.Fragment.S_P_OrderHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
@@ -92,6 +96,9 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.p_R_ReportFragment){
             backAlert();
         }
+        else if(navController.getCurrentDestination().getId()==R.id.s_P_Return_ReportFragment2){
+            backAlert();
+        }
         else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptHistoryFragment){
             NavDirections action= PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToHomeFragment();
             navController.navigate(action);
@@ -102,9 +109,22 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.salesPurchaseReturnFragment){
             backAlert();
         }
+        else if(navController.getCurrentDestination().getId()==R.id.salesPurchaseReturnHistoryFragment){
+            NavDirections action= SalesPurchaseReturnHistoryFragmentDirections.actionSalesPurchaseReturnHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderFragment){
+            backAlert();
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderHistoryFragment){
+            NavDirections action=S_P_OrderHistoryFragmentDirections.actionSPOrderHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,11 +133,13 @@ public class Home extends AppCompatActivity {
         setContentView(view);
         helper=new DatabaseHelper(this);
 
-
+        schedulerJob=new SchedulerJob();
         toolbar=binding.toolbar;
         drawer=binding.drawerLayout;
         navigationView=binding.navView;
         setSupportActionBar(toolbar);
+
+
         navController = Navigation.findNavController(this,R.id.nav_host_fragment);
 
         View headerView=navigationView.getHeaderView(0);
@@ -134,7 +156,8 @@ public class Home extends AppCompatActivity {
                 R.id.homeFragment, R.id.salesPurchaseHistoryFragment,
                 R.id.purchaseFragment,R.id.report_selection_fragment,
                 R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment,
-                R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment)
+                R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment,
+                R.id.s_P_OrderHistoryFragment)
                 .setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -186,6 +209,14 @@ public class Home extends AppCompatActivity {
                 }
                 else if(navController.getCurrentDestination().getId()==R.id.salesPurchaseReturnFragment){
                     NavDirections action= SalesPurchaseReturnFragmentDirections.actionSalesPurchaseReturnFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderFragment){
+                    NavDirections action= S_P_OrderFragmentDirections.actionSPOrderFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderHistoryFragment){
+                    NavDirections action= S_P_OrderHistoryFragmentDirections.actionSPOrderHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
                 }
@@ -271,6 +302,20 @@ public class Home extends AppCompatActivity {
                         }
                         break;
 
+
+                        case R.id.s_P_OrderHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(2,"Sales Order");
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
+                        }
+                        break;
+
+                        case R.id.Purchase_OrderHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(1,"Purchase Order");
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
+                        }
+                        break;
 
                         case R.id.ReceiptHistoryFragment:    {
                             tagCursor=helper.getTagDetails();
@@ -436,6 +481,10 @@ public class Home extends AppCompatActivity {
                 backAlert();
                 return true;
             }else if(navController.getCurrentDestination().getId()==R.id.salesPurchaseReturnFragment){
+                backAlert();
+                return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderFragment){
                 backAlert();
                 return true;
             }

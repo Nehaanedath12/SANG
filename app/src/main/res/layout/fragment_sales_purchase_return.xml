@@ -89,19 +89,18 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/linear_add_details"
                 android:layout_below="@id/card_header"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:orientation="horizontal">
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Product Details"
                     android:textSize="15dp"
-                    android:gravity="center_vertical"
+                    android:gravity="center"
                     android:layout_marginStart="10dp"
                     android:textStyle="bold" />
                 <Button
@@ -109,9 +108,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ADD"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginEnd="10dp" />
 
-            </LinearLayout>
+
+
+            </RelativeLayout>
 
             <androidx.cardview.widget.CardView
                 android:visibility="gone"
@@ -132,10 +134,42 @@
                     android:padding="10dp"
                     android:orientation="vertical">
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/docText"
+                            android:gravity="center"
+                            android:textColor="@color/black"
+                            android:layout_marginStart="10dp"/>
+                        <TextView
+                            android:id="@+id/add_byDoc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="By DocNo"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:layout_toStartOf="@id/down_arrow"
+                            android:textAllCaps="false"
+                           />
+                        <ImageView
+                            android:id="@+id/down_arrow"
+                            android:layout_alignParentEnd="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_downarrow"/>
+
+                    </RelativeLayout>
+
                     <LinearLayout
+                        android:layout_marginTop="10dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
 
                         <AutoCompleteTextView
                             android:id="@+id/product_name"

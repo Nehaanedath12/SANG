@@ -28,5 +28,16 @@ public class URLs {
     public static final String GetTransReturnSummary =domain+"GetTransReturnSummary";
     public static final String DeleteTransReturn =domain+"DeleteTransReturn";
 
+    public static final String GetDocNo =domain+"GetDocNo";
+    public static final String GetProduct_DocNo =domain+"GetProduct_DocNo";
+    public static final String PostTransReturn =domain+"PostTransReturn";
+    public static final String GetTransReturnDetails =domain+"GetTransReturnDetails";
+    public static final String GetSales_PurchaseReturnReport =domain+"GetSales_PurchaseReturnReport";
+    public static final String GetTransOrderSummary =domain+"GetTransOrderSummary";
+    public static final String DeleteTransOrder =domain+"DeleteTransOrder";
+    public static final String PostTransOrder =domain+"PostTransOrder";
+    public static final String GetTransOrderDetails =domain+"GetTransOrderDetails";
+    public static final String GetSales_PurchaseOrderReport =domain+"GetSales_PurchaseOrderReport";
+
 
 }

@@ -526,8 +526,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 Log.d("responseHistory", response.toString());
                                 try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
+                                    if(jsonArray.length()>0) {
                                         docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
+                                    }else {
+                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + 1;
 
+                                    }
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
                                 } catch (JSONException e) {
@@ -551,7 +555,6 @@ public class Sale_Purchase_Fragment extends Fragment {
             navController.navigate(actions);
         }
         ///////
-
 
     }
 
@@ -686,18 +689,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                     });
 
 
-//        EditMode=false;
-//        editModeProduct=false;
-//        initialValueSettingHeader();
-//        initialValueSettingBody();
-//        binding.customer.setText("");
-//        binding.description.setText("");
-//        for (int i=0;i<autoText_H_list.size();i++){
-//            autoText_H_list.get(i).setText("");
-//        }
-//        bodyPartList.clear();
-//        bodyPartAdapter.notifyDataSetChanged();
-
     }
 
     private void saveMain() {
@@ -786,6 +777,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain) {
+        Log.d("uploadjSONoBJECT",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
             AndroidNetworking.post("http://"+ URLs.PostProductStock)
@@ -828,13 +820,11 @@ public class Sale_Purchase_Fragment extends Fragment {
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("")){
                 if(!binding.rateProduct.getText().toString().equals("")){
-//                    if(!binding.vatProduct.getText().toString().equals("")){
-//                        if(!binding.disProduct.getText().toString().equals("")){
-//                            if(!binding.addChargesProduct.getText().toString().equals("")){
 
-                        BodyPart bodyPart=new BodyPart();
+                    BodyPart bodyPart=new BodyPart();
 
-                        qty=Integer.parseInt(binding.qtyProduct.getText().toString());
+                    qty=Integer.parseInt(binding.qtyProduct.getText().toString());
+
                         rate=Float.parseFloat(binding.rateProduct.getText().toString());
 
                         gross=qty*rate;
@@ -878,12 +868,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                         }
                         bodyPartAdapter.notifyDataSetChanged();
 
-//                        if(bodyPartList.size()>0){
-//                            binding.frameEmpty.setVisibility(View.GONE);
-//                        }
-//                        else {
-//                            binding.frameEmpty.setVisibility(View.VISIBLE);
-//                        }
                         binding.boyPartRV.setAdapter(bodyPartAdapter);
 
                         initialValueSettingBody();
@@ -903,9 +887,6 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                         ////////////////////////////////////////editProduct
 
-//                            }else {binding.addChargesProduct.setError("no addChargesProduct");}
-//                        }else {binding.disProduct.setError("no discount");}
-//                    }else {binding.vatProduct.setError("no Vat");}
                 }else {binding.rateProduct.setError("no Rate");}
             }else {binding.qtyProduct.setError("no qty");}
         }else {binding.productName.setError("enter valid product");}
@@ -956,11 +937,6 @@ public class Sale_Purchase_Fragment extends Fragment {
             autoText_B_list.get(i).setText("");
         }
         binding.remarksProduct.setText("");
-//        if(bodyPartList.size()==0) {
-//            binding.frameEmpty.setVisibility(View.VISIBLE);
-//        }
-
-
     }
 
     private void GetProduct(String productKeyword) {
@@ -1001,13 +977,13 @@ public class Sale_Purchase_Fragment extends Fragment {
         list = Arrays.asList(units.split("\\s*,\\s*"));
         UnitAdapter unitAdapter = new UnitAdapter(list, requireActivity());
         binding.spinnerUnit.setAdapter(unitAdapter);
-        if (bodyPartList.size() > 0) {
-            if (position != -1)
-                for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).equals(bodyPartList.get(position).getUnit())) {
+                        if (bodyPartList.size() > 0) {
+                        if (position != -1)
+                        for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).equals(bodyPartList.get(position).getUnit())) {
                         binding.spinnerUnit.setSelection(i);
-                    }
-                }
+                        }
+                        }
         }
     }
 
@@ -1182,7 +1158,8 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                                 if(cursor!=null && cursor.moveToFirst()){
                                 binding.productName.setText(cursor.getString(cursor.getColumnIndex(Products.S_NAME)));
-                                productId=cursor.getString(cursor.getColumnIndex(Products.I_ID));
+                                iProduct=cursor.getInt(cursor.getColumnIndex(Products.I_ID));
+                                setUnit(helper.getProductUnitById(iProduct),-1);
                                 }
                             }
                             });

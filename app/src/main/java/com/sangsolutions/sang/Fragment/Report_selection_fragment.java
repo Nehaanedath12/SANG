@@ -56,6 +56,40 @@ public class Report_selection_fragment extends Fragment {
                 navController.navigate(action);
             }
         });
+        binding.purchaseReturnReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToSPReturnReportFragment2("1","Purchase Return Report");
+                navController.navigate(action);
+            }
+        });
+        binding.salesReturnReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToSPReturnReportFragment2("2","Sales Return Report");
+                navController.navigate(action);
+            }
+        });
+        binding.purchaseOrderReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToSPOrderReportFragment("1","Purchase Order Report");
+
+                navController.navigate(action);
+            }
+        });
+        binding.salesOrderReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToSPOrderReportFragment("2","Sales Order Report");
+
+                navController.navigate(action);
+            }
+        });
         return binding.getRoot();
     }
 }

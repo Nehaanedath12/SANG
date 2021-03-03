@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.media.session.MediaSession;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
@@ -195,8 +197,9 @@ public class Tools {
         Collections.sort(num);
 
         int value=num.get(num.size() - 1);
-        Log.d("docNumberr",num.get(num.size() - 1).toString());
+        Log.d("docNumberr",num.get(num.size() - 1).toString()+" "+value);
         return value+1;
     }
+
 
 }

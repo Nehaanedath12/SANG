@@ -14,6 +14,7 @@ import com.sangsolutions.sang.Service.GetBankService;
 import com.sangsolutions.sang.Service.GetMasterSettingsService;
 import com.sangsolutions.sang.Service.GetMasterTagDetails;
 import com.sangsolutions.sang.Service.GetProductService;
+import com.sangsolutions.sang.Service.GetTokenService;
 import com.sangsolutions.sang.Service.GetTransactionSettingService;
 import com.sangsolutions.sang.Service.GetUserService;
 
@@ -94,6 +95,20 @@ public class SchedulerJob {
         JobInfo job = new JobInfo.Builder(
                 5,
                 new ComponentName(context, GetUserService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        assert js != null;
+        js.schedule(job);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void SyncToken(Context context) {
+        Log.d("Timingg","Tools.token");
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                6,
+                new ComponentName(context, GetTokenService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .build();
         assert js != null;

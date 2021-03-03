@@ -33,6 +33,14 @@
             android:id="@+id/PurchaseReturnHistoryFragment"
             android:icon="@drawable/ic_return"
             android:title="Purchase Return" />
+        <item
+            android:id="@+id/s_P_OrderHistoryFragment"
+            android:icon="@drawable/ic_return"
+            android:title="Sales Order" />
+        <item
+            android:id="@+id/Purchase_OrderHistoryFragment"
+            android:icon="@drawable/ic_return"
+            android:title="Purchase Order" />
 
 
         <item

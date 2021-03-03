@@ -17,6 +17,7 @@ public class Products {
         this.sBarcode=sBarcode;
     }
 
+
     public String getsBarcode() {
         return sBarcode;
     }

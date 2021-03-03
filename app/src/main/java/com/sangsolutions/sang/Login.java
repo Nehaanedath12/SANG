@@ -117,6 +117,7 @@ public class Login extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void syncData() {
+        schedulerJob.SyncToken(this);
         schedulerJob.SyncUser(this);
         schedulerJob.SyncBank(this);
         schedulerJob.SyncTransSalePurchase(this);

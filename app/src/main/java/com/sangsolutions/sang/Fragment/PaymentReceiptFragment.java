@@ -1088,7 +1088,12 @@ public class PaymentReceiptFragment extends Fragment {
                                     Log.d("responseHistory", response.toString());
                                     try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
-                                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" +Tools.getDocNo(response);
+                                    if(jsonArray.length()>0) {
+                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
+                                    }else {
+                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + 1;
+
+                                    }
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
                                     } catch (JSONException e) {
