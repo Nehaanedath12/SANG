@@ -25,15 +25,14 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
+import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
-import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
-import com.sangsolutions.sang.databinding.FragmentSalesPurchaseHistoryBinding;
+import com.sangsolutions.sang.databinding.FragmentQuatationHistoryBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,13 +41,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SalesPurchaseHistoryFragment extends Fragment {
-    FragmentSalesPurchaseHistoryBinding binding;
+public class QuotationHistoryFragment extends Fragment {
+
+    FragmentQuatationHistoryBinding binding;
 
     int iDocType;
     String title;
     NavController navController;
-    List<SalesPurchaseHistory>historyList;
+    List<SalesPurchaseHistory> historyList;
     SalesPurchaseHistoryAdapter historyAdapter;
     AlertDialog alertDialog;
     DatabaseHelper helper;
@@ -56,11 +56,10 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     String toolTitle;
     boolean selectionActive = false;
     Animation slideUp, slideDown;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding=FragmentSalesPurchaseHistoryBinding.inflate(getLayoutInflater());
+        binding=FragmentQuatationHistoryBinding.inflate(getLayoutInflater());
         helper=new DatabaseHelper(requireContext());
         historyList=new ArrayList<>();
         historyAdapter=new SalesPurchaseHistoryAdapter(requireActivity(),historyList);
@@ -73,11 +72,11 @@ public class SalesPurchaseHistoryFragment extends Fragment {
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         assert getArguments() != null;
-        iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
-        if (iDocType == 10) {
-            toolTitle = "Purchase";
+        iDocType = QuotationHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
+        if (iDocType == 14) {
+            toolTitle = "Purchase Quotation";
         } else {
-            toolTitle = "Sales";
+            toolTitle = "Sales Quotation";
         }
 
         Cursor cursor_userId=helper.getUserId();
@@ -88,9 +87,9 @@ public class SalesPurchaseHistoryFragment extends Fragment {
         binding.fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections action=SalesPurchaseHistoryFragmentDirections
-                        .actionSalesPurchaseHistoryFragmentToSalePurchaseFragment2(toolTitle).setIDocType(iDocType).setEditMode(false).setITransId(0);
-
+                NavDirections action=QuotationHistoryFragmentDirections
+                        .actionQuotationHistoryFragmentToQuotationFragment(toolTitle).setEditMode(false)
+                        .setITransId(0).setIDocType(iDocType);
                 navController.navigate(action);
             }
         });
@@ -116,8 +115,8 @@ public class SalesPurchaseHistoryFragment extends Fragment {
             }
         });
 
-        return binding.getRoot();
 
+        return binding.getRoot();
     }
 
     private void deleteAlert() {
@@ -139,6 +138,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                 })
                 .create()
                 .show();
+
     }
 
     private void DeleteItems() {
@@ -160,7 +160,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
 
     private void getHistoryDatas() {
         alertDialog.show();
-        AndroidNetworking.get("http://"+  URLs.GetTransSummary)
+        AndroidNetworking.get("http://"+  URLs.GetTransQuotationSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
@@ -184,34 +184,29 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     }
 
     private void loadDatas(JSONArray response) {
-                        historyList.clear();
-                        historyAdapter.notifyDataSetChanged();
+        historyList.clear();
+        historyAdapter.notifyDataSetChanged();
 
-                        try {
-                        JSONArray jsonArray = new JSONArray(response.toString());
+        try {
+            JSONArray jsonArray = new JSONArray(response.toString());
 
-                        if(jsonArray.length()==0){
-                            alertDialog.dismiss();
-                        }
+            if(jsonArray.length()==0){
+                alertDialog.dismiss();
+            }
 
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                        Log.d("I_TRANS_ID",jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1)+"");
-                        SalesPurchaseHistory history=new SalesPurchaseHistory(
-                        jsonObject.getInt(SalesPurchaseHistory.I_TRANS_ID),
-                        jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1),
-                        jsonObject.getInt(SalesPurchaseHistory.N_AMOUNT),
-                        jsonObject.getString(SalesPurchaseHistory.S_DOC_NO),
-                        jsonObject.getString(SalesPurchaseHistory.S_DATE),
-                        jsonObject.getString(SalesPurchaseHistory.S_ACCOUNT1),
-                        jsonObject.getString(SalesPurchaseHistory.S_ACCOUNT2)
-
-                        );
-
-                    historyList.add(history);
-                    historyAdapter.notifyDataSetChanged();
-                    if(i+1==jsonArray.length()){
+                Log.d("I_TRANS_ID",jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1)+"");
+                SalesPurchaseHistory history=new SalesPurchaseHistory();
+                history.setiAccount1( jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1));
+                history.setsAccount1( jsonObject.getString(SalesPurchaseHistory.S_ACCOUNT1));
+                history.setsDate( jsonObject.getString(SalesPurchaseHistory.S_DATE));
+                history.setsDocNo( jsonObject.getString(SalesPurchaseHistory.S_DOC_NO));
+                history.setiTransId(  jsonObject.getInt(SalesPurchaseHistory.I_TRANS_ID));
+                historyList.add(history);
+                historyAdapter.notifyDataSetChanged();
+                if(i+1==jsonArray.length()){
                     alertDialog.dismiss();
                     binding.recyclerView.setAdapter(historyAdapter);
 
@@ -220,8 +215,9 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                         public void onItemClick(int iTransId, int position) {
                             if(!selectionActive) {
                                 if (Tools.isConnected(requireContext())) {
-                                    NavDirections action = SalesPurchaseHistoryFragmentDirections
-                                            .actionSalesPurchaseHistoryFragmentToSalePurchaseFragment2(toolTitle).setIDocType(iDocType).setEditMode(true).setITransId(iTransId);
+                                    NavDirections action=QuotationHistoryFragmentDirections
+                                            .actionQuotationHistoryFragmentToQuotationFragment(toolTitle).setEditMode(true)
+                                            .setITransId(iTransId).setIDocType(iDocType);
                                     navController.navigate(action);
                                 } else {
                                     Toast.makeText(requireContext(), "no Internet", Toast.LENGTH_SHORT).show();
@@ -244,11 +240,31 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                         }
                     });
 
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteFromAPI(int iTransId) {
+        AndroidNetworking.get("http://"+  URLs.DeleteTransQuotation)
+                .addQueryParameter("iTransId", String.valueOf(iTransId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("response_delete",response);
+                        getHistoryDatas();
                     }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("response_delete",anError.toString()+ anError.getErrorDetail()+anError.getErrorBody());
+
                     }
-                    } catch (JSONException e) {
-                    e.printStackTrace();
-                    }
+                });
     }
 
     private void enableActionMode(int position) {
@@ -281,6 +297,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     }
 
     private void closeSelection() {
+
         historyAdapter.clearSelections();
         binding.fabAdd.setVisibility(View.VISIBLE);
         binding.fabAdd.startAnimation(slideUp);
@@ -295,28 +312,5 @@ public class SalesPurchaseHistoryFragment extends Fragment {
             }
         }, 300);
         selectionActive = false;
-    }
-
-    private void deleteFromAPI(int iTransId) {
-        AndroidNetworking.get("http://"+  URLs.DeleteTrans)
-                .addQueryParameter("iTransId", String.valueOf(iTransId))
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsString(new StringRequestListener() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("response_delete",response);
-                        if(response.equals("-1")){
-                            Toast.makeText(requireContext(), "Can't delete.Its invoice has used.", Toast.LENGTH_SHORT).show();
-                        }
-                        getHistoryDatas();
-                    }
-
-                    @Override
-                    public void onError(ANError anError) {
-                        Log.d("response_delete",anError.toString()+ anError.getErrorDetail()+anError.getErrorBody());
-
-                    }
-                });
     }
 }

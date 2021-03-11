@@ -496,7 +496,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         numberOfLinesB =0;
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
-        if (iDocType == 1) {
+        if (iDocType == 10) {
             binding.customer.setHint("Select Vendor");
             toolTitle = "Purchase Summary";
         } else {
@@ -589,9 +589,9 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void loadAPIValue_for_Edit(JSONObject response) {
 
-        JSONArray jsonArray= null;
+
         try {
-            jsonArray = new JSONArray(response.getString("Table"));
+           JSONArray jsonArray = new JSONArray(response.getString("Table"));
             Log.d("HeadArray",jsonArray.length()+"");
             JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
             Log.d("BodyArray1",jsonArray1.length()+"");
@@ -666,7 +666,6 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void deleteAll() {
-
             AndroidNetworking.get("http://"+  URLs.DeleteTrans)
                     .addQueryParameter("iTransId", String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
@@ -678,7 +677,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                             NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
                             navController.navigate(actions);
                             Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
-
                         }
 
                         @Override
@@ -878,7 +876,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
                             @Override
                             public void onItemClick(BodyPart bodyPart, int position) {
-
                                 editingProductField(bodyPart,position);
 
 
@@ -895,6 +892,9 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void editingProductField(BodyPart bodyPart, int position) {
+        for (int i=0;i<autoText_B_list.size();i++){
+            autoText_B_list.get(i).setText("");
+        }
         editModeProduct =true;
         position_body_Edit=position;
         binding.cardViewBody.setVisibility(View.VISIBLE);

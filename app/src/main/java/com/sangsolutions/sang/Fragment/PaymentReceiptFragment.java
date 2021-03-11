@@ -510,7 +510,7 @@ public class PaymentReceiptFragment extends Fragment {
 
     private void fieldsChecking(int iPaymentMethod) {
         if(iPaymentMethod==2){
-            if(!binding.bankName.getText().toString().equals("")){
+            if(!binding.bankName.getText().toString().equals("") && iBank!=0){
                 if(!binding.checkNo.getText().toString().equals("")){
 
                     mandatoryChecking();
@@ -666,6 +666,7 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain, List<File> files) {
+        Log.d("jsonObjectMain",jsonObjectMain.toString());
                     if(Tools.isConnected(requireActivity())) {
                     alertDialog.show();
                     AndroidNetworking.upload("http://"+URLs.Post_Receipt_Payment)
@@ -1061,7 +1062,7 @@ public class PaymentReceiptFragment extends Fragment {
         binding.date.setText(StringDate);
         binding.checkDate.setText(StringDate);
 
-        if (iDocType == 1) {
+        if (iDocType == 15) {
             binding.customer.setHint("Select Vendor");
             toolTitle = "Payment Summary";
         } else {

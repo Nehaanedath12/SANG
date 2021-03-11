@@ -941,7 +941,9 @@ public class SalesPurchaseReturnFragment extends Fragment {
     }
 
     private void editingProductField(BodyPart bodyPart, int position) {
-
+        for (int i=0;i<autoText_B_list.size();i++){
+            autoText_B_list.get(i).setText("");
+        }
         editModeProduct =true;
         position_body_Edit=position;
         binding.cardViewBody.setVisibility(View.VISIBLE);
@@ -1221,7 +1223,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
         numberOfLinesB =0;
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
-        if (iDocType == 1) {
+        if (iDocType == 11) {
             binding.customer.setHint("Select Vendor");
             toolTitle = "Purchase Return History";
         } else {

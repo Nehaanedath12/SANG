@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,9 +51,10 @@ import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
-import com.sangsolutions.sang.Adapter.OrderBodyAdapter.OrderBodyAdapter;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.Products.ProductsAdapter;
+import com.sangsolutions.sang.Adapter.QuotationAdapter.QuotationAdapter;
+import com.sangsolutions.sang.Adapter.QuotationAdapter.QuotationClass;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetailsAdapter;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
@@ -64,7 +64,7 @@ import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
-import com.sangsolutions.sang.databinding.FragmentSalesPurchaseOrderBinding;
+import com.sangsolutions.sang.databinding.FragmentQuotationBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,11 +80,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import io.fotoapparat.parameter.Flash;
+public class QuotationFragment extends Fragment {
 
-public class S_P_OrderFragment extends Fragment {
+    FragmentQuotationBinding binding;
 
-    FragmentSalesPurchaseOrderBinding binding;
     int iDocType,iTransId;
     boolean EditMode;
     String docNo;
@@ -110,9 +109,8 @@ public class S_P_OrderFragment extends Fragment {
     HashMap<Integer, Integer> hashMapBody;
     HashMap<Integer, Integer> hashMapHeader;
 
-    List<BodyPart>bodyPartList;
-    OrderBodyAdapter orderBodyAdapter;
-
+    List<QuotationClass>bodyPartList;
+    QuotationAdapter bodyPartAdapter;
     NavController navController;
 
     int numberOfLinesH;
@@ -138,22 +136,29 @@ public class S_P_OrderFragment extends Fragment {
     List<Integer> headerListTags;
     List<Integer>bodyListTags;
     String userCode;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding=FragmentSalesPurchaseOrderBinding.inflate(getLayoutInflater());
+
+        binding=FragmentQuotationBinding.inflate(getLayoutInflater());
+
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-        assert getArguments() != null;
-        iDocType = S_P_OrderFragmentArgs.fromBundle(getArguments()).getIDocType();
-        iTransId = S_P_OrderFragmentArgs.fromBundle(getArguments()).getITransId();
-        EditMode = S_P_OrderFragmentArgs.fromBundle(getArguments()).getEditMode();
-        Log.d("llllll","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +"");
 
         hashMapBody=new HashMap<>();
         hashMapHeader=new HashMap<>();
 
         headerListTags =new ArrayList<>();
         bodyListTags =new ArrayList<>();
+
+        assert getArguments() != null;
+        iDocType = QuotationFragmentArgs.fromBundle(getArguments()).getIDocType();
+        iTransId = QuotationFragmentArgs.fromBundle(getArguments()).getITransId();
+        EditMode = QuotationFragmentArgs.fromBundle(getArguments()).getEditMode();
+
+        Log.d("llllll","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +"");
+
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireActivity());
 
@@ -187,8 +192,9 @@ public class S_P_OrderFragment extends Fragment {
         if(cursorTagNumber!=null) {
             tagTotalNumber = cursorTagNumber.getCount();
         }
+
         bodyPartList=new ArrayList<>();
-        orderBodyAdapter=new OrderBodyAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
+        bodyPartAdapter=new QuotationAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
         initialValueSettingHeader();
@@ -196,15 +202,25 @@ public class S_P_OrderFragment extends Fragment {
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dateSetting(binding.date);
+                DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-            }
-        });
 
-        binding.delDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dateSetting(binding.delDate);
+                        StringDate = Tools.checkDigit(dayOfMonth)+
+                                "-" +
+                                Tools.checkDigit(month + 1) +
+                                "-"+
+                                year;
+                        binding.date.setText(StringDate);
+                    }
+                };
+                Calendar now = Calendar.getInstance();
+                int year = now.get(Calendar.YEAR);
+                int month = now.get(Calendar.MONTH);
+                int day = now.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), onDateSetListener, year, month, day);
+                datePickerDialog.show();
             }
         });
 
@@ -302,9 +318,7 @@ public class S_P_OrderFragment extends Fragment {
                 }
 
             }
-
         }
-
 
         binding.barcodeI.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -313,6 +327,7 @@ public class S_P_OrderFragment extends Fragment {
                 barcodeScanningChecking();
             }
         });
+
 
         binding.productName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -330,15 +345,11 @@ public class S_P_OrderFragment extends Fragment {
                 GetProduct(s.toString());
             }
         });
-
         binding.productName.setThreshold(1);
         binding.productName.setAdapter(productsAdapter);
         if (binding.surfaceView.getVisibility() == View.VISIBLE) {
             binding.productName.dismissDropDown();
         }
-
-
-
         binding.customer.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -381,6 +392,7 @@ public class S_P_OrderFragment extends Fragment {
                 }
             }
         });
+
         binding.saveMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -470,11 +482,13 @@ public class S_P_OrderFragment extends Fragment {
             }
         });
 
+
         return binding.getRoot();
     }
 
     private void deleteAll() {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransOrder)
+
+        AndroidNetworking.get("http://"+  URLs.DeleteTransQuotation)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -482,11 +496,10 @@ public class S_P_OrderFragment extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         Log.d("response_delete",response);
-                        NavDirections actions =S_P_OrderFragmentDirections
-                                .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+                        NavDirections actions =QuotationFragmentDirections
+                                .actionQuotationFragmentToQuotationHistoryFragment(iDocType,toolTitle);
                         navController.navigate(actions);
                         Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
-
                     }
 
                     @Override
@@ -495,6 +508,7 @@ public class S_P_OrderFragment extends Fragment {
 
                     }
                 });
+
     }
 
     private void saveMain() {
@@ -502,8 +516,7 @@ public class S_P_OrderFragment extends Fragment {
         try{
             jsonObjectMain.put("iTransId",iTransId);
             jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
-            jsonObjectMain.put("sDeliveryDate",Tools.dateFormat(binding.delDate.getText().toString()));
+            jsonObjectMain.put("sDate",Tools.dateFormat(StringDate));
             jsonObjectMain.put("iDocType",iDocType);
             jsonObjectMain.put("iAccount1",iCustomer);
             jsonObjectMain.put("iAccount2",0);
@@ -543,6 +556,8 @@ public class S_P_OrderFragment extends Fragment {
 
                 jsonObject.put("iProduct",bodyPartList.get(i).getiProduct());
                 jsonObject.put("fQty",bodyPartList.get(i).getQty());
+                jsonObject.put("fRate",bodyPartList.get(i).getRate());
+
                 if(bodyPartList.get(i).getRemarks().equals("")){
                     jsonObject.put("sRemarks","");
                 }else {
@@ -550,9 +565,9 @@ public class S_P_OrderFragment extends Fragment {
                 }
                 jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
 
-
                 Log.d("jsonObjecttIproduct",jsonObject.get("iProduct")+"");
                 Log.d("jsonObjecttQty",jsonObject.get("fQty")+"");
+                Log.d("jsonObjecttrate",jsonObject.get("fRate")+"");
                 Log.d("jsonObjecttrema",jsonObject.get("sRemarks")+"");
 
 
@@ -568,14 +583,14 @@ public class S_P_OrderFragment extends Fragment {
             Log.d("exception",e.getMessage());
             e.printStackTrace();
         }
+
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain) {
-
         Log.d("uploadjSONoBJECT",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ URLs.PostTransOrder)
+            AndroidNetworking.post("http://"+ URLs.PostTransQuotation)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -587,8 +602,8 @@ public class S_P_OrderFragment extends Fragment {
                                 Log.d("responsePost ", "successfully");
                                 Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
                                 bodyPartList.clear();
-                                NavDirections actions =S_P_OrderFragmentDirections
-                                        .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+                                NavDirections actions =QuotationFragmentDirections
+                                        .actionQuotationFragmentToQuotationHistoryFragment(iDocType,toolTitle);
                                 navController.navigate(actions);
                             }
                         }
@@ -606,71 +621,65 @@ public class S_P_OrderFragment extends Fragment {
             snackbar.setTextColor(Color.WHITE);
             snackbar.show();
         }
-    }
-
-    private void dateSetting(EditText date) {
-        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-
-                StringDate = Tools.checkDigit(dayOfMonth)+
-                        "-" +
-                        Tools.checkDigit(month + 1) +
-                        "-"+
-                        year;
-                date.setText(StringDate);
-            }
-        };
-        Calendar now = Calendar.getInstance();
-        int year = now.get(Calendar.YEAR);
-        int month = now.get(Calendar.MONTH);
-        int day = now.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), onDateSetListener, year, month, day);
-        datePickerDialog.show();
 
     }
 
     private void saveBodyPartProduct() {
+        float rate;
         int qty;
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("")){
-                BodyPart bodyPart=new BodyPart();
+                if(!binding.rateProduct.getText().toString().equals("")){
 
-                qty=Integer.parseInt(binding.qtyProduct.getText().toString());
+                    QuotationClass bodyPart=new QuotationClass();
 
-                bodyPart.setProductName(binding.productName.getText().toString());
-                bodyPart.setQty(qty);
-                bodyPart.setiProduct(iProduct);
-                bodyPart.setHashMapBody(hashMapBody);
-                bodyPart.setUnit(binding.spinnerUnit.getSelectedItem().toString());
-                bodyPart.setRemarks(binding.remarksProduct.getText().toString());
-                if(editModeProduct) {
-                    bodyPartList.set(position_body_Edit,bodyPart);
+                    qty=Integer.parseInt(binding.qtyProduct.getText().toString());
 
-                }else {
-                    bodyPartList.add(bodyPart);
+                    rate=Float.parseFloat(binding.rateProduct.getText().toString());
 
-                }
-                orderBodyAdapter.notifyDataSetChanged();
+                    bodyPart.setProductName(binding.productName.getText().toString());
+                    bodyPart.setQty(qty);
+                    bodyPart.setRate(rate);
+                    bodyPart.setiProduct(iProduct);
+                    bodyPart.setHashMapBody(hashMapBody);
+                    bodyPart.setUnit(binding.spinnerUnit.getSelectedItem().toString());
 
-                binding.boyPartRV.setAdapter(orderBodyAdapter);
+                    bodyPart.setRemarks(binding.remarksProduct.getText().toString());
 
-                initialValueSettingBody();
-                binding.cardViewBody.setVisibility(View.GONE);
+                    if(editModeProduct) {
+                        bodyPartList.set(position_body_Edit,bodyPart);
 
-                orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
-                    @Override
-                    public void onItemClick(BodyPart bodyPart, int position) {
-                        editingProductField(bodyPart,position);
+                    }else {
+                        bodyPartList.add(bodyPart);
+
                     }
-                });
-            }else {binding.qtyProduct.setError("No Quantity");}
-        }else {binding.productName.setError("Enter proper Name");}
+                    bodyPartAdapter.notifyDataSetChanged();
+
+                    binding.boyPartRV.setAdapter(bodyPartAdapter);
+
+                    initialValueSettingBody();
+                    binding.cardViewBody.setVisibility(View.GONE);
+
+                    /////////////////////////////////////////editProduct
+
+
+                    bodyPartAdapter.setOnClickListener(new QuotationAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(QuotationClass quotationClass, int position) {
+                            editingProductField(bodyPart,position);
+                        }
+                    });
+
+                    ////////////////////////////////////////editProduct
+
+                }else {binding.rateProduct.setError("no Rate");}
+            }else {binding.qtyProduct.setError("no qty");}
+        }else {binding.productName.setError("enter valid product");}
+
     }
 
-    private void editingProductField(BodyPart bodyPart, int position) {
+    private void editingProductField(QuotationClass bodyPart, int position) {
         for (int i=0;i<autoText_B_list.size();i++){
             autoText_B_list.get(i).setText("");
         }
@@ -680,6 +689,7 @@ public class S_P_OrderFragment extends Fragment {
         binding.productName.setText(bodyPart.getProductName());
         iProduct=bodyPart.getiProduct();
         binding.qtyProduct.setText(String.valueOf(bodyPart.getQty()));
+        binding.rateProduct.setText(String.valueOf(bodyPart.getRate()));
         binding.remarksProduct.setText(bodyPart.getRemarks());
         setUnit(helper.getProductUnitById(iProduct),position);
 
@@ -701,6 +711,7 @@ public class S_P_OrderFragment extends Fragment {
         hashMapBody=new HashMap<>();
         binding.productName.setText("");
         binding.qtyProduct.setText("");
+        binding.rateProduct.setText("");
         binding.cardViewBody.setVisibility(View.GONE);
         setUnit("",-1);
 
@@ -708,7 +719,6 @@ public class S_P_OrderFragment extends Fragment {
             autoText_B_list.get(i).setText("");
         }
         binding.remarksProduct.setText("");
-
     }
 
     private void GetCustomer(String customerKeyword) {
@@ -775,6 +785,7 @@ public class S_P_OrderFragment extends Fragment {
                 }
             }
         }
+
     }
 
     private void barcodeScanningChecking() {
@@ -796,6 +807,7 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void barcodeScanning() {
+
         barcodeDetector=new BarcodeDetector.Builder(requireActivity()).setBarcodeFormats(Barcode.ALL_FORMATS).build();
         cameraSource=new CameraSource.Builder(requireActivity(),barcodeDetector).setAutoFocusEnabled(true)
                 .setRequestedPreviewSize(1080,1920).build();
@@ -899,7 +911,6 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void GetTagDetails(String s, int iTag, AutoCompleteTextView autocompleteView, String iTagPosition) {
-
         tagList.clear();
         Cursor cursor=helper.getTagbyKeyword(s,iTag);
         if(cursor!=null && !s.equals("")) {
@@ -948,12 +959,11 @@ public class S_P_OrderFragment extends Fragment {
         numberOfLinesB =0;
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
-        binding.delDate.setText(StringDate);
-        if (iDocType == 12) {
+        if (iDocType == 14) {
             binding.customer.setHint("Select Vendor");
-            toolTitle = "Purchase Order Summary";
+            toolTitle = "Purchase Quotation Summary";
         } else {
-            toolTitle = "Sale Order Summary";
+            toolTitle = "Sale Quotation Summary";
         }
 
         if(Tools.isConnected(requireActivity())) {
@@ -968,7 +978,7 @@ public class S_P_OrderFragment extends Fragment {
 
                 ///////
 
-                AndroidNetworking.get("http://" + URLs.GetTransOrderSummary)
+                AndroidNetworking.get("http://" + URLs.GetTransQuotationSummary)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -996,7 +1006,8 @@ public class S_P_OrderFragment extends Fragment {
                             public void onError(ANError anError) {
                                 Log.d("responseTotalNumber", anError.toString());
                                 alertDialog.dismiss();
-                                NavDirections actions =S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+                                NavDirections actions =QuotationFragmentDirections
+                                        .actionQuotationFragmentToQuotationHistoryFragment(iDocType,toolTitle);
                                 navController.navigate(actions);
                             }
                         });
@@ -1004,17 +1015,15 @@ public class S_P_OrderFragment extends Fragment {
         }else {
             alertDialog.dismiss();
             Toast.makeText(requireActivity(),"No Internet", Toast.LENGTH_SHORT).show();
-            NavDirections actions =S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+            NavDirections actions =QuotationFragmentDirections
+                    .actionQuotationFragmentToQuotationHistoryFragment(iDocType,toolTitle);
             navController.navigate(actions);
         }
-        ///////
-
     }
 
     private void EditValueFromAPI() {
-
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + URLs.GetTransOrderDetails)
+            AndroidNetworking.get("http://" + URLs.GetTransQuotationDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -1031,7 +1040,8 @@ public class S_P_OrderFragment extends Fragment {
                             Log.d("Response_loadEditValue",anError.toString());
                             alertDialog.dismiss();
                             Toast.makeText(requireActivity(), anError.getMessage(), Toast.LENGTH_SHORT).show();
-                            NavDirections actions =S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+                            NavDirections actions =QuotationFragmentDirections
+                                    .actionQuotationFragmentToQuotationHistoryFragment(iDocType,toolTitle);
                             navController.navigate(actions);
                         }
                     });
@@ -1039,13 +1049,13 @@ public class S_P_OrderFragment extends Fragment {
             Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
             alertDialog.dismiss();
         }
+
+
     }
 
     private void loadAPIValue_for_Edit(JSONObject response) {
-
-        JSONArray jsonArray= null;
         try {
-            jsonArray = new JSONArray(response.getString("Table"));
+            JSONArray jsonArray = new JSONArray(response.getString("Table"));
             Log.d("HeadArray",jsonArray.length()+"");
             JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
             Log.d("BodyArray1",jsonArray1.length()+"");
@@ -1056,11 +1066,9 @@ public class S_P_OrderFragment extends Fragment {
                 binding.docNo.setText(jsonObject.getString("sDocNo"));
                 docNo=jsonObject.getString("sDocNo");
                 binding.date.setText(jsonObject.getString("sDate"));
-                binding.delDate.setText(jsonObject.getString("sDelivaryDate"));
                 iCustomer = jsonObject.getInt("iAccount1");
                 binding.customer.setText(jsonObject.getString("sAccount1"));
                 binding.description.setText(jsonObject.getString("sNarration"));
-                Log.d("BodyPartt",jsonObject.getString("sDelivaryDate"));
             }
 
 
@@ -1072,32 +1080,34 @@ public class S_P_OrderFragment extends Fragment {
                 }
                 for(int k=0;k<bodyListTags.size();k++){
                     hashMapBody.put(bodyListTags.get(k),jsonObjectInner.getInt("iTag"+ bodyListTags.get(k)));
-
                 }
-
-                BodyPart bodyPart=new BodyPart();
+                QuotationClass bodyPart=new QuotationClass();
                 bodyPart.setiProduct(jsonObjectInner.getInt("iProduct"));
                 bodyPart.setProductName(jsonObjectInner.getString("sProduct"));
                 bodyPart.setQty(jsonObjectInner.getInt("fQty"));
+                bodyPart.setRate(Float.parseFloat(jsonObjectInner.getString("fRate")));
                 bodyPart.setRemarks(jsonObjectInner.getString("sRemarks"));
                 bodyPart.setUnit(jsonObjectInner.getString("sUnits"));
                 bodyPart.setHashMapBody(hashMapBody);
 
+                Log.d("hashmapbody",hashMapBody.toString());
 
                 bodyPartList.add(bodyPart);
-                orderBodyAdapter.notifyDataSetChanged();
+                bodyPartAdapter.notifyDataSetChanged();
                 hashMapBody=new HashMap<>();
 
 
                 if(jsonArray1.length()==j+1){
                     Log.d("Bodypartlistsize",bodyPartList.size()+" ");
-                    binding.boyPartRV.setAdapter(orderBodyAdapter);
+                    binding.boyPartRV.setAdapter(bodyPartAdapter);
                     alertDialog.dismiss();
                     Log.d("Bodypartlistsize",bodyPartList.size()+" "+jsonObjectInner.getString("sProduct"));
-                    orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
+
+
+                    bodyPartAdapter.setOnClickListener(new QuotationAdapter.OnClickListener() {
                         @Override
-                        public void onItemClick(BodyPart bodyPart, int position) {
-                            editingProductField(bodyPart,position);
+                        public void onItemClick(QuotationClass quotationClass, int position) {
+                            editingProductField(quotationClass,position);
                         }
                     });
                 }
@@ -1110,5 +1120,6 @@ public class S_P_OrderFragment extends Fragment {
             Log.d("exception",e.getMessage());
             e.printStackTrace();
         }
+
     }
 }

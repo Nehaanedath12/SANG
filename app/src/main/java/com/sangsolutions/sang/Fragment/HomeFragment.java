@@ -94,8 +94,8 @@ public class HomeFragment extends Fragment {
             LocalDate returnValue = date.minusDays(i);
             weekList.add(String.valueOf(returnValue));
         }
-        getDataFromAPI("1", barEntryList_P, binding.barChartPurchase);
-        getDataFromAPI("2",barEntryList_S,binding.barChartSale);
+        getDataFromAPI("10", barEntryList_P, binding.barChartPurchase);
+        getDataFromAPI("20",barEntryList_S,binding.barChartSale);
         return binding.getRoot();
     }
 

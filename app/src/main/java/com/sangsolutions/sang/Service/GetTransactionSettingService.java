@@ -42,8 +42,19 @@ public class GetTransactionSettingService extends JobService {
         AndroidNetworking.initialize(this);
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
         editor = preferences.edit();
-        GetTransSetting("1");
-        GetTransSetting("2");
+        GetTransSetting("10");
+        GetTransSetting("11");
+        GetTransSetting("12");
+        GetTransSetting("13");
+        GetTransSetting("14");
+
+        GetTransSetting("20");
+        GetTransSetting("21");
+        GetTransSetting("22");
+        GetTransSetting("23");
+        GetTransSetting("24");
+
+        GetTransSetting("40");
         return true;
     }
 

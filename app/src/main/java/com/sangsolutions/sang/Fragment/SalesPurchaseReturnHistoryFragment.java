@@ -61,6 +61,7 @@ public class SalesPurchaseReturnHistoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentHistorySalesPurchaseReturnBinding.inflate(getLayoutInflater());
+        assert getArguments() != null;
         iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
@@ -74,7 +75,7 @@ public class SalesPurchaseReturnHistoryFragment extends Fragment {
         binding.fabClose.setVisibility(View.GONE);
         binding.fabAdd.setVisibility(View.VISIBLE);
 
-        if(iDocType==1){
+        if(iDocType==11){
            toolTitle="Purchase Return";
         }
         else {

@@ -35,13 +35,32 @@
             android:title="Purchase Return" />
         <item
             android:id="@+id/s_P_OrderHistoryFragment"
-            android:icon="@drawable/ic_return"
+            android:icon="@drawable/ic_order"
             android:title="Sales Order" />
         <item
             android:id="@+id/Purchase_OrderHistoryFragment"
-            android:icon="@drawable/ic_return"
+            android:icon="@drawable/ic_order"
             android:title="Purchase Order" />
 
+        <item
+            android:id="@+id/requestHistoryFragment"
+            android:icon="@drawable/ic_report"
+            android:title="Request" />
+        <item
+            android:id="@+id/enquiryrequestHistoryFragment"
+            android:icon="@drawable/ic_report"
+            android:title="Enquiry" />
+
+        <item
+
+            android:id="@+id/SalesquotationHistoryFragment"
+            android:icon="@drawable/ic_report"
+            android:title="Sales Quotation" />
+
+        <item
+            android:id="@+id/quotationHistoryFragment"
+            android:icon="@drawable/ic_report"
+            android:title="Purchase Quotation" />
 
         <item
             android:id="@+id/syncNav"

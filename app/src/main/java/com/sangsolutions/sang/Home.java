@@ -39,6 +39,7 @@ import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
 import com.sangsolutions.sang.Fragment.P_R_ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.QuotationHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderHistoryFragmentDirections;
@@ -157,7 +158,7 @@ public class Home extends AppCompatActivity {
                 R.id.purchaseFragment,R.id.report_selection_fragment,
                 R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment,
                 R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment,
-                R.id.s_P_OrderHistoryFragment)
+                R.id.s_P_OrderHistoryFragment,R.id.requestHistoryFragment,R.id.quotationHistoryFragment)
                 .setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -219,6 +220,17 @@ public class Home extends AppCompatActivity {
                     NavDirections action= S_P_OrderHistoryFragmentDirections.actionSPOrderHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
+
+                else if(navController.getCurrentDestination().getId()==R.id.quotationHistoryFragment){
+                    NavDirections action= QuotationHistoryFragmentDirections
+                            .actionQuotationHistoryFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.SalesquotationHistoryFragment){
+                    NavDirections action= QuotationHistoryFragmentDirections
+                            .actionQuotationHistoryFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
                 }
                 });
 
@@ -235,11 +247,11 @@ public class Home extends AppCompatActivity {
                         tagCursor=helper.getTagDetails();
                         if(tagCursor.moveToFirst() && tagCursor.getCount()>0) {
                             if (navController.getCurrentDestination().getId() != R.id.salesPurchaseHistoryFragment) {
-                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1).setToolTitle("Purchase Summary");
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(10).setToolTitle("Purchase Summary");
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             } else {
-                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(1);
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase Summary").setIDocType(10);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }
@@ -253,12 +265,12 @@ public class Home extends AppCompatActivity {
                         tagCursor=helper.getTagDetails();
                         if(tagCursor.getCount()>0) {
                         if(navController.getCurrentDestination().getId() !=R.id.salesPurchaseHistoryFragment){
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(2);
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(20);
                             navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
                         else{
-                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(2);
+                            NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale Summary").setIDocType(20);
                             navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
@@ -272,12 +284,12 @@ public class Home extends AppCompatActivity {
                             tagCursor=helper.getTagDetails();
                             if(tagCursor.getCount()>0) {
                             if(navController.getCurrentDestination().getId()!=R.id.paymentReceiptHistoryFragment){
-                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",1);
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",15);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }
                             else {
-                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",1);
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",15);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }
@@ -289,14 +301,14 @@ public class Home extends AppCompatActivity {
 
 
                         case R.id.salesPurchaseReturnHistoryFragment:{
-                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Sales Return History",2);
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Sales Return History",21);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
 
                         }
                         break;
                         case R.id.PurchaseReturnHistoryFragment:{
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Purchase Return History",1);
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Purchase Return History",11);
                             navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
@@ -304,29 +316,57 @@ public class Home extends AppCompatActivity {
 
 
                         case R.id.s_P_OrderHistoryFragment:{
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(2,"Sales Order");
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(22,"Sales Order");
                             navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
                         break;
 
                         case R.id.Purchase_OrderHistoryFragment:{
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(1,"Purchase Order");
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(12,"Purchase Order");
                             navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
                         break;
 
+                        case R.id.requestHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToRequestHistoryFragment(13,"Request History");
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
+                        }
+                        break;
+                        case R.id.enquiryrequestHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToRequestHistoryFragment(23,"Enquiry History");
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
+                        }
+                        break;
+
+                        case R.id.quotationHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections
+                                    .actionHomeFragmentToQuotationHistoryFragment(14,"Purchase Quotation History");
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
+                        }
+                        break;
+
+                        case R.id.SalesquotationHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections
+                                    .actionHomeFragmentToQuotationHistoryFragment(24,"Sales Quotation History");
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
+                        }
+                        break;
                         case R.id.ReceiptHistoryFragment:    {
                             tagCursor=helper.getTagDetails();
                             if(tagCursor.getCount()>0) {
                             if(navController.getCurrentDestination().getId()!=R.id.paymentReceiptHistoryFragment){
-                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",2);
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",25);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }
                             else {
-                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",2);
+                                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History",25);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             }

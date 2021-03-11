@@ -31,28 +31,28 @@ public class Report_selection_fragment extends Fragment {
         binding.saleReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("2","Sales Report");
+                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("20","Sales Report");
                 navController.navigate(actions);
             }
         });
         binding.purchaseReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("1","Purchase Report");
+                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("10","Purchase Report");
                 navController.navigate(actions);
             }
         });
         binding.PaymentReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("1","Payment Report");
+                NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("15","Payment Report");
                 navController.navigate(action);
             }
         });
         binding.receiptReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("2","Receipt Report");
+                NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("25","Receipt Report");
                 navController.navigate(action);
             }
         });
@@ -60,7 +60,7 @@ public class Report_selection_fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavDirections action=Report_selection_fragmentDirections
-                        .actionReportSelectionFragmentToSPReturnReportFragment2("1","Purchase Return Report");
+                        .actionReportSelectionFragmentToSPReturnReportFragment2("11","Purchase Return Report");
                 navController.navigate(action);
             }
         });
@@ -68,7 +68,7 @@ public class Report_selection_fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavDirections action=Report_selection_fragmentDirections
-                        .actionReportSelectionFragmentToSPReturnReportFragment2("2","Sales Return Report");
+                        .actionReportSelectionFragmentToSPReturnReportFragment2("21","Sales Return Report");
                 navController.navigate(action);
             }
         });
@@ -76,7 +76,7 @@ public class Report_selection_fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavDirections action=Report_selection_fragmentDirections
-                        .actionReportSelectionFragmentToSPOrderReportFragment("1","Purchase Order Report");
+                        .actionReportSelectionFragmentToSPOrderReportFragment("12","Purchase Order Report");
 
                 navController.navigate(action);
             }
@@ -85,11 +85,30 @@ public class Report_selection_fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavDirections action=Report_selection_fragmentDirections
-                        .actionReportSelectionFragmentToSPOrderReportFragment("2","Sales Order Report");
+                        .actionReportSelectionFragmentToSPOrderReportFragment("22","Sales Order Report");
 
                 navController.navigate(action);
             }
         });
+
+        binding.enquiryReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToRequestEnquiryReportFragment("23","Enquiry Report");
+                navController.navigate(action);
+            }
+        });
+
+        binding.requestReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToRequestEnquiryReportFragment("13","Request Report");
+                navController.navigate(action);
+            }
+        });
+
         return binding.getRoot();
     }
 }

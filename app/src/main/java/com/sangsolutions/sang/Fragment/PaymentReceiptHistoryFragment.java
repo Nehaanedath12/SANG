@@ -78,7 +78,7 @@ public class PaymentReceiptHistoryFragment extends Fragment {
         historyAdapter=new PaymentReceiptHistoryAdapter(requireActivity(),historyList);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        if(iDocType==1){
+        if(iDocType==15){
             toolTitle="Payment";
         }
         else {

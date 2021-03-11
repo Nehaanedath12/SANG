@@ -81,7 +81,7 @@ public class S_P_OrderHistoryFragment extends Fragment {
 
         assert getArguments() != null;
         iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
-        if (iDocType == 1) {
+        if (iDocType == 12) {
             toolTitle = "Purchase Order";
         } else {
             toolTitle = "Sales Order";
