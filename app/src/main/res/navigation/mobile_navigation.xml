@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_homeFragment_to_quotationHistoryFragment"
             app:destination="@id/quotationHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_stockCountHistoryFragment"
+            app:destination="@id/stockCountHistoryFragment" />
 
 
     </fragment>
@@ -110,6 +113,12 @@
         <action
             android:id="@+id/action_report_selection_fragment_to_requestEnquiryReportFragment"
             app:destination="@id/requestEnquiryReportFragment" />
+        <action
+            android:id="@+id/action_report_selection_fragment_to_quotationReportFragment"
+            app:destination="@id/quotationReportFragment" />
+        <action
+            android:id="@+id/action_report_selection_fragment_to_stockCountReport"
+            app:destination="@id/stockCountReport" />
 
     </fragment>
     <fragment
@@ -431,6 +440,81 @@
             app:destination="@id/report_selection_fragment" />
         <action
             android:id="@+id/action_requestEnquiryReportFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stockCountFragment"
+        android:name="com.sangsolutions.sang.Fragment.StockCountFragment"
+        android:label="StockCount"
+        tools:layout="@layout/fragment_stock_count">
+        <argument
+            android:name="iDocType"
+            app:argType="integer"
+            android:defaultValue="0"/>
+        <argument
+            android:name="iTransId"
+            app:argType="integer"
+            android:defaultValue="0" />
+
+        <argument
+            android:name="EditMode"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_stockCountFragment_to_stockCountHistoryFragment"
+            app:destination="@id/stockCountHistoryFragment" />
+        <action
+            android:id="@+id/action_stockCountFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stockCountHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.StockCountHistoryFragment"
+        android:label="StockCount History"
+        tools:layout="@layout/fragment_history_stock_count">
+        <argument
+            android:name="iDocType"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_stockCountHistoryFragment_to_stockCountFragment"
+            app:destination="@id/stockCountFragment" />
+        <action
+            android:id="@+id/action_stockCountHistoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/quotationReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.QuotationReportFragment"
+        android:label="{tool_title}"
+        tools:layout="@layout/fragment_quotation_report">
+
+        <argument
+            android:name="iDocType"
+            app:argType="string" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_quotationReportFragment_to_report_selection_fragment"
+            app:destination="@id/report_selection_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stockCountReport"
+        android:name="com.sangsolutions.sang.Fragment.StockCountReport"
+        android:label="StockCount Report"
+        tools:layout="@layout/fragment_stockcount_report">
+        <argument
+            android:name="iDocType"
+            app:argType="string" />
+        <argument
+            android:name="tool_title"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_stockCountReport_to_report_selection_fragment"
+            app:destination="@id/report_selection_fragment" />
+        <action
+            android:id="@+id/action_stockCountReport_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 

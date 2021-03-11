@@ -98,7 +98,7 @@ public class S_P_OrderHistoryFragment extends Fragment {
         binding.fabClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                closeSelection();
+                closeSelection();
             }
         });
         binding.fabDelete.setOnClickListener(new View.OnClickListener() {

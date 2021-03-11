@@ -158,7 +158,8 @@ public class Home extends AppCompatActivity {
                 R.id.purchaseFragment,R.id.report_selection_fragment,
                 R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment,
                 R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment,
-                R.id.s_P_OrderHistoryFragment,R.id.requestHistoryFragment,R.id.quotationHistoryFragment)
+                R.id.s_P_OrderHistoryFragment,R.id.requestHistoryFragment,R.id.quotationHistoryFragment,
+                R.id.stockCountHistoryFragment)
                 .setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -350,6 +351,8 @@ public class Home extends AppCompatActivity {
                         }
                         break;
 
+
+
                         case R.id.SalesquotationHistoryFragment:{
                             NavDirections action=HomeFragmentDirections
                                     .actionHomeFragmentToQuotationHistoryFragment(24,"Sales Quotation History");
@@ -357,6 +360,15 @@ public class Home extends AppCompatActivity {
                             navController.navigate(action);
                         }
                         break;
+
+                        case R.id.stockCountHistoryFragment:{
+                            NavDirections action=HomeFragmentDirections
+                                    .actionHomeFragmentToStockCountHistoryFragment(40);
+                            navController.navigate(R.id.homeFragment);
+                            navController.navigate(action);
+                        }
+                        break;
+
                         case R.id.ReceiptHistoryFragment:    {
                             tagCursor=helper.getTagDetails();
                             if(tagCursor.getCount()>0) {

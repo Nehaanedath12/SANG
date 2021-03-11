@@ -109,6 +109,31 @@ public class Report_selection_fragment extends Fragment {
             }
         });
 
+        binding.purchaseQuotationReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToQuotationReportFragment("14","Purchase Quotation");
+                navController.navigate(action);
+            }
+        });
+        binding.salesQuotationReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToQuotationReportFragment("21","Sales Quotation");
+                navController.navigate(action);
+            }
+        });
+
+        binding.stockReportReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToStockCountReport("40","StockCount Report");
+                navController.navigate(action);
+            }
+        });
         return binding.getRoot();
     }
 }

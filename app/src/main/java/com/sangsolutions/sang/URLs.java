@@ -50,7 +50,13 @@ public class URLs {
     public static final String GetTransQuotationDetails =domain+"GetTransQuotationDetails";
 
     public static final String GetSales_PurchaseRequestReport =domain+"GetSales_PurchaseRequestReport";
+    public static final String GetTransStockSummary =domain+"GetTransStockSummary";
 
+    public static final String DeleteTransStock =domain+"DeleteTransStock";
+    public static final String PostTransStock =domain+"PostTransStock";
+    public static final String GetTransStockDetails =domain+"GetTransStockDetails";
+    public static final String GetSales_PurchaseQuotationReport =domain+"GetSales_PurchaseQuotationReport";
+    public static final String GetSales_PurchaseStockReport =domain+"GetSales_PurchaseStockReport";
 
 
 }

@@ -106,7 +106,6 @@ public class SalesPurchaseHistoryAdapter extends RecyclerView.Adapter<SalesPurch
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        Log.d("customerName",list.get(position).sAccount1);
         holder.customerName.setText(list.get(position).sAccount1);
         holder.docNo.setText(list.get(position).sDocNo);
         holder.date.setText(list.get(position).sDate);

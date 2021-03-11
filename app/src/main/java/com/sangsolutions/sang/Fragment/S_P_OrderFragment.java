@@ -1043,9 +1043,9 @@ public class S_P_OrderFragment extends Fragment {
 
     private void loadAPIValue_for_Edit(JSONObject response) {
 
-        JSONArray jsonArray= null;
+
         try {
-            jsonArray = new JSONArray(response.getString("Table"));
+           JSONArray jsonArray = new JSONArray(response.getString("Table"));
             Log.d("HeadArray",jsonArray.length()+"");
             JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
             Log.d("BodyArray1",jsonArray1.length()+"");

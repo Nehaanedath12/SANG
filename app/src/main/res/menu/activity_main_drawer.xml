@@ -61,6 +61,10 @@
             android:id="@+id/quotationHistoryFragment"
             android:icon="@drawable/ic_report"
             android:title="Purchase Quotation" />
+        <item
+            android:id="@+id/stockCountHistoryFragment"
+            android:icon="@drawable/ic_report"
+            android:title="Stock Count" />
 
         <item
             android:id="@+id/syncNav"
