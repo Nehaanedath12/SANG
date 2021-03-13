@@ -89,6 +89,8 @@ public class RequestHistoryAdapter extends RecyclerView.Adapter<RequestHistoryAd
         void onItemLongClick(int position);
 
         void onDeleteClick(int iTransId);
+
+        void onPDFclick(int iTransId, int position);
     }
 
 
@@ -146,6 +148,13 @@ public class RequestHistoryAdapter extends RecyclerView.Adapter<RequestHistoryAd
             }
         });
 
+        holder.pdf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickListener.onPDFclick(list.get(position).iTransId,position);
+            }
+        });
+
 
         holder.parentCard.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -171,7 +180,7 @@ public class RequestHistoryAdapter extends RecyclerView.Adapter<RequestHistoryAd
 
         TextView date,docNo;
         CardView parentCard;
-        ImageView delete,img_check;
+        ImageView delete,img_check,pdf;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -180,6 +189,7 @@ public class RequestHistoryAdapter extends RecyclerView.Adapter<RequestHistoryAd
             docNo=itemView.findViewById(R.id.DocNo);
             delete=itemView.findViewById(R.id.delete);
             img_check=itemView.findViewById(R.id.check);
+            pdf=itemView.findViewById(R.id.print);
 
         }
     }

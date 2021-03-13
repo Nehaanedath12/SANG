@@ -81,8 +81,12 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
 
         Log.d("mapsizee",list.get(position).hashMapBody.size()+"");
 
+
         for (int tagId=1;tagId<=tagTotalNumber;tagId++){
+            Log.d("iDocTypeBody",iDocType+" "+tagId);
             Cursor cursor=helper.getTransSettings(iDocType,tagId);
+            Log.d("iDocTypeBody",cursor.toString()+"");
+
             if(cursor!=null ) {
                 cursor.moveToFirst();
                 String iTagPosition = cursor.getString(cursor.getColumnIndex(TransSetting.I_TAG_POSITION));

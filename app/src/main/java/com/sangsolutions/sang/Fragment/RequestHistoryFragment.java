@@ -266,6 +266,12 @@ public class RequestHistoryFragment extends Fragment {
                         public void onDeleteClick(int iTransId) {
                             deleteFromAPI(iTransId);
                         }
+
+                        @Override
+                        public void onPDFclick(int iTransId, int position) {
+                            Toast.makeText(requireContext(), "pdf order", Toast.LENGTH_SHORT).show();
+
+                        }
                     });
 
 

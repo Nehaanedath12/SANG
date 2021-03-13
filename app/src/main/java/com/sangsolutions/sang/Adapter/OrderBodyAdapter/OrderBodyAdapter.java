@@ -82,31 +82,32 @@ public class OrderBodyAdapter extends RecyclerView.Adapter<OrderBodyAdapter.View
                 Cursor cursor1 = helper.getTagNamebyId(tagId);
                 cursor1.moveToFirst();
                 if (iTagPosition.equals("2")) {
+                    if (visibility.equals("true")) {
+                        LinearLayout l_tags = holder.linearTag;
+                        // add autocompleteTextView
+                        TextView textView = new TextView(context);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        textView.setLayoutParams(params);
+                        params.setMargins(5, 0, 5, 0);
+                        l_tags.addView(textView);
+                        textView.setGravity(Gravity.CENTER);
+                        textView.setWidth(150);
+                        textView.setText("");
 
-                    LinearLayout l_tags = holder.linearTag;
-                    // add autocompleteTextView
-                    TextView textView = new TextView(context);
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    textView.setLayoutParams(params);
-                    params.setMargins(5, 0, 5, 0);
-                    l_tags.addView(textView);
-                    textView.setGravity(Gravity.CENTER);
-                    textView.setWidth(150);
-                    textView.setText("");
+                        for (int i = 0; i < list.get(position).hashMapBody.size(); i++) {
+                            int tagId_map = (int) list.get(position).hashMapBody.keySet().toArray()[i];
+                            int tagDetails_map = (int) list.get(position).hashMapBody.values().toArray()[i];
 
-                    for (int i=0;i<list.get(position).hashMapBody.size();i++) {
-                        int tagId_map = (int) list.get(position).hashMapBody.keySet().toArray()[i];
-                        int tagDetails_map = (int) list.get(position).hashMapBody.values().toArray()[i];
-
-                        try {
-                            if (tagId_map == tagId) {
-                                Cursor cursor_map = helper.getTagName(tagId, tagDetails_map);
-                                textView.setText(cursor_map.getString(cursor_map.getColumnIndex(TagDetails.S_NAME)));
+                            try {
+                                if (tagId_map == tagId) {
+                                    Cursor cursor_map = helper.getTagName(tagId, tagDetails_map);
+                                    textView.setText(cursor_map.getString(cursor_map.getColumnIndex(TagDetails.S_NAME)));
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
 
+                        }
                     }
                 }
             }

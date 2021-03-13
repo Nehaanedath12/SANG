@@ -225,7 +225,6 @@ public class StockCountFragment extends Fragment {
                 cursor1.moveToFirst();
                 if(iTagPosition.equals("1")){
 
-                    headerListTags.add(tagId);
                     LinearLayout ll = binding.linearHeader;
                     // add autocompleteTextView
                     AutoCompleteTextView autoTextHeader = new AutoCompleteTextView(requireActivity());
@@ -233,6 +232,8 @@ public class StockCountFragment extends Fragment {
                     autoTextHeader.setLayoutParams(p);
                     if(visibility.equals("false")){
                         autoTextHeader.setEnabled(false);
+                    }else {
+                        headerListTags.add(tagId);
                     }
                     if(mandatory.equals("true")){
                         mandatoryList_H.add(autoTextHeader);
@@ -249,9 +250,6 @@ public class StockCountFragment extends Fragment {
 
 
                 }else if(iTagPosition.equals("2")){
-
-                    bodyListTags.add(tagId);
-
                     LinearLayout ll = binding.linearBody;
                     // add autocompleteTextView
                     AutoCompleteTextView autoTextBody = new AutoCompleteTextView(requireActivity());
@@ -259,6 +257,8 @@ public class StockCountFragment extends Fragment {
                     autoTextBody.setLayoutParams(p);
                     if(visibility.equals("false")){
                         autoTextBody.setEnabled(false);
+                    }else {
+                        bodyListTags.add(tagId);
                     }
                     if(mandatory.equals("true")){
                         mandatoryList_B.add(autoTextBody);
@@ -340,6 +340,13 @@ public class StockCountFragment extends Fragment {
                     if (!mandatoryList_B.get(i).getText().toString().equals("") &&
                             helper.isTagValid(mandatoryList_B.get(i).getText().toString().trim())) {
                         if (i + 1 == mandatoryList_B.size() && flag ) {
+
+                            for(int j=0;j<bodyListTags.size();j++){
+                                if(autoText_B_list.get(j).getText().toString().equals("")){
+                                    bodyListTags.remove(bodyListTags.get(j));
+                                }
+                            }
+
                             saveBodyPartProduct();
                         }
 
@@ -373,6 +380,12 @@ public class StockCountFragment extends Fragment {
                                             if (!mandatoryList_H.get(i).getText().toString().equals("")
                                                     && helper.isTagValid(mandatoryList_H.get(i).getText().toString().trim())) {
                                                 if (i + 1 == mandatoryList_H.size() && flag) {
+//
+                                                    for(int j=0;j<headerListTags.size();j++){
+                                                        if(autoText_H_list.get(j).getText().toString().equals("")){
+                                                            hashMapHeader.remove(headerListTags.get(j));
+                                                        }
+                                                    }
 //                                                                if(mandatoryList_H.size()==hashMapHeader.size()){
                                                     saveMain();
 //                                                                }
@@ -575,7 +588,8 @@ public class StockCountFragment extends Fragment {
         int qty;
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
-            if(!binding.qtyProduct.getText().toString().equals("")){
+            if(!binding.qtyProduct.getText().toString().equals("") &&
+                    Float.parseFloat(binding.qtyProduct.getText().toString())!=0.0){
                 BodyPart bodyPart=new BodyPart();
 
                 qty=Integer.parseInt(binding.qtyProduct.getText().toString());

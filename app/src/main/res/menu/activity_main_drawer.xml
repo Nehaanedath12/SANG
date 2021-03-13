@@ -44,26 +44,26 @@
 
         <item
             android:id="@+id/requestHistoryFragment"
-            android:icon="@drawable/ic_report"
+            android:icon="@drawable/ic_request"
             android:title="Request" />
         <item
             android:id="@+id/enquiryrequestHistoryFragment"
-            android:icon="@drawable/ic_report"
+            android:icon="@drawable/ic_request"
             android:title="Enquiry" />
 
         <item
 
             android:id="@+id/SalesquotationHistoryFragment"
-            android:icon="@drawable/ic_report"
+            android:icon="@drawable/ic_quotation"
             android:title="Sales Quotation" />
 
         <item
             android:id="@+id/quotationHistoryFragment"
-            android:icon="@drawable/ic_report"
+            android:icon="@drawable/ic_quotation"
             android:title="Purchase Quotation" />
         <item
             android:id="@+id/stockCountHistoryFragment"
-            android:icon="@drawable/ic_report"
+            android:icon="@drawable/ic_stock_count"
             android:title="Stock Count" />
 
         <item

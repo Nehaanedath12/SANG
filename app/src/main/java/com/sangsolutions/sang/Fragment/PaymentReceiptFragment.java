@@ -529,11 +529,21 @@ public class PaymentReceiptFragment extends Fragment {
                         boolean flag = true;
                         if (!binding.amount.getText().toString().equals("")) {
                         if (mandatoryList_H.size() <= 0) {
+                            for(int j=0;j<headerListTags.size();j++){
+                                if(autoText_H_list.get(j).getText().toString().equals("")){
+                                    hashMapHeader.remove(headerListTags.get(j));
+                                }
+                            }
                         uploadToJson();
                         }
                         for (int i = 0; i < mandatoryList_H.size(); i++) {
                         if (!mandatoryList_H.get(i).getText().toString().equals("")) {
                         if (i + 1 == mandatoryList_H.size() && flag) {
+                            for(int j=0;j<headerListTags.size();j++){
+                                if(autoText_H_list.get(j).getText().toString().equals("")){
+                                    hashMapHeader.remove(headerListTags.get(j));
+                                }
+                            }
                             uploadToJson();
                         }
                         } else {
@@ -897,6 +907,7 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void API_Invoice() {
+        Log.d("icustomer",iCustomer+" "+iDocType);
                 AndroidNetworking.get("http://"+ URLs.GetInvoiceList)
                 .addQueryParameter("iCustomer",String.valueOf(iCustomer))
                 .addQueryParameter("iType",String.valueOf(iDocType))

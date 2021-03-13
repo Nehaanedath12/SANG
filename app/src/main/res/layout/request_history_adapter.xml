@@ -43,6 +43,12 @@
                 android:layout_weight="1"
                 android:id="@+id/Date"/>
             <ImageView
+                android:id="@+id/print"
+                android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_print"/>
+            <ImageView
                 android:id="@+id/delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

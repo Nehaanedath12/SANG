@@ -41,6 +41,8 @@ import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.QuotationHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
+import com.sangsolutions.sang.Fragment.RequestFragmentDirections;
+import com.sangsolutions.sang.Fragment.RequestHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_ReportFragmentDirections;
@@ -49,6 +51,9 @@ import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseReturnFragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseReturnHistoryFragment;
 import com.sangsolutions.sang.Fragment.SalesPurchaseReturnHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.StockCountFragmentDirections;
+import com.sangsolutions.sang.Fragment.StockCountHistoryFragment;
+import com.sangsolutions.sang.Fragment.StockCountHistoryFragmentDirections;
 import com.sangsolutions.sang.databinding.ActivityMainBinding;
 
 import org.json.JSONArray;
@@ -91,15 +96,15 @@ public class Home extends AppCompatActivity {
             NavDirections action= Report_selection_fragmentDirections.actionReportSelectionFragmentToHomeFragment();
             navController.navigate(action);
         }
-        else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
-            backAlert();
-        }
-        else if(navController.getCurrentDestination().getId()==R.id.p_R_ReportFragment){
-            backAlert();
-        }
-        else if(navController.getCurrentDestination().getId()==R.id.s_P_Return_ReportFragment2){
-            backAlert();
-        }
+//        else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
+//            backAlert();
+//        }
+//        else if(navController.getCurrentDestination().getId()==R.id.p_R_ReportFragment){
+//            backAlert();
+//        }
+//        else if(navController.getCurrentDestination().getId()==R.id.s_P_Return_ReportFragment2){
+//            backAlert();
+//        }
         else if(navController.getCurrentDestination().getId()==R.id.paymentReceiptHistoryFragment){
             NavDirections action= PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToHomeFragment();
             navController.navigate(action);
@@ -120,6 +125,27 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderHistoryFragment){
             NavDirections action=S_P_OrderHistoryFragmentDirections.actionSPOrderHistoryFragmentToHomeFragment();
             navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.requestHistoryFragment){
+            NavDirections action= RequestHistoryFragmentDirections.actionRequestHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.requestFragment){
+            backAlert();
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.quotationHistoryFragment){
+            NavDirections action=QuotationHistoryFragmentDirections.actionQuotationHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.quotationFragment){
+            backAlert();
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.stockCountHistoryFragment){
+            NavDirections action= StockCountHistoryFragmentDirections.actionStockCountHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.stockCountFragment){
+            backAlert();
         }
 
 
@@ -227,11 +253,15 @@ public class Home extends AppCompatActivity {
                             .actionQuotationHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
-                else if(navController.getCurrentDestination().getId()==R.id.SalesquotationHistoryFragment){
-                    NavDirections action= QuotationHistoryFragmentDirections
-                            .actionQuotationHistoryFragmentToHomeFragment();
+                else if(navController.getCurrentDestination().getId()==R.id.stockCountHistoryFragment) {
+                    NavDirections action = StockCountHistoryFragmentDirections.actionStockCountHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
+                else if(navController.getCurrentDestination().getId()==R.id.stockCountFragment){
+                    NavDirections action= StockCountFragmentDirections.actionStockCountFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+
                 }
                 });
 
@@ -317,14 +347,14 @@ public class Home extends AppCompatActivity {
 
 
                         case R.id.s_P_OrderHistoryFragment:{
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(22,"Sales Order");
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(22,"Sales Order History");
                             navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
                         break;
 
                         case R.id.Purchase_OrderHistoryFragment:{
-                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(12,"Purchase Order");
+                            NavDirections action=HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(12,"Purchase Order History");
                             navController.navigate(R.id.homeFragment);
                             navController.navigate(action);
                         }
@@ -537,6 +567,14 @@ public class Home extends AppCompatActivity {
                 return true;
             }
             else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderFragment){
+                backAlert();
+                return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.quotationFragment){
+                backAlert();
+                return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.stockCountFragment){
                 backAlert();
                 return true;
             }

@@ -381,6 +381,12 @@ public class QuotationFragment extends Fragment {
                     if (!mandatoryList_B.get(i).getText().toString().equals("") &&
                             helper.isTagValid(mandatoryList_B.get(i).getText().toString().trim())) {
                         if (i + 1 == mandatoryList_B.size() && flag ) {
+                            for(int j=0;j<bodyListTags.size();j++){
+                                if(autoText_B_list.get(j).getText().toString().equals("")){
+                                    bodyListTags.remove(bodyListTags.get(j));
+                                }
+                            }
+
                             saveBodyPartProduct();
                         }
 
@@ -416,6 +422,12 @@ public class QuotationFragment extends Fragment {
                                                     && helper.isTagValid(mandatoryList_H.get(i).getText().toString().trim())) {
                                                 if (i + 1 == mandatoryList_H.size() && flag) {
 //                                                                if(mandatoryList_H.size()==hashMapHeader.size()){
+
+                                                    for(int j=0;j<headerListTags.size();j++){
+                                                        if(autoText_H_list.get(j).getText().toString().equals("")){
+                                                            hashMapHeader.remove(headerListTags.get(j));
+                                                        }
+                                                    }
                                                     saveMain();
 //                                                                }
 //                                                                else {

@@ -47,12 +47,14 @@ public class GetTransactionSettingService extends JobService {
         GetTransSetting("12");
         GetTransSetting("13");
         GetTransSetting("14");
+        GetTransSetting("15");
 
         GetTransSetting("20");
         GetTransSetting("21");
         GetTransSetting("22");
         GetTransSetting("23");
         GetTransSetting("24");
+        GetTransSetting("25");
 
         GetTransSetting("40");
         return true;

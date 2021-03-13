@@ -67,7 +67,6 @@ public class P_R_ReportFragment extends Fragment {
         binding = FragmentReportReceiptPaymentBinding.inflate(getLayoutInflater());
         assert getArguments() != null;
         iType=S_P_ReportFragmentArgs.fromBundle(getArguments()).getIDocType();
-        Toast.makeText(requireContext(), iType, Toast.LENGTH_SHORT).show();
         helper=new DatabaseHelper(requireContext());
 
         customerList =new ArrayList<>();

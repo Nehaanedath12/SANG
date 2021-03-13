@@ -386,6 +386,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                             if (!mandatoryList_B.get(i).getText().toString().equals("") &&
                                     helper.isTagValid(mandatoryList_B.get(i).getText().toString().trim())) {
                                 if (i + 1 == mandatoryList_B.size() && flag ) {
+
+                                    for(int j=0;j<bodyListTags.size();j++){
+                                        if(autoText_B_list.get(j).getText().toString().equals("")){
+                                            bodyListTags.remove(bodyListTags.get(j));
+                                        }
+                                    }
                                    saveBodyPartProduct();
                                 }
 
