@@ -61,6 +61,7 @@ import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetailsAdapter;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -137,12 +138,18 @@ public class Sale_Purchase_Fragment extends Fragment {
     List<Integer>bodyListTags;
     String userCode;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         binding=FragmentSalePurchaseBinding.inflate(getLayoutInflater());
 
+        try {
+            ((Home)getActivity()).setDrawerEnabled(false);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
         hashMapBody=new HashMap<>();
@@ -521,7 +528,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                 ///////
 
-                AndroidNetworking.get("http://" + URLs.GetTransSummary)
+                AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetTransSummary)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -566,7 +573,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
     private void EditValueFromAPI() {
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + URLs.GetTransDetails)
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -672,7 +679,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void deleteAll() {
-            AndroidNetworking.get("http://"+  URLs.DeleteTrans)
+            AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTrans)
                     .addQueryParameter("iTransId", String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -701,7 +708,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         try{
             jsonObjectMain.put("iTransId",iTransId);
             jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(StringDate));
+            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
             jsonObjectMain.put("iDocType",iDocType);
             jsonObjectMain.put("iAccount1",iCustomer);
             jsonObjectMain.put("iAccount2",0);
@@ -784,7 +791,7 @@ public class Sale_Purchase_Fragment extends Fragment {
         Log.d("uploadjSONoBJECT",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ URLs.PostProductStock)
+            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity()) + URLs.PostProductStock)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()

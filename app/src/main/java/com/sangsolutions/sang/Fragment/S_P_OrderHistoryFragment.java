@@ -29,6 +29,7 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -61,6 +62,11 @@ public class S_P_OrderHistoryFragment extends Fragment {
 
         binding=FragmentSalesPurchaseOrderHistoryBinding.inflate(getLayoutInflater());
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        try {
+            ((Home)getActivity()).setDrawerEnabled(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         helper=new DatabaseHelper(requireContext());
         historyList=new ArrayList<>();
@@ -161,7 +167,7 @@ public class S_P_OrderHistoryFragment extends Fragment {
 
     private void getHistoryDatas() {
         alertDialog.show();
-        AndroidNetworking.get("http://"+  URLs.GetTransOrderSummary)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.GetTransOrderSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
@@ -256,7 +262,7 @@ public class S_P_OrderHistoryFragment extends Fragment {
 
     private void deleteFromAPI(int iTransId) {
 
-        AndroidNetworking.get("http://"+  URLs.DeleteTransOrder)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransOrder)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()

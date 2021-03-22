@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -42,7 +43,7 @@ public class GetBankService extends JobService {
 
     private void GetBanks() {
 
-        AndroidNetworking.get("http://"+ URLs.GetBanks)
+        AndroidNetworking.get("http://"+ new Tools().getIP(GetBankService.this)+ URLs.GetBanks)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
@@ -56,6 +57,7 @@ public class GetBankService extends JobService {
                     @Override
                     public void onError(ANError anError) {
 
+                        Toast.makeText(GetBankService.this, "enter valid Ip Address", Toast.LENGTH_SHORT).show();
                         Log.d("responseBank",anError.toString());
                     }
                 });

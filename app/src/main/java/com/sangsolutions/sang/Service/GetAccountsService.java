@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -41,7 +42,7 @@ public class GetAccountsService extends JobService {
     }
 
     private void GetAccounts() {
-        AndroidNetworking.get("http://"+ URLs.GetAccounts)
+        AndroidNetworking.get("http://"+  new Tools().getIP(GetAccountsService.this) +URLs.GetAccounts)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
@@ -53,6 +54,7 @@ public class GetAccountsService extends JobService {
 
                     @Override
                     public void onError(ANError anError) {
+                        Toast.makeText(GetAccountsService.this, "enter valid Ip Address", Toast.LENGTH_SHORT).show();
                         Log.d("response",anError.toString());
                     }
                 });

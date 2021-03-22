@@ -34,8 +34,8 @@ public class SettingsActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
-                if(!Tools.isValidIP(binding.ipAddress.getText().toString())){
-                    Toast.makeText(SettingsActivity.this, "Enter Valid IP", Toast.LENGTH_SHORT).show();
+                if(binding.ipAddress.getText().toString().equals("")){
+                    Toast.makeText(SettingsActivity.this, "Enter Ip Address", Toast.LENGTH_SHORT).show();
                 }
                 else if(tools.setIP(getApplicationContext(),binding.ipAddress.getText().toString())){
                     startActivity(new Intent(getApplicationContext(),Login.class));

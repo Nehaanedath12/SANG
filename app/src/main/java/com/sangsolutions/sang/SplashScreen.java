@@ -17,12 +17,12 @@ public class SplashScreen extends AppCompatActivity {
                 try{
                     sleep(2000);
 
-//                    if(!new Tools().getIP(SplashScreen.this).isEmpty()){
+                    if(!new Tools().getIP(SplashScreen.this).isEmpty()){
                         startActivity(new Intent(getApplicationContext(),Login.class));
-//                    }
-//                    else {
-//                        startActivity(new Intent(getApplicationContext(),SettingsActivity.class));
-//                    }
+                    }
+                    else {
+                        startActivity(new Intent(getApplicationContext(),SettingsActivity.class));
+                    }
                     finish();
 
                 }catch (Exception e){

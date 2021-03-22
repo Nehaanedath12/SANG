@@ -188,7 +188,7 @@ public class S_P_Return_ReportFragment extends Fragment {
         String fromDate=Tools.dateFormat(binding.fromDate.getText().toString().trim());
         String toDate=Tools.dateFormat(binding.toDate.getText().toString().trim());
 
-        AndroidNetworking.get("http://"+ URLs.GetSales_PurchaseReturnReport)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetSales_PurchaseReturnReport)
                 .addQueryParameter("UserId",userId)
                 .addQueryParameter("FromDate",fromDate)
                 .addQueryParameter("ToDate",toDate)

@@ -60,7 +60,7 @@ public class GetMasterTagDetails extends JobService {
 
     private void GetTag_Details(int iType) {
         Log.d("homeFragment","homeFragmentS"+"i");
-        AndroidNetworking.get("http://"+URLs.GetMasterTagDetails)
+        AndroidNetworking.get("http://"+ new Tools().getIP(GetMasterTagDetails.this) +URLs.GetMasterTagDetails)
                 .addQueryParameter("iType",String.valueOf(iType))
                 .setPriority(Priority.MEDIUM)
                 .build()

@@ -58,6 +58,7 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -151,6 +152,11 @@ public class PaymentReceiptFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        binding=FragmentPaymentReceiptBinding.inflate(getLayoutInflater());
        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        try {
+            ((Home)getActivity()).setDrawerEnabled(false);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireContext());
         decimalFormat= new DecimalFormat("0.00");
@@ -437,7 +443,7 @@ public class PaymentReceiptFragment extends Fragment {
 
 
     private void deleteAll() {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransReceipt_Payment)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransReceipt_Payment)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -679,7 +685,7 @@ public class PaymentReceiptFragment extends Fragment {
         Log.d("jsonObjectMain",jsonObjectMain.toString());
                     if(Tools.isConnected(requireActivity())) {
                     alertDialog.show();
-                    AndroidNetworking.upload("http://"+URLs.Post_Receipt_Payment)
+                    AndroidNetworking.upload("http://"+ new Tools().getIP(requireActivity())+URLs.Post_Receipt_Payment)
                     .addMultipartParameter("json_content",jsonObjectMain.toString())
                     .setContentType("multipart/form-data")
                     .addMultipartFileList("file",files)
@@ -907,10 +913,17 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
     private void API_Invoice() {
+        int itype=0;
+        if(iDocType==15){
+            itype=10;
+        }else if(iDocType==25)
+        {
+            itype=20;
+        }
         Log.d("icustomer",iCustomer+" "+iDocType);
-                AndroidNetworking.get("http://"+ URLs.GetInvoiceList)
+                AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetInvoiceList)
                 .addQueryParameter("iCustomer",String.valueOf(iCustomer))
-                .addQueryParameter("iType",String.valueOf(iDocType))
+                .addQueryParameter("iType",String.valueOf(itype))
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
@@ -1089,7 +1102,7 @@ public class PaymentReceiptFragment extends Fragment {
                     if (cursor.moveToFirst() && cursor.getCount() > 0) {
                     userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
                     }
-                                    AndroidNetworking.get("http://" +URLs.GetTransReceipt_PaymentSummary)
+                                    AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) +URLs.GetTransReceipt_PaymentSummary)
                                     .addQueryParameter("iDocType", String.valueOf(iDocType))
                                     .addQueryParameter("iUser", userIdS)
                                     .setPriority(Priority.MEDIUM)
@@ -1131,7 +1144,7 @@ public class PaymentReceiptFragment extends Fragment {
 
     private void EditValueFromAPI() {
         if(Tools.isConnected(requireContext())){
-                            AndroidNetworking.get("http://" +URLs.GetTransReceipt_PaymentDetails)
+                            AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) +URLs.GetTransReceipt_PaymentDetails)
                             .addQueryParameter("iTransId",String.valueOf(iTransId))
                             .setPriority(Priority.MEDIUM)
                             .build()

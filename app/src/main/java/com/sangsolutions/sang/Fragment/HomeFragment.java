@@ -34,6 +34,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.common.internal.Constants;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.SchedulerJob;
 import com.sangsolutions.sang.Tools;
@@ -70,7 +71,11 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentHomeBinding.inflate(getLayoutInflater());
-
+        try {
+            ((Home)getActivity()).setDrawerEnabled(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         navController = Navigation.findNavController(requireActivity(),R.id.nav_host_fragment);
         schedulerJob=new SchedulerJob();
         helper=new DatabaseHelper(requireContext());
@@ -101,7 +106,7 @@ public class HomeFragment extends Fragment {
 
     private void getDataFromAPI(String iDoc, List<BarEntry> barEntryList, BarChart barChart) {
         barEntryList.clear();
-        AndroidNetworking.get("http://"+URLs.GetDashTransactionData)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+URLs.GetDashTransactionData)
                 .addQueryParameter("iDoc",iDoc)
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)

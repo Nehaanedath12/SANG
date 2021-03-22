@@ -41,8 +41,7 @@ public class GetProductService extends JobService {
     }
 
     private void GetProducts() {
-        Log.d("syncProduct","http://"+ URLs.GetProducts);
-        AndroidNetworking.get("http://" + URLs.GetProducts)
+        AndroidNetworking.get("http://" + new Tools().getIP(GetProductService.this) + URLs.GetProducts)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {

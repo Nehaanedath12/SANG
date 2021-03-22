@@ -47,6 +47,7 @@ import com.sangsolutions.sang.Adapter.RequestHistoryAdapter.RequestHistoryAdapte
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -80,6 +81,11 @@ public class StockCountHistoryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentHistoryStockCountBinding.inflate(getLayoutInflater());
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        try {
+            ((Home)getActivity()).setDrawerEnabled(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         helper=new DatabaseHelper(requireContext());
         historyList=new ArrayList<>();
@@ -178,7 +184,7 @@ public class StockCountHistoryFragment extends Fragment {
     private void getHistoryDatas() {
 
         alertDialog.show();
-        AndroidNetworking.get("http://"+  URLs.GetTransStockSummary)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.GetTransStockSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
@@ -299,7 +305,7 @@ public class StockCountHistoryFragment extends Fragment {
     }
 
     private void deleteFromAPI(int iTransId) {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransStock)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransStock)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -371,7 +377,7 @@ public class StockCountHistoryFragment extends Fragment {
     private void pdfGeneration(int iTransId) {
 
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + URLs.GetTransStockDetails)
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransStockDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()

@@ -29,6 +29,7 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -60,6 +61,11 @@ public class QuotationHistoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentQuatationHistoryBinding.inflate(getLayoutInflater());
+        try {
+            ((Home)getActivity()).setDrawerEnabled(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         helper=new DatabaseHelper(requireContext());
         historyList=new ArrayList<>();
         historyAdapter=new SalesPurchaseHistoryAdapter(requireActivity(),historyList);
@@ -160,7 +166,7 @@ public class QuotationHistoryFragment extends Fragment {
 
     private void getHistoryDatas() {
         alertDialog.show();
-        AndroidNetworking.get("http://"+  URLs.GetTransQuotationSummary)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.GetTransQuotationSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
@@ -248,7 +254,7 @@ public class QuotationHistoryFragment extends Fragment {
     }
 
     private void deleteFromAPI(int iTransId) {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransQuotation)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransQuotation)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()

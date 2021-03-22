@@ -182,7 +182,7 @@ public class QuotationReportFragment extends Fragment {
         String fromDate=Tools.dateFormat(binding.fromDate.getText().toString().trim());
         String toDate=Tools.dateFormat(binding.toDate.getText().toString().trim());
 
-        AndroidNetworking.get("http://"+ URLs.GetSales_PurchaseQuotationReport)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetSales_PurchaseQuotationReport)
                 .addQueryParameter("UserId",userId)
                 .addQueryParameter("FromDate",fromDate)
                 .addQueryParameter("ToDate",toDate)

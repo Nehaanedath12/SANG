@@ -59,6 +59,7 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -138,7 +139,11 @@ public class RequestFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        binding=FragmentRequestBinding.inflate(getLayoutInflater());
-
+        try {
+            ((Home)getActivity()).setDrawerEnabled(false);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
@@ -452,7 +457,7 @@ public class RequestFragment extends Fragment {
 
     private void deleteAll() {
 
-        AndroidNetworking.get("http://"+  URLs.DeleteTransRequest)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransRequest)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -480,7 +485,7 @@ public class RequestFragment extends Fragment {
         try{
             jsonObjectMain.put("iTransId",iTransId);
             jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(StringDate));
+            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
             jsonObjectMain.put("iDocType",iDocType);
             jsonObjectMain.put("sNarration",binding.description.getText().toString());
             assert userIdS != null;
@@ -549,7 +554,7 @@ public class RequestFragment extends Fragment {
         Log.d("uploadjSONoBJECT",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ URLs.PostTransRequest)
+            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity())+ URLs.PostTransRequest)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -895,7 +900,7 @@ public class RequestFragment extends Fragment {
 
                 ///////
 
-                AndroidNetworking.get("http://" + URLs.GetTransRequestSummary)
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransRequestSummary)
                         .addQueryParameter("iUser", userIdS)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .setPriority(Priority.MEDIUM)
@@ -941,7 +946,7 @@ public class RequestFragment extends Fragment {
 
     private void EditValueFromAPI() {
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + URLs.GetTransRequestDetails)
+            AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetTransRequestDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .addQueryParameter("iDocType",String.valueOf(iDocType))
                     .setPriority(Priority.MEDIUM)

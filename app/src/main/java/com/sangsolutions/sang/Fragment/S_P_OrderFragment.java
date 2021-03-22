@@ -61,6 +61,7 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -143,6 +144,11 @@ public class S_P_OrderFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentSalesPurchaseOrderBinding.inflate(getLayoutInflater());
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        try {
+            ((Home)getActivity()).setDrawerEnabled(false);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         assert getArguments() != null;
         iDocType = S_P_OrderFragmentArgs.fromBundle(getArguments()).getIDocType();
         iTransId = S_P_OrderFragmentArgs.fromBundle(getArguments()).getITransId();
@@ -486,7 +492,7 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void deleteAll() {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransOrder)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransOrder)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -587,7 +593,7 @@ public class S_P_OrderFragment extends Fragment {
         Log.d("uploadjSONoBJECT",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ URLs.PostTransOrder)
+            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity())+ URLs.PostTransOrder)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -980,7 +986,7 @@ public class S_P_OrderFragment extends Fragment {
 
                 ///////
 
-                AndroidNetworking.get("http://" + URLs.GetTransOrderSummary)
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransOrderSummary)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -1026,7 +1032,7 @@ public class S_P_OrderFragment extends Fragment {
     private void EditValueFromAPI() {
 
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + URLs.GetTransOrderDetails)
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransOrderDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()

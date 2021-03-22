@@ -41,7 +41,6 @@ import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.QuotationHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
-import com.sangsolutions.sang.Fragment.RequestFragmentDirections;
 import com.sangsolutions.sang.Fragment.RequestHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderHistoryFragmentDirections;
@@ -49,10 +48,8 @@ import com.sangsolutions.sang.Fragment.S_P_ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.SalesPurchaseReturnFragmentDirections;
-import com.sangsolutions.sang.Fragment.SalesPurchaseReturnHistoryFragment;
 import com.sangsolutions.sang.Fragment.SalesPurchaseReturnHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.StockCountFragmentDirections;
-import com.sangsolutions.sang.Fragment.StockCountHistoryFragment;
 import com.sangsolutions.sang.Fragment.StockCountHistoryFragmentDirections;
 import com.sangsolutions.sang.databinding.ActivityMainBinding;
 
@@ -76,6 +73,18 @@ public class Home extends AppCompatActivity {
     Cursor tagCursor;
     SchedulerJob schedulerJob;
     List<Integer>tagList;
+    int lockmode;
+
+
+
+    public void setDrawerEnabled(boolean enabled){
+        if(enabled){
+           lockmode=  DrawerLayout.LOCK_MODE_UNLOCKED;
+        }else {
+           lockmode= DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
+        }
+        drawer.setDrawerLockMode(lockmode);
+    }
 
     @Override
     public void onBackPressed() {
@@ -484,7 +493,7 @@ public class Home extends AppCompatActivity {
     }
 
     private void GetTag_Details(int iType) {
-        AndroidNetworking.get("http://"+URLs.GetMasterTagDetails)
+        AndroidNetworking.get("http://"+ new Tools().getIP(Home.this) +URLs.GetMasterTagDetails)
                 .addQueryParameter("iType",String.valueOf(iType))
                 .setPriority(Priority.MEDIUM)
                 .build()

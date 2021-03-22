@@ -152,7 +152,7 @@ public class P_R_ReportFragment extends Fragment {
         String fromDate=Tools.dateFormat(binding.fromDate.getText().toString().trim());
         String toDate=Tools.dateFormat(binding.toDate.getText().toString().trim());
 
-        AndroidNetworking.get("http://"+ URLs.GetReceipt_PaymentReport)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetReceipt_PaymentReport)
                 .addQueryParameter("UserId",userId)
                 .addQueryParameter("FromDate",fromDate)
                 .addQueryParameter("ToDate",toDate)

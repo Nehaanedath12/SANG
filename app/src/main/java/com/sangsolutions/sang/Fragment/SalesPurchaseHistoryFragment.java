@@ -29,6 +29,7 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Tools;
@@ -61,6 +62,11 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentSalesPurchaseHistoryBinding.inflate(getLayoutInflater());
+        try {
+            ((Home)getActivity()).setDrawerEnabled(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         helper=new DatabaseHelper(requireContext());
         historyList=new ArrayList<>();
         historyAdapter=new SalesPurchaseHistoryAdapter(requireActivity(),historyList);
@@ -160,7 +166,8 @@ public class SalesPurchaseHistoryFragment extends Fragment {
 
     private void getHistoryDatas() {
         alertDialog.show();
-        AndroidNetworking.get("http://"+  URLs.GetTransSummary)
+        Log.d("doctypee",iDocType+"");
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.GetTransSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
@@ -298,7 +305,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     }
 
     private void deleteFromAPI(int iTransId) {
-        AndroidNetworking.get("http://"+  URLs.DeleteTrans)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTrans)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()

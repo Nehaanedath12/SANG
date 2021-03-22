@@ -42,7 +42,7 @@ public class GetUserService extends JobService {
     }
 
     private void GetUsers() {
-        AndroidNetworking.get("http://"+ URLs.GetUserLogin)
+        AndroidNetworking.get("http://"+ new Tools().getIP(GetUserService.this) + URLs.GetUserLogin)
                 .setPriority(Priority.MEDIUM)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
@@ -80,6 +80,7 @@ public class GetUserService extends JobService {
                                 jsonObject.getString(User.B_MOB),
                                 jsonObject.getString(User.USER_CODE));
                         if(helper.checkUserById(jsonObject.getString(User.I_ID))){
+
                             if(helper.checkAllDataUser(user)){
                                 Log.d("success","User Updated successfully "+i);
                             }

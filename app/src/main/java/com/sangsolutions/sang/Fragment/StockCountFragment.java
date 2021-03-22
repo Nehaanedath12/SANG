@@ -59,6 +59,7 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -137,6 +138,12 @@ public class StockCountFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentStockCountBinding.inflate(getLayoutInflater());
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        try {
+            ((Home)getActivity()).setDrawerEnabled(false);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         assert getArguments() != null;
         iDocType = StockCountFragmentArgs.fromBundle(getArguments()).getIDocType();
         iTransId = StockCountFragmentArgs.fromBundle(getArguments()).getITransId();
@@ -452,7 +459,7 @@ public class StockCountFragment extends Fragment {
     }
 
     private void deleteAll() {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransStock)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransStock)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -549,7 +556,7 @@ public class StockCountFragment extends Fragment {
     private void uploadToAPI(JSONObject jsonObjectMain) {
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ URLs.PostTransStock)
+            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity())+ URLs.PostTransStock)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -909,7 +916,7 @@ public class StockCountFragment extends Fragment {
 
                 ///////
 
-                AndroidNetworking.get("http://" + URLs.GetTransStockSummary)
+                AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetTransStockSummary)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -958,7 +965,7 @@ public class StockCountFragment extends Fragment {
     private void EditValueFromAPI() {
 
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + URLs.GetTransStockDetails)
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransStockDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()

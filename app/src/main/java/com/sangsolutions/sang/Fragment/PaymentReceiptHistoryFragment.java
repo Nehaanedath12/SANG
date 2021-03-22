@@ -31,6 +31,7 @@ import com.sangsolutions.sang.Adapter.PaymentReceiptHistoryAdapter.PaymentReceip
 import com.sangsolutions.sang.Adapter.PaymentReceiptHistoryAdapter.PaymentReceiptHistoryAdapter;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Tools;
@@ -63,6 +64,11 @@ public class PaymentReceiptHistoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentPaymentReceiptHistoryBinding.inflate(getLayoutInflater());
+        try {
+            ((Home)getActivity()).setDrawerEnabled(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         helper=new DatabaseHelper(requireContext());
 
@@ -162,7 +168,7 @@ public class PaymentReceiptHistoryFragment extends Fragment {
 
     private void getHistoryDatas() {
         alertDialog.show();
-        AndroidNetworking.get("http://"+ URLs.GetTransReceipt_PaymentSummary)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetTransReceipt_PaymentSummary)
                 .addQueryParameter("iDocType",String.valueOf(iDocType))
                 .addQueryParameter("iUser",userIdS)
                 .setPriority(Priority.MEDIUM)
@@ -297,7 +303,7 @@ public class PaymentReceiptHistoryFragment extends Fragment {
     }
 
     private void deleteFromAPI(int iTransId) {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransReceipt_Payment)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransReceipt_Payment)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()

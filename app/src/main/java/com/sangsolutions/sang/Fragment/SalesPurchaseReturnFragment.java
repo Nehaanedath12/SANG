@@ -62,6 +62,7 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -154,7 +155,11 @@ public class SalesPurchaseReturnFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding=FragmentSalesPurchaseReturnBinding.inflate(getLayoutInflater());
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
-
+        try {
+            ((Home)getActivity()).setDrawerEnabled(false);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         hashMapBody=new HashMap<>();
         hashMapHeader=new HashMap<>();
 
@@ -563,7 +568,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
     }
 
     private void deleteAll() {
-        AndroidNetworking.get("http://"+  URLs.DeleteTransReturn)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransReturn)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -667,7 +672,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
                                 }
                             }
                             else {
-                                AndroidNetworking.get("http://" + URLs.GetProduct_DocNo)
+                                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetProduct_DocNo)
                                         .addQueryParameter("iTransId", String.valueOf(iTransReturnId))
                                         .addQueryParameter("iType","2")
                                         .addQueryParameter("search",productBarCode)
@@ -709,7 +714,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
         try{
             jsonObjectMain.put("iTransId",iTransId);
             jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(StringDate));
+            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
             jsonObjectMain.put("iDocType",iDocType);
             jsonObjectMain.put("iAccount1",iCustomer);
             jsonObjectMain.put("iAccount2",0);
@@ -796,7 +801,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
         Log.d("uploadToAPI",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ URLs.PostTransReturn)
+            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity())+ URLs.PostTransReturn)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -1080,7 +1085,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
     private void addProductByDocNo(Editable s) {
         docNoList.clear();
-            AndroidNetworking.get("http://" + URLs.GetDocNo)
+            AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetDocNo)
                     .addQueryParameter("iCustomer", String.valueOf(iCustomer))
                     .addQueryParameter("iType", String.valueOf(iDocType))
                     .addQueryParameter("search", String.valueOf(s))
@@ -1131,7 +1136,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
     }
 
     private void LoadProductsFromAPI(int iTransReturnId, String productKeyword) {
-        AndroidNetworking.get("http://" + URLs.GetProduct_DocNo)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetProduct_DocNo)
                 .addQueryParameter("iTransId", String.valueOf(iTransReturnId))
                 .addQueryParameter("iType","1")
                 .addQueryParameter("search",productKeyword)
@@ -1240,7 +1245,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
                 }
                 ///////
 
-                AndroidNetworking.get("http://" + URLs.GetTransReturnSummary)
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransReturnSummary)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -1286,7 +1291,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
     private void EditValueFromAPI() {
         if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + URLs.GetTransReturnDetails)
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransReturnDetails)
                     .addQueryParameter("iTransId",String.valueOf(iTransId))
                     .setPriority(Priority.MEDIUM)
                     .build()

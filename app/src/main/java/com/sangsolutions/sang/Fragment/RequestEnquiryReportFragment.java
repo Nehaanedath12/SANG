@@ -148,7 +148,7 @@ public class RequestEnquiryReportFragment extends Fragment {
         String fromDate=Tools.dateFormat(binding.fromDate.getText().toString().trim());
         String toDate=Tools.dateFormat(binding.toDate.getText().toString().trim());
 
-        AndroidNetworking.get("http://"+ URLs.GetSales_PurchaseRequestReport)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetSales_PurchaseRequestReport)
                 .addQueryParameter("UserId",userId)
                 .addQueryParameter("FromDate",fromDate)
                 .addQueryParameter("ToDate",toDate)

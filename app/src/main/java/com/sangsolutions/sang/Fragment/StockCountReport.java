@@ -54,7 +54,7 @@ public class StockCountReport extends Fragment {
     List<Products> productsList;
     ProductsAdapter productsAdapter;
     DatabaseHelper helper;
-    int iProduct,iCustomer;
+    int iProduct;
     List<Customer> customerList;
     CustomerAdapter customerAdapter;
     String userId="0";
@@ -160,7 +160,7 @@ public class StockCountReport extends Fragment {
         String fromDate=Tools.dateFormat(binding.fromDate.getText().toString().trim());
         String toDate=Tools.dateFormat(binding.toDate.getText().toString().trim());
 
-        AndroidNetworking.get("http://"+ URLs.GetSales_PurchaseStockReport)
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetSales_PurchaseStockReport)
                 .addQueryParameter("UserId",userId)
                 .addQueryParameter("FromDate",fromDate)
                 .addQueryParameter("ToDate",toDate)
