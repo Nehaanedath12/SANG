@@ -60,4 +60,8 @@ public class URLs {
     public static final String GetSales_PurchaseStockReport =domain+"GetSales_PurchaseStockReport";
 
 
+//    GetNextDocNo
+
+    public static final String GetNextDocNo =domain+"GetNextDocNo";
+
 }

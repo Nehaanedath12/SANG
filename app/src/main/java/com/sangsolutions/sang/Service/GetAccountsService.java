@@ -36,8 +36,8 @@ public class GetAccountsService extends JobService {
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
-        GetAccounts();
         AndroidNetworking.initialize(this);
+        GetAccounts();
         return true;
     }
 

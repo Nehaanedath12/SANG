@@ -53,6 +53,12 @@
             android:permission="android.permission.BIND_JOB_SERVICE"/>
         <service android:name=".Service.GetTokenService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.PostSalePurchaseService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.PostPaymentReceiptService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -42,7 +41,6 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
-import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.BankAdapter.Bank;
 import com.sangsolutions.sang.Adapter.BankAdapter.BankAdapter;
 import com.sangsolutions.sang.Adapter.CheckImageAdapter.CheckImageAdapter;
@@ -58,6 +56,7 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.Payment_Receipt_class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -143,7 +142,7 @@ public class PaymentReceiptFragment extends Fragment {
     List<String> imageList;
     CheckImageAdapter imageAdapter;
 
-    String Image;
+    String Image,image;
 
 
 
@@ -215,28 +214,6 @@ public class PaymentReceiptFragment extends Fragment {
             tagTotalNumber = cursorTagNumber.getCount();
         }
 
-       initialValueSettingHeader();
-
-        binding.paymentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if(parent.getItemAtPosition(position).toString().equals("Cheque")){
-                    binding.checkDetails.setVisibility(View.VISIBLE);
-                }
-
-                else if(parent.getItemAtPosition(position).toString().equals("Cash")){
-                    binding.checkDetails.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
         for (int tagId=1;tagId<=tagTotalNumber;tagId++){
             Cursor cursor=helper.getTransSettings(iDocType,tagId);
             if(cursor!=null ){
@@ -273,8 +250,29 @@ public class PaymentReceiptFragment extends Fragment {
                 }
                 }
         }
+        initialValueSettingHeader();
 
-       binding.date.setOnClickListener(new View.OnClickListener() {
+        binding.paymentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(parent.getItemAtPosition(position).toString().equals("Cheque")){
+                    binding.checkDetails.setVisibility(View.VISIBLE);
+                }
+
+                else if(parent.getItemAtPosition(position).toString().equals("Cash")){
+                    binding.checkDetails.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        binding.date.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
                settingDate(binding.date);
@@ -345,7 +343,11 @@ public class PaymentReceiptFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                if(Tools.isConnected(requireActivity())){
                 invoiceDialogue();
+                }else {
+                    Toast.makeText(requireActivity(), "You are offline!!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -430,7 +432,7 @@ public class PaymentReceiptFragment extends Fragment {
                         if (bitmapPhoto != null) {
                             File f=new File(Tools.savePhoto(requireContext(),photoResult));
                             imageList.add(Uri.fromFile(f)+"");
-//                            Log.d("ImageList",photoResult.saveToFile(new File()));
+                            Log.d("ImageList",Tools.savePhoto(requireContext(),photoResult));
                             imageAdapter.notifyDataSetChanged();
                             fotoapparat.stop();
                             dialogue.dismiss();
@@ -571,26 +573,27 @@ public class PaymentReceiptFragment extends Fragment {
 
         for (int i = 0; i < imageList.size(); i++) {
                 if(imageList.get(i).contains("file://")){
-                Log.d("fileC",  imageList.get(i).substring(7)+"");
                 imageList.set(i,imageList.get(i).substring(7));
                 }
                 else if(imageList.get(i).contains("http")){
                 Bitmap myBitmap = BitmapFactory.decodeFile(imageList.get(i));
                 String image=Tools.savePhotoURL(requireContext(),myBitmap);
                 imageList.set(i, image);
-                Log.d("fileI",  image+"");
                 }
-                Log.d("imagelist_size",  imageList.size()+" "+imageList.get(i));
 
                 File file1 = new File(imageList.get(i));
                 if (file1.exists()) {
                 file.add(file1);
-                Log.d("file1",  file.get(i)+"");
                 }
-                }
-        String imageName=Tools.getFileList(Image);
-        Log.d("Imagee",Image+"       "+imageName);
 
+            image = TextUtils.join(",", imageList);
+                }
+
+        if(Tools.isConnected(requireContext())){
+
+
+        String imageName=Tools.getFileList(Image);
+            Log.d("jsonObjecMain",Image+"");
         JSONObject jsonObjectMain=new JSONObject();
         try{
             jsonObjectMain.put("iTransId",iTransId);
@@ -679,10 +682,15 @@ public class PaymentReceiptFragment extends Fragment {
             e.printStackTrace();
         }
 
+        }else {
+            saveLocally(image);
+        }
+
+
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain, List<File> files) {
-        Log.d("jsonObjectMain",jsonObjectMain.toString());
+        Log.d("jsonObjectMain",jsonObjectMain.toString()+" "+files.toString());
                     if(Tools.isConnected(requireActivity())) {
                     alertDialog.show();
                     AndroidNetworking.upload("http://"+ new Tools().getIP(requireActivity())+URLs.Post_Receipt_Payment)
@@ -694,9 +702,16 @@ public class PaymentReceiptFragment extends Fragment {
                     .getAsString(new StringRequestListener() {
                                 @Override
                                 public void onResponse(String response) {
+                                    Log.d("responsePostt", response);
                                 if (response.contains(docNo)) {
                                 alertDialog.dismiss();
+                                    if(helper.deletePayRec_Header(iTransId,iDocType,docNo)){
+                                        if(helper.delete_PayRec_Body(iDocType,iTransId)){
+                                            Log.d("responsePost ", "successfully");
+                                        }
+                                    }
                                 Log.d("responsePost_R_P", "successfully");
+                                    alertDialog.dismiss();
                                 Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
                                 NavDirections actions = PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToPaymentReceiptHistoryFragment(toolTitle,iDocType);
                                 navController.navigate(actions);
@@ -710,11 +725,112 @@ public class PaymentReceiptFragment extends Fragment {
                             }
                             });
         }
-        else {
-            Snackbar snackbar=Snackbar.make(binding.getRoot(),"No Internet",Snackbar.LENGTH_LONG);
-            snackbar.setBackgroundTint(Color.RED);
-            snackbar.setTextColor(Color.WHITE);
-            snackbar.show();
+
+    }
+
+    private void saveLocally(String file) {
+
+        Log.d("fileee",file+"  "+iPaymentMethod);
+        Cursor cursor1=helper.getDataFromPaymentReceipt();
+        if(!EditMode) {
+            if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
+                iTransId = Tools.getNewDocNoLocally(cursor1);
+            }
+        }
+
+        Payment_Receipt_class PR_class=new Payment_Receipt_class();
+        PR_class.setiTransId(iTransId);
+        PR_class.setsDocNo(docNo);
+        PR_class.setsDate(binding.date.getText().toString());
+        PR_class.setiDocType(iDocType);
+        PR_class.setiAccount1(iCustomer);
+        PR_class.setiAccount2(0);
+        PR_class.setsNarration(binding.description.getText().toString());
+        PR_class.setProcessTime(DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"");
+        PR_class.setStatus(0);
+        PR_class.setfAmount(Double.parseDouble(binding.amount.getText().toString()));
+        PR_class.setiPaymentMethod(iPaymentMethod);
+
+        if(iPaymentMethod==2) {
+            PR_class.setiBank( iBank);
+            PR_class.setiChequeNo( Integer.parseInt(binding.checkNo.getText().toString()));
+            PR_class.setsAttachment(file);
+        }else if(iPaymentMethod==1){
+            PR_class.setiBank( 0);
+            PR_class.setiChequeNo( 0);
+            PR_class.setsAttachment("");
+        }
+        PR_class.setsChequeDate( binding.checkDate.getText().toString());
+        if(helper.deletePayRec_Header(iTransId,iDocType,docNo)) {
+            Log.d("deletePayRec_Header",iTransId+" "+iDocType+" "+docNo);
+            if (helper.insert_PayRec_Header(PR_class)) {
+                Log.d("deletePayRec_r",iTransId+" "+iDocType+" "+docNo);
+                InsertBodyPart_DB();
+            }
+        }
+
+
+    }
+
+    private void InsertBodyPart_DB() {
+        if(helper.delete_PayRec_Body(iDocType,iTransId)) {
+
+                Payment_Receipt_class payRec_classBody = new Payment_Receipt_class();
+                for (int j = 1; j <= tagTotalNumber; j++) {
+                    if (hashMapHeader.containsKey(j)) {
+                        loadDataTags(payRec_classBody, j, hashMapHeader.get(j));
+                    } else {
+                        loadDataTags(payRec_classBody, j, 0);
+                    }
+                }
+                payRec_classBody.setiRefDocId(0);
+                payRec_classBody.setfAmount(0.0);
+                payRec_classBody.setiDocType(iDocType);
+                payRec_classBody.setsDocNo(docNo);
+                payRec_classBody.setiTransId(iTransId);
+                if (helper.insert_PayRec_Body(payRec_classBody)) {
+                    Log.d("DataBodyInsert", "SUCCESS");
+                    Toast.makeText(requireActivity(), "Posted successfully in DB", Toast.LENGTH_SHORT).show();
+                    NavDirections actions = PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToPaymentReceiptHistoryFragment(toolTitle, iDocType);
+                    navController.navigate(actions);
+                }
+        }
+    }
+
+    private void loadDataTags(Payment_Receipt_class payRec_classBody, int j, Integer iTag) {
+        switch (j){
+            case 1:{
+                payRec_classBody.setiTag1(iTag);
+                break;
+            }
+            case 2:{
+                payRec_classBody.setiTag2(iTag);
+                break;
+            }
+            case 3:{
+                payRec_classBody.setiTag3(iTag);
+                break;
+            }
+            case 4:{
+                payRec_classBody.setiTag4(iTag);
+                break;
+            }
+            case 5:{
+                payRec_classBody.setiTag5(iTag);
+                break;
+            }
+            case 6:{
+                payRec_classBody.setiTag6(iTag);
+                break;
+            } case 7:{
+                payRec_classBody.setiTag7(iTag);
+                break;
+            }
+            case 8:{
+                payRec_classBody.setiTag8(iTag);
+                break;
+            }
+
         }
     }
 
@@ -1092,17 +1208,17 @@ public class PaymentReceiptFragment extends Fragment {
         } else {
             toolTitle = "Receipt Summary";
         }
+        Cursor cursor = helper.getUserCode(userIdS);
+        if (cursor.moveToFirst() && cursor.getCount() > 0) {
+            userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        }
 
         if(Tools.isConnected(requireActivity())) {
                 if (EditMode) {
                 EditValueFromAPI();
                 }
                 else {
-                    Cursor cursor = helper.getUserCode(userIdS);
-                    if (cursor.moveToFirst() && cursor.getCount() > 0) {
-                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
-                    }
-                                    AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) +URLs.GetTransReceipt_PaymentSummary)
+                                    AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) +URLs.GetNextDocNo)
                                     .addQueryParameter("iDocType", String.valueOf(iDocType))
                                     .addQueryParameter("iUser", userIdS)
                                     .setPriority(Priority.MEDIUM)
@@ -1114,10 +1230,8 @@ public class PaymentReceiptFragment extends Fragment {
                                     try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
                                     if(jsonArray.length()>0) {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
-                                    }else {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + 1;
-
+                                        JSONObject jsonObject=jsonArray.getJSONObject(0);
+                                        docNo=jsonObject.getString("Column1");
                                     }
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
@@ -1137,8 +1251,78 @@ public class PaymentReceiptFragment extends Fragment {
         else {
             Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
             alertDialog.dismiss();
-            NavDirections actions = PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToPaymentReceiptHistoryFragment(toolTitle,iDocType);
-            navController.navigate(actions);
+            if(EditMode){
+                editfromlocaldb();
+            }else {
+                Cursor cursor1=helper.getDataFrom_PayRec_Header();
+//                int count=cursor1.getCount()+1;
+
+                if(cursor1.getCount()>0) {
+                    int count= Tools.getNewDocNoLocally(cursor1);
+                    Log.d("statuss",count+"");
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) +"-L"+ "-" + "000" + count;
+                }else {
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date() )+"-L"+ "-" + "000" + 1;
+
+                }
+            }
+
+            binding.docNo.setText(docNo);
+
+        }
+    }
+
+    private void editfromlocaldb() {
+        Cursor cursorEdit_H = helper.getEditValuesHeaderPayRec(iTransId, iDocType);
+        if (cursorEdit_H.moveToFirst() && cursorEdit_H.getCount() > 0) {
+            docNo = cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Payment_Receipt_class.S_DOC_NO));
+            binding.docNo.setText(docNo);
+            binding.date.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Payment_Receipt_class.S_DATE)));
+            iCustomer = cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Payment_Receipt_class.I_ACCOUNT_1));
+            binding.customer.setText(helper.getCustomerUsingId(iCustomer));
+            binding.description.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Payment_Receipt_class.S_NARRATION)));
+            binding.amount.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Payment_Receipt_class.F_AMOUNT)));
+            iPaymentMethod = cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Payment_Receipt_class.I_PAYMENT_METHOD));
+            if (iPaymentMethod == 2) {
+            binding.paymentSpinner.setSelection(1);
+            iBank = cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Payment_Receipt_class.I_BANK));
+            binding.bankName.setText(helper.getBankUsingId(iBank));
+            binding.checkNo.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Payment_Receipt_class.I_CHEQUE_NO)));
+            binding.checkDate.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Payment_Receipt_class.S_CHEQUE_DATE)));
+            changeStatus(iTransId,docNo,1);
+
+            String attachments=cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Payment_Receipt_class.S_ATTACHMENT));
+                List<String> imgList = new ArrayList<>(Arrays.asList(attachments.split(",")));
+                for (int i=0;i<imgList.size();i++){
+                File f=new File(imgList.get(i)+"");
+                imageList.add(Uri.fromFile(f)+"");
+                imageAdapter.notifyDataSetChanged();
+                }
+        }
+    }
+        Cursor cursorEdit_B=helper.getEditValuesBodyP_ayRec(iTransId,iDocType);
+
+        if(cursorEdit_B.moveToFirst() && cursorEdit_B.getCount()>0) {
+            for (int i = 0; i < cursorEdit_B.getCount(); i++) {
+                for (int k = 0; k < headerListTags.size(); k++) {
+                    int tagDetails=cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ headerListTags.get(k)));
+                    hashMapHeader.put(headerListTags.get(k),tagDetails);
+                    Cursor tagNameCursor=helper.getTagName(headerListTags.get(k),tagDetails);
+                    Log.d("statuss",tagDetails+" ");
+                    if(tagDetails!=0) {
+                        autoText_H_list.get(k).setText(tagNameCursor.getString(tagNameCursor.getColumnIndex(TagDetails.S_NAME)));
+                    }else {
+                        autoText_H_list.get(k).setText("");
+                    }
+                    }
+                cursorEdit_B.moveToNext();
+            }
+        }
+    }
+
+    private void changeStatus(int iTransId, String docNo, int iStatus) {
+        if(helper.changeStatus_PayRec(iTransId,docNo,iStatus)){
+            Log.d("statusChange","successfully");
         }
     }
 

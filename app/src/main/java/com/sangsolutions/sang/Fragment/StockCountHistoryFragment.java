@@ -491,8 +491,13 @@ public class StockCountHistoryFragment extends Fragment {
              jsonArray1 = new JSONArray(response.getString("Table1"));
             Log.d("BodyArray1",jsonArray1.length()+"");
                 JSONObject jsonObjectInner = jsonArray1.getJSONObject(0);
+
                 for (int k = 0; k < headerListTags.size(); k++) {
+                    Log.d("headerListTag_size",headerListTags.size()+"");
+
                     Cursor cursor1=helper.getTagNamebyId(headerListTags.get(k));
+                    Log.d("headerListTag_size",cursor1.getCount()+"");
+
                     cursor1.moveToFirst();
                     Log.d("headerListTags",cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME))+" "+jsonObjectInner.getString("sTag" + headerListTags.get(k)));
                     canvas.drawText(cursor1.getString(cursor1.getColumnIndex(MasterSettings.S_NAME)),

@@ -20,6 +20,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -31,6 +32,8 @@ import com.sangsolutions.sang.Adapter.PaymentReceiptHistoryAdapter.PaymentReceip
 import com.sangsolutions.sang.Adapter.PaymentReceiptHistoryAdapter.PaymentReceiptHistoryAdapter;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.Payment_Receipt_class;
+import com.sangsolutions.sang.Database.Sales_purchase_Class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
@@ -83,6 +86,7 @@ public class PaymentReceiptHistoryFragment extends Fragment {
         historyList=new ArrayList<>();
         historyAdapter=new PaymentReceiptHistoryAdapter(requireActivity(),historyList);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerView.setAdapter(historyAdapter);
 
         if(iDocType==15){
             toolTitle="Payment";
@@ -94,7 +98,19 @@ public class PaymentReceiptHistoryFragment extends Fragment {
         if(cursor_userId!=null &&cursor_userId.moveToFirst()) {
             userIdS = cursor_userId.getString(cursor_userId.getColumnIndex("user_Id"));
         }
+        binding.refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                binding.refresh.setRefreshing(false);
+                if(!Tools.isConnected(requireContext())){
+                    Toast.makeText(requireContext(), "No Internet!!", Toast.LENGTH_SHORT).show();
+                }
+                navController.navigate(R.id.homeFragment);
+                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment(toolTitle+" Summary",iDocType);
+                navController.navigate(action);
 
+            }
+        });
 
         binding.fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +170,12 @@ public class PaymentReceiptHistoryFragment extends Fragment {
         for (int i =0;i<listSelectedItem.size();i++) {
             for (int j =0;j<historyList.size();j++) {
                 if (listSelectedItem.get(i) == j) {
-                    deleteFromAPI(historyList.get(j).getiTransId());
+                    if(Tools.isConnected(requireContext())) {
+                        deleteFromAPI(historyList.get(j).getiTransId());
+                    }else {
+                        deleteFromDB(historyList.get(j).getiTransId(),historyList.get(j).getsDocNo());
+
+                    }
                 }
             }
 
@@ -168,24 +189,100 @@ public class PaymentReceiptHistoryFragment extends Fragment {
 
     private void getHistoryDatas() {
         alertDialog.show();
-        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetTransReceipt_PaymentSummary)
-                .addQueryParameter("iDocType",String.valueOf(iDocType))
-                .addQueryParameter("iUser",userIdS)
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+        Log.d("responseP_RHistory", iDocType + "");
+        if (Tools.isConnected(requireContext())) {
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransReceipt_PaymentSummary)
+                    .addQueryParameter("iDocType", String.valueOf(iDocType))
+                    .addQueryParameter("iUser", userIdS)
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONArray(new JSONArrayRequestListener() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d("responseP_RHistory", response.toString());
+                            loadDatas(response);
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            Log.d("responseP_RHistory", anError.toString());
+                            alertDialog.dismiss();
+                        }
+                    });
+
+        } else {
+            loadDatasFromDB();
+        }
+    }
+
+    private void loadDatasFromDB() {
+
+        historyList.clear();
+        historyAdapter.notifyDataSetChanged();
+        alertDialog.dismiss();
+        Cursor cursor=helper.getDataFromPayRec_by_Itype(iDocType);
+        if(cursor.moveToFirst() && cursor!=null){
+
+
+            for (int i=0;i<cursor.getCount();i++){
+                PaymentReceiptHistory history=new PaymentReceiptHistory();
+                Log.d("historyList",cursor.getString(cursor.getColumnIndex(Payment_Receipt_class.S_DATE))+"");
+
+                history.setsDate(cursor.getString(cursor.getColumnIndex(Payment_Receipt_class.S_DATE)));
+                history.setsDocNo(cursor.getString(cursor.getColumnIndex(Payment_Receipt_class.S_DOC_NO)));
+                history.setiTransId(cursor.getInt(cursor.getColumnIndex(Payment_Receipt_class.I_TRANS_ID)));
+
+                int iCustomer=cursor.getInt(cursor.getColumnIndex(Payment_Receipt_class.I_ACCOUNT_1));
+                String customerName=helper.getCustomerUsingId(iCustomer);
+                history.setsAccount1(customerName);
+
+                historyList.add(history);
+                historyAdapter.notifyDataSetChanged();
+
+                Log.d("historyList",history.getsDate()+""+history.getsDocNo()+" "
+                        +history.getiTransId()+" "+customerName);
+
+                historyAdapter.setOnClickListener(new PaymentReceiptHistoryAdapter.OnClickListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
-                        Log.d("responseP_RHistory",response.toString());
-                        loadDatas(response);
+                    public void onItemClick(int iTransId, int position) {
+                        adapterOnItemClick(iTransId,position);
                     }
 
                     @Override
-                    public void onError(ANError anError) {
-                        Log.d("responseP_RHistory",anError.toString());
-                        alertDialog.dismiss();
+                    public void onDeleteClick(List<PaymentReceiptHistory> list, int position) {
+                        deleteFromDB(list.get(position).getiTransId(),list.get(position).sDocNo);
+                        loadDatasFromDB();
+                    }
+
+                    @Override
+                    public void onItemLongClick(int position) {
+                        enableActionMode(position);
+                        selectionActive = true;
                     }
                 });
+                cursor.moveToNext();
+            }
+        }
+
+    }
+
+    private void deleteFromDB(int iTransId, String sDocNo) {
+        if(helper.deletePayRec_Header(iTransId,iDocType,sDocNo)){
+            if(helper.delete_PayRec_Body(iDocType,iTransId)){
+                Toast.makeText(requireContext(), " Deleted from Device", Toast.LENGTH_SHORT).show();
+                historyAdapter.notifyDataSetChanged();
+
+            }
+        }
+    }
+
+    private void adapterOnItemClick(int iTransId, int position) {
+        if (!selectionActive) {
+                NavDirections action = PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToPaymentReceiptFragment(toolTitle, iDocType).setITransId(iTransId).setEditMode(true);
+                navController.navigate(action);
+        }else {
+            enableActionMode(position);
+        }
     }
 
     private void loadDatas(JSONArray response) {
@@ -220,20 +317,10 @@ public class PaymentReceiptHistoryFragment extends Fragment {
                 historyAdapter.notifyDataSetChanged();
                 if(i+1==jsonArray.length()){
                     alertDialog.dismiss();
-                    binding.recyclerView.setAdapter(historyAdapter);
                     historyAdapter.setOnClickListener(new PaymentReceiptHistoryAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(int iTransId, int position) {
-                            if (!selectionActive) {
-                                if (Tools.isConnected(requireContext())) {
-                                    NavDirections action = PaymentReceiptHistoryFragmentDirections.actionPaymentReceiptHistoryFragmentToPaymentReceiptFragment(toolTitle, iDocType).setITransId(iTransId).setEditMode(true);
-                                    navController.navigate(action);
-                                } else {
-                                    Toast.makeText(requireContext(), "no Internet", Toast.LENGTH_SHORT).show();
-                                }
-                            }else {
-                                enableActionMode(position);
-                            }
+                          adapterOnItemClick(iTransId,position);
                         }
 
                         @Override

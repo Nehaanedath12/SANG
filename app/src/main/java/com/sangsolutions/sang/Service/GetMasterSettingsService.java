@@ -48,14 +48,14 @@ public class GetMasterSettingsService extends JobService {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("response",response.toString());
+                        Log.d("responseMaster",response.toString());
                         loadMasterData(response);
                     }
 
                     @Override
                     public void onError(ANError anError) {
                         Toast.makeText(GetMasterSettingsService.this, "enter valid Ip Address", Toast.LENGTH_SHORT).show();
-                        Log.d("response",anError.toString());
+                        Log.d("responseMaster",anError.toString());
                     }
                 });
     }

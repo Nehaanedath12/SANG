@@ -445,6 +445,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
+
                         addProductByDocNo(s);
                     }
                 });
@@ -1085,9 +1086,16 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
     private void addProductByDocNo(Editable s) {
         docNoList.clear();
+        int iType = 0;
+        if(iDocType==21){
+             iType=20;
+        }else if(iDocType==11){
+            iType=10;
+        }
+        Log.d("addProductByDocNo",s.toString()+iCustomer+" ");
             AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) + URLs.GetDocNo)
                     .addQueryParameter("iCustomer", String.valueOf(iCustomer))
-                    .addQueryParameter("iType", String.valueOf(iDocType))
+                    .addQueryParameter("iType", String.valueOf(iType))
                     .addQueryParameter("search", String.valueOf(s))
                     .setPriority(Priority.MEDIUM)
                     .build()

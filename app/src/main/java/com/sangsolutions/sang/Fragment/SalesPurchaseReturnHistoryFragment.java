@@ -39,7 +39,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.annotation.Native;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -260,7 +259,7 @@ public class SalesPurchaseReturnHistoryFragment extends Fragment {
                         }
 
                         @Override
-                        public void onDeleteClick(int iTransId) {
+                        public void onDeleteClick(int iTransId, String sDocNo) {
                             deleteFromAPI(iTransId);
                         }
 

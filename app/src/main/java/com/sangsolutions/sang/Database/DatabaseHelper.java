@@ -23,12 +23,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     Context context;
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "Sang.db";
     private static final String TABLE_MASTER_SETTINGS = "t1_masterSettings";
     private static final String TABLE_ACCOUNTS = "t1_accounts";
@@ -38,6 +37,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static  final String TABLE_CURRENT_LOGIN = "t1_currentLogin";
     private static  final String TABLE_TAG_DETAILS = "t1_tag_details";
     private static  final String TABLE_BANK = "t1_bank";
+
+    private static  final String TABLE_SALE_PURCHASE_HEADER = "t1_sale_purchase_Header";
+    private static  final String TABLE_SALE_PURCHASE_BODY = "t1_sale_purchase_Body";
+    private static  final String TABLE_PAYMENT_RECEIPT_HEADER = "t1_payment_receipt_Header";
+    private static  final String TABLE_PAYMENT_RECEIPT_BODY = "t1_payment_receipt_body";
+
 
 
     private static  final String IID = "iId";
@@ -99,6 +104,90 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + Bank.S_CODE + " TEXT(50) DEFAULT null  "+ ");";
 
 
+
+    private static final String CREATE_TABLE_SALE_PURCHASE_HEADER =" create table if not exists " + TABLE_SALE_PURCHASE_HEADER + " (" +
+            "" + Sales_purchase_Class.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_ACCOUNT_1 +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_ACCOUNT_2 +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + Sales_purchase_Class.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_Class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_Class.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_Class.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+    private static final String CREATE_TABLE_SALE_PURCHASE_BODY =" create table if not exists " + TABLE_SALE_PURCHASE_BODY + " (" +
+            "" + Sales_purchase_Class.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+            "" + Sales_purchase_Class.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.F_QTY+  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.F_RATE + "  TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_Class.F_DISCOUNT +  " TEXT(50) DEFAULT null , "  +
+            "" + Sales_purchase_Class.F_ADD_CHARGES + " TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_Class.F_VAT_PER + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.F_VAT + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.F_NET + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_Class.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
+
+
+    private static final String CREATE_TABLE_PAYMENT_RECEIPT_HEADER=" create table if not exists " + TABLE_PAYMENT_RECEIPT_HEADER + " (" +
+
+
+            "" + Payment_Receipt_class.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_ACCOUNT_1 +  " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_ACCOUNT_2 +  " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + Payment_Receipt_class.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + Payment_Receipt_class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Payment_Receipt_class.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + Payment_Receipt_class.STATUS +  " INTEGER DEFAULT 0, " +
+
+            "" + Payment_Receipt_class.I_CHEQUE_NO+  " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.F_AMOUNT +  " TEXT (50) DEFAULT null, " +
+            "" + Payment_Receipt_class.I_PAYMENT_METHOD +  " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_BANK +  " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.S_CHEQUE_DATE + " TEXT(50) DEFAULT null, " +
+            "" + Payment_Receipt_class.S_ATTACHMENT+ " TEXT(50) DEFAULT null" +
+
+            ");";
+
+
+    private static final String CREATE_TABLE_PAYMENT_RECEIPT_BODY=" create table if not exists " + TABLE_PAYMENT_RECEIPT_BODY + " (" +
+            "" + Payment_Receipt_class.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+            "" + Payment_Receipt_class.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + Payment_Receipt_class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Payment_Receipt_class.I_REF_DOC_ID + " INTEGER DEFAULT 0, " +
+            "" + Payment_Receipt_class.F_AMOUNT + " TEXT(50) DEFAULT null  " +
+
+            ");";
+
+
     private SQLiteDatabase db;
 
     public DatabaseHelper(@Nullable Context context) {
@@ -117,6 +206,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_CURRENT_LOGIN);
         db.execSQL(CREATE_TABLE_TAG_DETAILS);
         db.execSQL(CREATE_TABLE_BANK);
+        db.execSQL(CREATE_TABLE_SALE_PURCHASE_HEADER);
+        db.execSQL(CREATE_TABLE_SALE_PURCHASE_BODY);
+        db.execSQL(CREATE_TABLE_PAYMENT_RECEIPT_HEADER);
+        db.execSQL(CREATE_TABLE_PAYMENT_RECEIPT_BODY);
     }
 
     @Override
@@ -628,4 +721,320 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public boolean insert_S_P_Header(Sales_purchase_Class sp_class) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(Sales_purchase_Class.I_TRANS_ID,sp_class.getiTransId());
+        cv.put(Sales_purchase_Class.S_DOC_NO,sp_class.getsDocNo());
+        cv.put(Sales_purchase_Class.I_DOC_TYPE,sp_class.getiDocType());
+        cv.put(Sales_purchase_Class.I_ACCOUNT_1,sp_class.getiAccount1());
+        cv.put(Sales_purchase_Class.I_ACCOUNT_2,sp_class.getiAccount2());
+        cv.put(Sales_purchase_Class.S_NARRATION,sp_class.getsNarration());
+        cv.put(Sales_purchase_Class.S_DATE,sp_class.getsDate());
+        cv.put(Sales_purchase_Class.PROCESS_TIME,sp_class.getProcessTime());
+        cv.put(Sales_purchase_Class.STATUS,sp_class.getStatus());
+
+
+        float status = db.insert(TABLE_SALE_PURCHASE_HEADER, null, cv);
+        return status != -1;
+    }
+
+    public boolean insert_S_P_Body(Sales_purchase_Class sp) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(Sales_purchase_Class.I_TAG_1,sp.getiTag1());
+        cv.put(Sales_purchase_Class.I_TAG_2,sp.getiTag2());
+        cv.put(Sales_purchase_Class.I_TAG_3,sp.getiTag3());
+        cv.put(Sales_purchase_Class.I_TAG_4,sp.getiTag4());
+        cv.put(Sales_purchase_Class.I_TAG_5,sp.getiTag5());
+        cv.put(Sales_purchase_Class.I_TAG_6,sp.getiTag6());
+        cv.put(Sales_purchase_Class.I_TAG_7,sp.getiTag7());
+        cv.put(Sales_purchase_Class.I_TAG_8,sp.getiTag8());
+
+        cv.put(Sales_purchase_Class.I_PRODUCT,sp.getiProduct());
+        cv.put(Sales_purchase_Class.F_QTY,sp.getFqty());
+        cv.put(Sales_purchase_Class.F_RATE,sp.getfRate());
+        cv.put(Sales_purchase_Class.F_DISCOUNT,sp.getfDiscount());
+        cv.put(Sales_purchase_Class.F_ADD_CHARGES,sp.getfAddCharges());
+        cv.put(Sales_purchase_Class.F_VAT_PER,sp.getFvatPer());
+        cv.put(Sales_purchase_Class.F_VAT,sp.getfVat());
+        cv.put(Sales_purchase_Class.S_REMARKS,sp.getsRemarks());
+        cv.put(Sales_purchase_Class.S_UNITS,sp.getUnit());
+        cv.put(Sales_purchase_Class.F_NET,sp.getNet());
+
+        cv.put(Sales_purchase_Class.S_DOC_NO,sp.getsDocNo());
+        cv.put(Sales_purchase_Class.I_DOC_TYPE,sp.getiDocType());
+        cv.put(Sales_purchase_Class.I_TRANS_ID,sp.getiTransId());
+
+        float status = db.insert(TABLE_SALE_PURCHASE_BODY, null, cv);
+        return status != -1;
+
+    }
+
+
+
+    public Cursor getDataFromS_P_Header() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public String getCustomerUsingId(int iCustomer) {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+ Customer.S_NAME +" from "+TABLE_ACCOUNTS+" where "+Customer.I_ID+ "= '"+iCustomer+"'",null);
+        cursor.moveToFirst();
+        String customer=cursor.getString(cursor.getColumnIndex(Customer.S_NAME));
+        return customer;
+    }
+
+
+
+
+    public Cursor getDataFromS_P_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_HEADER+" where "
+                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public Cursor getEditValuesHeaderS_P(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_HEADER+" where "
+                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"' and "+Sales_purchase_Class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatus_S_P(int transId, String docNo, int iStatus) {
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(Sales_purchase_Class.STATUS,iStatus);
+        float status=db.update(TABLE_SALE_PURCHASE_HEADER,cv,  Sales_purchase_Class.I_TRANS_ID + " = ? and " + Sales_purchase_Class.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+    }
+
+    public Cursor getEditValuesBodyS_P(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_BODY+" where "
+                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"' and "+Sales_purchase_Class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public String getProductNameById(int iProduct) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+Products.S_NAME+" from "+TABLE_PRODUCT+" where "
+                +Products.I_ID+"='"+iProduct+"'",null);
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndex(Products.S_NAME));
+    }
+
+
+
+    public Cursor getDataFromS_P_HeaderPost() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_HEADER+
+                " where status=0 union select * from "+TABLE_SALE_PURCHASE_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean delete_S_P_Body(int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_BODY, Sales_purchase_Class.I_DOC_TYPE + " =  ? and "
+                    + Sales_purchase_Class.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+
+    }
+
+    public boolean deleteSP_Header(int iTransId, int iDocType, String sDocNo) {
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_HEADER, Sales_purchase_Class.S_DOC_NO + " =  ? and "
+                    + Sales_purchase_Class.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+
+    }
+
+    public Cursor getDataFromPaymentReceipt() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean deletePayRec_Header(int iTransId, int iDocType, String sDocNo) {
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_PAYMENT_RECEIPT_HEADER, Payment_Receipt_class.S_DOC_NO + " =  ? and "
+                    + Payment_Receipt_class.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public boolean insert_PayRec_Header(Payment_Receipt_class pr_class) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        float status = 0;
+        try {
+        cv.put(Payment_Receipt_class.I_TRANS_ID,pr_class.getiTransId());
+        cv.put(Payment_Receipt_class.S_DOC_NO,pr_class.getsDocNo());
+        cv.put(Payment_Receipt_class.I_DOC_TYPE,pr_class.getiDocType());
+        cv.put(Payment_Receipt_class.I_ACCOUNT_1,pr_class.getiAccount1());
+        cv.put(Payment_Receipt_class.I_ACCOUNT_2,pr_class.getiAccount2());
+        cv.put(Payment_Receipt_class.S_NARRATION,pr_class.getsNarration());
+        cv.put(Payment_Receipt_class.S_DATE,pr_class.getsDate());
+        cv.put(Payment_Receipt_class.PROCESS_TIME,pr_class.getProcessTime());
+        cv.put(Payment_Receipt_class.STATUS,pr_class.getStatus());
+
+        cv.put(Payment_Receipt_class.F_AMOUNT,pr_class.getfAmount());
+        cv.put(Payment_Receipt_class.I_PAYMENT_METHOD,pr_class.getiPaymentMethod());
+        cv.put(Payment_Receipt_class.I_BANK,pr_class.getiBank());
+        cv.put(Payment_Receipt_class.I_CHEQUE_NO,pr_class.getiChequeNo());
+        cv.put(Payment_Receipt_class.S_ATTACHMENT,pr_class.getsAttachment());
+        cv.put(Payment_Receipt_class.S_CHEQUE_DATE,pr_class.getsChequeDate());
+
+
+         status = db.insert(TABLE_PAYMENT_RECEIPT_HEADER, null, cv);
+        }catch (Exception e){
+            Log.d("Exceptionn",e.getMessage());
+
+        }
+        return status != -1;
+    }
+
+    public boolean delete_PayRec_Body(int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_PAYMENT_RECEIPT_BODY, Payment_Receipt_class.I_DOC_TYPE + " =  ? and "
+                    + Payment_Receipt_class.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+
+    }
+
+    public Cursor getDataFrom_PayRec_Header() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean insert_PayRec_Body(Payment_Receipt_class prClass) {
+
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(Payment_Receipt_class.I_TAG_1,prClass.getiTag1());
+        cv.put(Payment_Receipt_class.I_TAG_2,prClass.getiTag2());
+        cv.put(Payment_Receipt_class.I_TAG_3,prClass.getiTag3());
+        cv.put(Payment_Receipt_class.I_TAG_4,prClass.getiTag4());
+        cv.put(Payment_Receipt_class.I_TAG_5,prClass.getiTag5());
+        cv.put(Payment_Receipt_class.I_TAG_6,prClass.getiTag6());
+        cv.put(Payment_Receipt_class.I_TAG_7,prClass.getiTag7());
+        cv.put(Payment_Receipt_class.I_TAG_8,prClass.getiTag8());
+
+        cv.put(Payment_Receipt_class.I_REF_DOC_ID,prClass.getiRefDocId());
+        cv.put(Payment_Receipt_class.F_AMOUNT,prClass.getfAmount());
+
+        cv.put(Payment_Receipt_class.S_DOC_NO,prClass.getsDocNo());
+        cv.put(Payment_Receipt_class.I_DOC_TYPE,prClass.getiDocType());
+        cv.put(Payment_Receipt_class.I_TRANS_ID,prClass.getiTransId());
+
+        float status = db.insert(TABLE_PAYMENT_RECEIPT_BODY, null, cv);
+        return status != -1;
+    }
+
+    public Cursor getDataFromPayRec_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_HEADER+" where "
+                +Payment_Receipt_class.I_DOC_TYPE+"='"+iDocType+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getEditValuesHeaderPayRec(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_HEADER+" where "
+                +Payment_Receipt_class.I_DOC_TYPE+"='"+iDocType+"' and "+Payment_Receipt_class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public String getBankUsingId(int iBank) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select "+ Bank.S_NAME +" from "+TABLE_BANK+" where "+Bank.I_ID+ "= '"+iBank+"'",null);
+        cursor.moveToFirst();
+        String bankName=cursor.getString(cursor.getColumnIndex(Bank.S_NAME));
+        return bankName;
+
+    }
+
+    public boolean changeStatus_PayRec(int transId, String docNo, int iStatus) {
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(Payment_Receipt_class.STATUS,iStatus);
+        float status=db.update(TABLE_PAYMENT_RECEIPT_HEADER,cv,  Payment_Receipt_class.I_TRANS_ID + " = ? and " + Payment_Receipt_class.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+    }
+
+    public Cursor getEditValuesBodyP_ayRec(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_BODY+" where "
+                +Payment_Receipt_class.I_DOC_TYPE+"='"+iDocType+"' and "+Payment_Receipt_class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public Cursor getDataFrom_PayRec_HeaderPost() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_HEADER+
+                " where status=0 union select * from "+TABLE_PAYMENT_RECEIPT_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
 }

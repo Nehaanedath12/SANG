@@ -3,6 +3,10 @@ package com.sangsolutions.sang;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -13,6 +17,8 @@ import android.widget.Toast;
 
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Service.GetMasterSettingsService;
+import com.sangsolutions.sang.Service.GetProductService;
 import com.sangsolutions.sang.databinding.ActivityLoginBinding;
 
 import java.util.Objects;
@@ -56,10 +62,14 @@ public class Login extends AppCompatActivity {
 
         if (helper.GetLoginStatus()) {
             startActivity(new Intent(Login.this, Home.class));
-            finish();
+            finishAffinity();
 
         }
-        syncData();
+        if(Tools.isConnected(this)) {
+            syncData();
+        }else {
+            Toast.makeText(this, "No Internet", Toast.LENGTH_SHORT).show();
+        }
         binding.save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -118,13 +128,14 @@ public class Login extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void syncData() {
-        schedulerJob.SyncToken(this);
-        schedulerJob.SyncUser(this);
-        schedulerJob.SyncBank(this);
-        schedulerJob.SyncTransSalePurchase(this);
-        schedulerJob.SyncMasterSettings(this);
-        schedulerJob.SyncAccounts(this);
-        schedulerJob.SyncProduct(this);
+        Log.d("ipppp","new Tools().getIP(Login.this)");
 
+        schedulerJob.SyncMasterSettings(Login.this);
+//        schedulerJob.SyncToken(this);
+        schedulerJob.SyncProduct(Login.this);
+        schedulerJob.SyncTransSalePurchase(Login.this);
+        schedulerJob.SyncUser(Login.this);
+        schedulerJob.SyncAccounts(Login.this);
+        schedulerJob.SyncBank(Login.this);
     }
 }

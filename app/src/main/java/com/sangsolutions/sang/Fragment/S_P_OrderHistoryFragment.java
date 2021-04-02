@@ -241,7 +241,7 @@ public class S_P_OrderHistoryFragment extends Fragment {
                         }
 
                         @Override
-                        public void onDeleteClick(int iTransId) {
+                        public void onDeleteClick(int iTransId, String sDocNo) {
                             deleteFromAPI(iTransId);
                         }
 

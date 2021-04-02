@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.sangsolutions.sang.Adapter.InvoiceAdapter.Invoice;
-import com.sangsolutions.sang.Adapter.InvoiceAdapter.InvoiceSelectedAdapter;
 import com.sangsolutions.sang.R;
 
 import java.util.ArrayList;
@@ -88,7 +85,7 @@ public class SalesPurchaseHistoryAdapter extends RecyclerView.Adapter<SalesPurch
 
         void onItemLongClick(int position);
 
-        void onDeleteClick(int iTransId);
+        void onDeleteClick(int iTransId, String sDocNo);
     }
 
     public SalesPurchaseHistoryAdapter(Context context, List<SalesPurchaseHistory> list) {
@@ -137,7 +134,7 @@ public class SalesPurchaseHistoryAdapter extends RecyclerView.Adapter<SalesPurch
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        onClickListener.onDeleteClick(list.get(position).iTransId);
+                        onClickListener.onDeleteClick(list.get(position).iTransId,list.get(position).sDocNo);
                         dialog.dismiss();
                     }
                 });

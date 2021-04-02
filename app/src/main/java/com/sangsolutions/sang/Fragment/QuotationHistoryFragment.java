@@ -235,7 +235,7 @@ public class QuotationHistoryFragment extends Fragment {
                         }
 
                         @Override
-                        public void onDeleteClick(int iTransId) {
+                        public void onDeleteClick(int iTransId, String sDocNo) {
                             deleteFromAPI(iTransId);
                         }
 

@@ -3,16 +3,17 @@ package com.sangsolutions.sang;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
-import android.media.session.MediaSession;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.util.TypedValue;
+
+import com.sangsolutions.sang.Database.Sales_purchase_Class;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +43,7 @@ public class Tools {
     public static boolean isValidIP(CharSequence target) {
         return (!TextUtils.isEmpty(target) && Patterns.IP_ADDRESS.matcher(target).matches());
     }
+
 
 
 
@@ -192,6 +194,26 @@ public class Tools {
 
             } catch (JSONException e) {
                 e.printStackTrace();
+            }
+        }
+        Collections.sort(num);
+
+        int value=num.get(num.size() - 1);
+        Log.d("docNumberr",num.get(num.size() - 1).toString()+" "+value);
+        return value+1;
+    }
+
+
+    public static int getNewDocNoLocally(Cursor cursor1) {
+        List<Integer>num=new ArrayList<>();
+        if(cursor1.moveToFirst()){
+            for (int i=0;i<cursor1.getCount();i++){
+                String sDocNo=cursor1.getString(cursor1.getColumnIndex(Sales_purchase_Class.S_DOC_NO));
+                String result[] = sDocNo.split("-");
+                String returnValue = result[result.length - 1];
+                num.add(Integer.parseInt(returnValue));
+                Log.d("docNumbers",num.get(i).toString());
+                cursor1.moveToNext();
             }
         }
         Collections.sort(num);

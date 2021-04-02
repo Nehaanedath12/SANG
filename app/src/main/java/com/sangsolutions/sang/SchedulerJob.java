@@ -12,11 +12,11 @@ import androidx.annotation.RequiresApi;
 import com.sangsolutions.sang.Service.GetAccountsService;
 import com.sangsolutions.sang.Service.GetBankService;
 import com.sangsolutions.sang.Service.GetMasterSettingsService;
-import com.sangsolutions.sang.Service.GetMasterTagDetails;
 import com.sangsolutions.sang.Service.GetProductService;
 import com.sangsolutions.sang.Service.GetTokenService;
 import com.sangsolutions.sang.Service.GetTransactionSettingService;
 import com.sangsolutions.sang.Service.GetUserService;
+import com.sangsolutions.sang.Service.PostSalePurchaseService;
 
 public class SchedulerJob {
 
@@ -90,6 +90,7 @@ public class SchedulerJob {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void SyncUser(Context context) {
+        Log.d("user2","user");
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobInfo job = new JobInfo.Builder(
@@ -101,19 +102,40 @@ public class SchedulerJob {
         js.schedule(job);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void SyncToken(Context context) {
-        Log.d("Timingg","Tools.token");
-        JobScheduler js =
-                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        JobInfo job = new JobInfo.Builder(
-                6,
-                new ComponentName(context, GetTokenService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .build();
-        assert js != null;
-        js.schedule(job);
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//    public void Post_SalePurchase(Context context) {
+//        Log.d("Post_SalePurchase","Post_SalePurchase");
+//        JobScheduler js =
+//                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//        JobInfo job = new JobInfo.Builder(
+//                6,
+//                new ComponentName(context, PostSalePurchaseService.class))
+//                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//                .build();
+//        Log.d("Post_SalePurchase","Post_SalePurchase");
+//        assert js != null;
+//        js.schedule(job);
+//    }
+
+
+//    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//    public void SyncToken(Home context) {
+//        Log.d("Timingg","Tools.token");
+//        JobScheduler js =
+//                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//        JobInfo job = new JobInfo.Builder(
+//                6,
+//                new ComponentName(context, GetTokenService.class))
+//                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//                .build();
+//        assert js != null;
+//        js.schedule(job);
+//    }
+
+
+
+
+
 
 //    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 //    public void syncMasterTagDetails(Context context) {

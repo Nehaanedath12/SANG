@@ -53,6 +53,7 @@ public class CheckImageAdapter extends RecyclerView.Adapter<CheckImageAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull CheckImageAdapter.ViewHolder holder, int position) {
         Picasso.get().load(list.get(position)).resize(200,350).centerCrop().into(holder.photo);
+        Log.d("PicassoPicasso",list.get(position));
 
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override

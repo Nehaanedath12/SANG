@@ -5,6 +5,9 @@ public class PaymentReceiptHistory {
     public int iTransId,iAccount1,iAccount2,fAmount,iPaymentMethod,iBank,iChequeNo;
     public  String sDocNo,sDate,sAccount1,sAccount2,sChequeDate;
 
+    public PaymentReceiptHistory() {
+    }
+
     public PaymentReceiptHistory(int iTransId, int iAccount1, int iAccount2, int fAmount,
                                  int iPaymentMethod, int iBank, int iChequeNo, String sDocNo,
                                  String sDate, String sAccount1, String sAccount2, String sChequeDate) {

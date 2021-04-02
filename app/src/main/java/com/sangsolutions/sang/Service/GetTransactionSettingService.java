@@ -101,11 +101,11 @@ public class GetTransactionSettingService extends JobService {
 
                         if(helper.checkTransSettingById(jsonObject.getString(TransSetting.I_DOC_TYPE),jsonObject.getString(TransSetting.I_TAG_ID))){
                             if(helper.checkAllDataTransSetting(transSalePurchase)){
-                                Log.d("success","transSalePurchase Updated successfully "+i);
+                                Log.d("successtrans","transSalePurchase Updated successfully "+i);
                             }
                         }
                         else if( helper.insertTransSetting(transSalePurchase)){
-                            Log.d("success","transSalePurchase added successfully "+i);
+                            Log.d("successtrans","transSalePurchase added successfully "+i);
                         }
 
                         if(i+1==jsonArray.length()){
