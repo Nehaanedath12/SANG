@@ -59,6 +59,12 @@
         <service android:name=".Service.PostPaymentReceiptService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.Post_SalePurchase_ReturnService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.Post_SalePurchase_OrderService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

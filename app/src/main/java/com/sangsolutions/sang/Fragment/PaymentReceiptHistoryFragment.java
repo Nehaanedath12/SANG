@@ -106,7 +106,7 @@ public class PaymentReceiptHistoryFragment extends Fragment {
                     Toast.makeText(requireContext(), "No Internet!!", Toast.LENGTH_SHORT).show();
                 }
                 navController.navigate(R.id.homeFragment);
-                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment(toolTitle+" Summary",iDocType);
+                NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment(toolTitle+" History",iDocType);
                 navController.navigate(action);
 
             }
@@ -245,7 +245,11 @@ public class PaymentReceiptHistoryFragment extends Fragment {
                 historyAdapter.setOnClickListener(new PaymentReceiptHistoryAdapter.OnClickListener() {
                     @Override
                     public void onItemClick(int iTransId, int position) {
-                        adapterOnItemClick(iTransId,position);
+                        if(!Tools.isConnected(requireContext())) {
+                            adapterOnItemClick(iTransId, position);
+                        }else {
+                            Toast.makeText(requireContext(), "Please Refresh", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
@@ -320,7 +324,11 @@ public class PaymentReceiptHistoryFragment extends Fragment {
                     historyAdapter.setOnClickListener(new PaymentReceiptHistoryAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(int iTransId, int position) {
-                          adapterOnItemClick(iTransId,position);
+                            if(Tools.isConnected(requireContext())) {
+                                adapterOnItemClick(iTransId, position);
+                            }else {
+                                Toast.makeText(requireContext(), "Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         @Override

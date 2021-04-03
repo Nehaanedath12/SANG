@@ -61,6 +61,8 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.Sales_purchase_Class;
+import com.sangsolutions.sang.Database.Sales_purchase_order_class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -197,7 +199,7 @@ public class S_P_OrderFragment extends Fragment {
         orderBodyAdapter=new OrderBodyAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-        initialValueSettingHeader();
+
 
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -310,6 +312,8 @@ public class S_P_OrderFragment extends Fragment {
             }
 
         }
+
+        initialValueSettingHeader();
 
 
         binding.barcodeI.setOnClickListener(new View.OnClickListener() {
@@ -456,7 +460,6 @@ public class S_P_OrderFragment extends Fragment {
                             }
                         }).create().show();
 
-
             }
         });
 
@@ -516,75 +519,180 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void saveMain() {
-        JSONObject jsonObjectMain=new JSONObject();
-        try{
-            jsonObjectMain.put("iTransId",iTransId);
-            jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
-            jsonObjectMain.put("sDeliveryDate",Tools.dateFormat(binding.delDate.getText().toString()));
-            jsonObjectMain.put("iDocType",iDocType);
-            jsonObjectMain.put("iAccount1",iCustomer);
-            jsonObjectMain.put("iAccount2",0);
-            jsonObjectMain.put("sNarration",binding.description.getText().toString());
-            assert userIdS != null;
-            jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
+        if (Tools.isConnected(requireContext())) {
+            JSONObject jsonObjectMain = new JSONObject();
+            try {
+                jsonObjectMain.put("iTransId", iTransId);
+                jsonObjectMain.put("sDocNo", docNo);
+                jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
+                jsonObjectMain.put("sDeliveryDate", Tools.dateFormat(binding.delDate.getText().toString()));
+                jsonObjectMain.put("iDocType", iDocType);
+                jsonObjectMain.put("iAccount1", iCustomer);
+                jsonObjectMain.put("iAccount2", 0);
+                jsonObjectMain.put("sNarration", binding.description.getText().toString());
+                assert userIdS != null;
+                jsonObjectMain.put("iUser", Integer.parseInt(userIdS));
 
-            Log.d("jsonObjecMain",jsonObjectMain.get("iTransId")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("sDocNo")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iDocType")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iAccount1")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iAccount2")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("sNarration")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iUser")+"");
-
-
-            JSONArray jsonArray=new JSONArray();
-            for (int i=0;i<bodyPartList.size();i++){
-                JSONObject jsonObject=new JSONObject();
+                Log.d("jsonObjecMain", jsonObjectMain.get("iTransId") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("sDocNo") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iDocType") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iAccount1") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iAccount2") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("sNarration") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iUser") + "");
 
 
-                Log.d("bodyPartList size",bodyPartList.size()+""+i);
+                JSONArray jsonArray = new JSONArray();
+                for (int i = 0; i < bodyPartList.size(); i++) {
+                    JSONObject jsonObject = new JSONObject();
 
-                for (int j=1;j<=tagTotalNumber;j++){
-                    if(hashMapHeader.containsKey(j)){
-                        jsonObject.put("iTag"+j,hashMapHeader.get(j));
+
+                    Log.d("bodyPartList size", bodyPartList.size() + "" + i);
+
+                    for (int j = 1; j <= tagTotalNumber; j++) {
+                        if (hashMapHeader.containsKey(j)) {
+                            jsonObject.put("iTag" + j, hashMapHeader.get(j));
+                        } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                            jsonObject.put("iTag" + j, bodyPartList.get(i).hashMapBody.get(j));
+                        } else {
+                            jsonObject.put("iTag" + j, 0);
+                        }
+
+
                     }
-                    else if(bodyPartList.get(i).hashMapBody.containsKey(j)){
-                        jsonObject.put("iTag"+j, bodyPartList.get(i).hashMapBody.get(j));
+
+                    jsonObject.put("iProduct", bodyPartList.get(i).getiProduct());
+                    jsonObject.put("fQty", bodyPartList.get(i).getQty());
+                    if (bodyPartList.get(i).getRemarks().equals("")) {
+                        jsonObject.put("sRemarks", "");
+                    } else {
+                        jsonObject.put("sRemarks", bodyPartList.get(i).getRemarks());
                     }
-                    else {
-                        jsonObject.put("iTag"+j,0);
-                    }
+                    jsonObject.put("sUnits", bodyPartList.get(i).getUnit());
 
 
+                    Log.d("jsonObjecttIproduct", jsonObject.get("iProduct") + "");
+                    Log.d("jsonObjecttQty", jsonObject.get("fQty") + "");
+                    Log.d("jsonObjecttrema", jsonObject.get("sRemarks") + "");
+
+
+                    jsonArray.put(jsonObject);
                 }
+                jsonObjectMain.put("Body", jsonArray);
 
-                jsonObject.put("iProduct",bodyPartList.get(i).getiProduct());
-                jsonObject.put("fQty",bodyPartList.get(i).getQty());
-                if(bodyPartList.get(i).getRemarks().equals("")){
-                    jsonObject.put("sRemarks","");
-                }else {
-                    jsonObject.put("sRemarks",bodyPartList.get(i).getRemarks());
-                }
-                jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
+                uploadToAPI(jsonObjectMain);
 
 
-                Log.d("jsonObjecttIproduct",jsonObject.get("iProduct")+"");
-                Log.d("jsonObjecttQty",jsonObject.get("fQty")+"");
-                Log.d("jsonObjecttrema",jsonObject.get("sRemarks")+"");
-
-
-
-                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                Log.d("exception", e.getMessage());
+                e.printStackTrace();
             }
-            jsonObjectMain.put("Body",jsonArray);
+        }else {
+            saveLocally();
+        }
+    }
 
-            uploadToAPI(jsonObjectMain);
+    private void saveLocally() {
+        Sales_purchase_order_class sp_class=new Sales_purchase_order_class();
+        Cursor cursor1=helper.getDataFromS_P_Order_Header();
+        if(!EditMode) {
+            if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
+                iTransId = Tools.getNewDocNoLocally(cursor1);
+            }
+        }
+
+        sp_class.setiTransId(iTransId);
+        sp_class.setsDocNo(docNo);
+        sp_class.setsDate(binding.date.getText().toString());
+        sp_class.setsDelDate(binding.delDate.getText().toString());
+        sp_class.setiDocType(iDocType);
+        sp_class.setiAccount1(iCustomer);
+        sp_class.setiAccount2(0);
+        sp_class.setsNarration(binding.description.getText().toString());
+        sp_class.setProcessTime(DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"");
+        sp_class.setStatus(0);
+        Log.d("responsePost", sp_class.getStatus()+"");
+        if(helper.deleteSP_Order_Header(iTransId,iDocType,docNo)) {
+            if (helper.insert_S_P_Order_Header(sp_class)) {
+                InsertBodyPart_DB();
+            }
+
+        }
+    }
+
+    private void InsertBodyPart_DB() {
+        if(helper.delete_S_P_Order_Body(iDocType,iTransId)) {
+
+            for (int i = 0; i < bodyPartList.size(); i++) {
+                Sales_purchase_order_class sp_classBody = new Sales_purchase_order_class();
+
+                for (int j = 1; j <= tagTotalNumber; j++) {
+                    if (hashMapHeader.containsKey(j)) {
+                        loadDataTags(sp_classBody, j, hashMapHeader.get(j));
+                    } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                        loadDataTags(sp_classBody, j, bodyPartList.get(i).hashMapBody.get(j));
+                    } else {
+                        loadDataTags(sp_classBody, j, 0);
+                    }
+                }
+                sp_classBody.setiProduct(bodyPartList.get(i).getiProduct());
+                sp_classBody.setFqty(bodyPartList.get(i).getQty());
+                sp_classBody.setsRemarks(bodyPartList.get(i).getRemarks());
+                sp_classBody.setUnit(bodyPartList.get(i).getUnit());
+                sp_classBody.setsDocNo(docNo);
+                sp_classBody.setiDocType(iDocType);
+                sp_classBody.setiTransId(iTransId);
+                Log.d("DataBodyInsert", "deleted");
+                if (helper.insert_S_P_Order_Body(sp_classBody)) {
+                    Log.d("DataBodyInsert", "SUCCESS");
+
+                    if (i + 1 == bodyPartList.size()) {
+                        Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
+                        NavDirections actions =S_P_OrderFragmentDirections
+                                .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+                        navController.navigate(actions);
+                    }
+                }
 
 
-        } catch (JSONException e) {
-            Log.d("exception",e.getMessage());
-            e.printStackTrace();
+            }
+        }
+    }
+
+    private void loadDataTags(Sales_purchase_order_class sp_class, int j, Integer iTag) {
+        switch (j){
+            case 1:{
+                sp_class.setiTag1(iTag);
+                break;
+            }
+            case 2:{
+                sp_class.setiTag2(iTag);
+                break;
+            }
+            case 3:{
+                sp_class.setiTag3(iTag);
+                break;
+            }
+            case 4:{
+                sp_class.setiTag4(iTag);
+                break;
+            }
+            case 5:{
+                sp_class.setiTag5(iTag);
+                break;
+            }
+            case 6:{
+                sp_class.setiTag6(iTag);
+                break;
+            } case 7:{
+                sp_class.setiTag7(iTag);
+                break;
+            }
+            case 8:{
+                sp_class.setiTag8(iTag);
+                break;
+            }
+
         }
     }
 
@@ -602,12 +710,16 @@ public class S_P_OrderFragment extends Fragment {
                         public void onResponse(String response) {
                             if (response.contains(docNo)) {
                                 alertDialog.dismiss();
-                                Log.d("responsePost ", "successfully");
-                                Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
-                                bodyPartList.clear();
-                                NavDirections actions =S_P_OrderFragmentDirections
-                                        .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
-                                navController.navigate(actions);
+                                if(helper.deleteSP_Header_Order(iTransId,iDocType,docNo)) {
+                                    if (helper.delete_S_P_Body_Order(iDocType, iTransId)) {
+                                        Log.d("responsePost ", "successfully");
+                                        Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
+                                        bodyPartList.clear();
+                                        NavDirections actions = S_P_OrderFragmentDirections
+                                                .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType, toolTitle);
+                                        navController.navigate(actions);
+                                    }
+                                }
                             }
                         }
 
@@ -962,9 +1074,9 @@ public class S_P_OrderFragment extends Fragment {
     private void initialValueSettingHeader() {
 
         alertDialog.show();
-        numberOfLinesH =0;
-        numberOfLinesB =0;
-        StringDate=df.format(new Date());
+        numberOfLinesH = 0;
+        numberOfLinesB = 0;
+        StringDate = df.format(new Date());
         binding.date.setText(StringDate);
         binding.delDate.setText(StringDate);
         if (iDocType == 12) {
@@ -973,20 +1085,18 @@ public class S_P_OrderFragment extends Fragment {
         } else {
             toolTitle = "Sale Order Summary";
         }
+        Cursor cursor = helper.getUserCode(userIdS);
+        if (cursor != null) {
+            userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        }
 
-        if(Tools.isConnected(requireActivity())) {
+        if (Tools.isConnected(requireActivity())) {
             if (EditMode) {
                 EditValueFromAPI();
             } else {
-                Cursor cursor = helper.getUserCode(userIdS);
-                if (cursor!=null) {
-                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
-                }
-
-
                 ///////
 
-                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransOrderSummary)
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransOrderSummary)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -997,9 +1107,9 @@ public class S_P_OrderFragment extends Fragment {
                                 Log.d("responseHistory", response.toString());
                                 try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
-                                    if(jsonArray.length()>0) {
+                                    if (jsonArray.length() > 0) {
                                         docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
-                                    }else {
+                                    } else {
                                         docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + 1;
 
                                     }
@@ -1014,20 +1124,111 @@ public class S_P_OrderFragment extends Fragment {
                             public void onError(ANError anError) {
                                 Log.d("responseTotalNumber", anError.toString());
                                 alertDialog.dismiss();
-                                NavDirections actions =S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+                                NavDirections actions = S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType, toolTitle);
                                 navController.navigate(actions);
                             }
                         });
             }
-        }else {
+        } else {
             alertDialog.dismiss();
-            Toast.makeText(requireActivity(),"No Internet", Toast.LENGTH_SHORT).show();
-            NavDirections actions =S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
-            navController.navigate(actions);
+            Toast.makeText(requireActivity(), "No Internet", Toast.LENGTH_SHORT).show();
+            if (EditMode) {
+                editfromlocaldb();
+            } else {
+                Cursor cursor1 = helper.getDataFromS_P_Order_Header();
+                if (cursor1.getCount() > 0) {
+                    int count = Tools.getNewDocNoLocally(cursor1);
+                    Log.d("status", count + "");
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + count;
+                } else {
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + 1;
+
+                }
+            }
+
+            binding.docNo.setText(docNo);
         }
+
         ///////
 
     }
+
+    private void editfromlocaldb() {
+
+        Cursor cursorEdit_H=helper.getEditValuesHeaderS_P_Order(iTransId,iDocType);
+
+        if(cursorEdit_H.moveToFirst()&& cursorEdit_H.getCount()>0){
+            iTransId=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.I_TRANS_ID));
+            docNo=cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_DOC_NO));
+            binding.docNo.setText(docNo);
+            binding.date.setText( cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_DATE)));
+            binding.delDate.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_DEL_DATE)));
+            binding.description.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_NARRATION)));
+            iCustomer=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.I_ACCOUNT_1));
+            binding.customer.setText(helper.getCustomerUsingId(iCustomer));
+            changeStatus(iTransId,docNo,1);
+        }
+
+        Cursor cursorEdit_B=helper.getEditValuesBodyS_P_Order(iTransId,iDocType);
+
+        if(cursorEdit_B.moveToFirst() && cursorEdit_B.getCount()>0) {
+            for (int i = 0; i < cursorEdit_B.getCount(); i++) {
+                for (int k = 0; k < headerListTags.size(); k++) {
+                    int tagDetails = cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + headerListTags.get(k)));
+                    hashMapHeader.put(headerListTags.get(k), tagDetails);
+                    Cursor tagNameCursor = helper.getTagName(headerListTags.get(k), tagDetails);
+                    if (tagDetails != 0) {
+                        autoText_H_list.get(k).setText(tagNameCursor.getString(tagNameCursor.getColumnIndex(TagDetails.S_NAME)));
+
+                    } else {
+                        autoText_H_list.get(k).setText("");
+                    }
+                }
+                for (int k = 0; k < bodyListTags.size(); k++) {
+                    hashMapBody.put(bodyListTags.get(k),cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ bodyListTags.get(k))));
+                }
+
+
+
+
+                BodyPart bodyPart=new BodyPart();
+                bodyPart.setiProduct( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.I_PRODUCT)));
+
+                String productName=helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.I_PRODUCT)));
+
+                bodyPart.setProductName(productName);
+                bodyPart.setQty( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.F_QTY)));
+                bodyPart.setRemarks(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.S_REMARKS)));
+                bodyPart.setUnit(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.S_UNITS)));
+                bodyPart.setHashMapBody(hashMapBody);
+
+                bodyPartList.add(bodyPart);
+                orderBodyAdapter.notifyDataSetChanged();
+                hashMapBody=new HashMap<>();
+
+                if(cursorEdit_B.getCount()==i+1){
+                    binding.boyPartRV.setAdapter(orderBodyAdapter);
+                    alertDialog.dismiss();
+                    orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(BodyPart bodyPart, int position) {
+                            editingProductField(bodyPart,position);
+                        }
+                    });
+
+                }
+                cursorEdit_B.moveToNext();
+
+            }
+        }
+    }
+
+    private void changeStatus(int transId, String docNo, int iStatus) {
+        if(helper.changeStatus_S_P_Order(transId,docNo,iStatus)){
+            Log.d("statusChange","successfully");
+        }
+    }
+
 
     private void EditValueFromAPI() {
 

@@ -1,8 +1,12 @@
 package com.sangsolutions.sang.Service;
 
 import android.annotation.SuppressLint;
+import android.app.job.JobInfo;
 import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
 import android.app.job.JobService;
+import android.content.ComponentName;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,11 +23,14 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.Sales_purchase_Class;
 import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
+import com.sangsolutions.sang.SchedulePost;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class PostSalePurchaseService extends JobService {
@@ -42,8 +49,13 @@ public class PostSalePurchaseService extends JobService {
         return true;
     }
 
+
+
+
+
     private void GetDataSalePurchase() {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
+
 
             @Override
             protected Void doInBackground(Void... voids) {
@@ -157,6 +169,21 @@ public class PostSalePurchaseService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        return false;
+        Log.d("Post_SalePurchasestop","iTransId"+"");
+//        new SchedulePost().Post_PaymentReceipt(this);
+//            Log.d("Post_PaymentReceipt","Post_PaymentReceipt");
+//            JobScheduler js =
+//                    (JobScheduler) getApplicationContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+//            JobInfo job = new JobInfo.Builder(
+//                    1,
+//                    new ComponentName(getApplicationContext(), PostPaymentReceiptService.class))
+//                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//                    .build();
+//            Log.d("Post_PaymentReceipt","Post_PaymentReceipt");
+//            assert js != null;
+//            js.schedule(job);
+
+
+        return true;
     }
 }

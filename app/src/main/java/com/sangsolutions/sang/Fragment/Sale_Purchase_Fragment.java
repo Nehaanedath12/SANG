@@ -578,8 +578,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                 editfromlocaldb();
             }else {
                 Cursor cursor1=helper.getDataFromS_P_Header();
-//                int count=cursor1.getCount()+1;
-
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("status",count+"");
@@ -592,10 +590,8 @@ public class Sale_Purchase_Fragment extends Fragment {
 
             binding.docNo.setText(docNo);
 
-//            NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
-//            navController.navigate(actions);
         }
-        ///////
+
 
     }
 
@@ -744,12 +740,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                     hashMapBody.put(bodyListTags.get(k),cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ bodyListTags.get(k))));
                 }
 
-                float gross= cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_QTY))* cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_QTY));
+                float gross= cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_QTY))* cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_RATE));
 
                 BodyPart bodyPart=new BodyPart();
                 bodyPart.setiProduct( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.I_PRODUCT)));
 
-               String productName=helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.I_PRODUCT)));
+                String productName=helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.I_PRODUCT)));
 
                 bodyPart.setProductName(productName);
                 bodyPart.setQty( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_QTY)));
@@ -920,13 +916,14 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 if(helper.deleteSP_Header(iTransId,iDocType,docNo)){
                                     if(helper.delete_S_P_Body(iDocType,iTransId)){
                                         Log.d("responsePost ", "successfully");
+                                        Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
+                                        bodyPartList.clear();
+                                        NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                                        navController.navigate(actions);
                                     }
                                 }
 
-                                Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
-                                bodyPartList.clear();
-                                NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
-                                navController.navigate(actions);
+
                                 }
                                 }
 
@@ -972,7 +969,6 @@ public class Sale_Purchase_Fragment extends Fragment {
         if(helper.delete_S_P_Body(iDocType,iTransId)) {
 
             for (int i = 0; i < bodyPartList.size(); i++) {
-                Log.d("bodyPartListi", bodyPartList.size() + " " + i);
                 Sales_purchase_Class sp_classBody = new Sales_purchase_Class();
 
                 for (int j = 1; j <= tagTotalNumber; j++) {
@@ -1001,13 +997,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                 Log.d("DataBodyInsert", "deleted");
                 if (helper.insert_S_P_Body(sp_classBody)) {
                     Log.d("DataBodyInsert", "SUCCESS");
+
+                    if (i + 1 == bodyPartList.size()) {
+                        Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
+                        NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                        navController.navigate(actions);
                 }
-
-
-                if (i + 1 == bodyPartList.size()) {
-                Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
-                NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
-                navController.navigate(actions);
                 }
             }
         }
@@ -1153,7 +1148,12 @@ public class Sale_Purchase_Fragment extends Fragment {
                 int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
                 int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
                 Cursor cursor = helper.getTagName(tagId, tagDetails);
+                if(tagDetails!=0){
                 autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                }else {
+                    autoText_B_list.get(i).setText("");
+
+                }
                 hashMapBody.put(tagId, tagDetails);
             }
         }catch (Exception e){

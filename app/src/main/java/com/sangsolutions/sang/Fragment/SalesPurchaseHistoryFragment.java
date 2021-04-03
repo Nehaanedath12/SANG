@@ -102,7 +102,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                     Toast.makeText(requireContext(), "No Internet!!", Toast.LENGTH_SHORT).show();
                 }
                 navController.navigate(R.id.homeFragment);
-                NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment(toolTitle+" Summary").setIDocType(iDocType);
+                NavDirections action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment(toolTitle+" History").setIDocType(iDocType);
                 navController.navigate(action);
 
             }
@@ -222,7 +222,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
         Cursor cursor=helper.getDataFromS_P_by_Itype(iDocType);
         if(cursor.moveToFirst() && cursor!=null){
 
-            Log.d("historyList",cursor.getCount()+"");
+            Log.d("doctypee",cursor.getCount()+"");
 
             for (int i=0;i<cursor.getCount();i++){
                 SalesPurchaseHistory history=new SalesPurchaseHistory();
@@ -243,7 +243,11 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                 historyAdapter.setOnClickListener(new SalesPurchaseHistoryAdapter.OnClickListener() {
                     @Override
                     public void onItemClick(int iTransId, int position) {
-                        adapterOnItemClick(iTransId,position);
+                        if(!Tools.isConnected(requireContext())) {
+                            adapterOnItemClick(iTransId,position);
+                        }else {
+                            Toast.makeText(requireContext(), "Please Refresh", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
@@ -306,7 +310,11 @@ public class SalesPurchaseHistoryFragment extends Fragment {
                         @Override
                         public void onItemClick(int iTransId, int position) {
 
-                            adapterOnItemClick(iTransId,position);
+                            if(Tools.isConnected(requireContext())) {
+                                adapterOnItemClick(iTransId, position);
+                            }else {
+                                Toast.makeText(requireContext(), "Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                            }
 
                         }
 

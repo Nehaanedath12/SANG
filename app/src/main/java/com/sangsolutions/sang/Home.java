@@ -429,13 +429,16 @@ public class Home extends AppCompatActivity {
         });
 
         final Handler handler = new Handler();
-        final int delay = 1000*5; // 1000 milliseconds == 1 second
+        final int delay = 1000*30; // 1000 milliseconds == 1 second
         handler.postDelayed(new Runnable() {
             public void run() {
                 Log.d("kkk","kk");
                 if(Tools.isConnected(Home.this)){
+                    Log.d("kkk","connected");
                     schedulepost.Post_SalePurchase(Home.this);
                     schedulepost.Post_PaymentReceipt(Home.this);
+                    schedulepost.Post_SalePurchase_Return(Home.this);
+                    schedulepost.Post_SalePurchase_Order(Home.this);
                 }
                 handler.postDelayed(this, delay);
             }

@@ -69,7 +69,6 @@ public class PostPaymentReceiptService extends JobService {
 
                         Log.d("iTransIdd",iTransId+"");
 
-
                         String Image=cursorHeader.getString(cursorHeader.getColumnIndex(Payment_Receipt_class.S_ATTACHMENT));
                         String imageName=Tools.getFileList(Image);
                         Log.d("iTransIdd",imageName+""+Image);
@@ -77,9 +76,9 @@ public class PostPaymentReceiptService extends JobService {
                         List<String> imgList = new ArrayList<>(Arrays.asList(Image.split(",")));
                         List<File> file = new ArrayList<>();
                         for (int k=0;k<imgList.size();k++) {
-                            File file1 = new File(imgList.get(i));
+                            File file1 = new File(imgList.get(k));
                             if (file1.exists()) {
-                                file.add(file1);
+                                file.add(Tools.CompressImage(file1,PostPaymentReceiptService.this));
                             }
                         }
 
@@ -134,6 +133,7 @@ public class PostPaymentReceiptService extends JobService {
                         }
 
 
+                        cursorHeader.moveToNext();
                         }
                 }
                 return null;
@@ -154,7 +154,7 @@ public class PostPaymentReceiptService extends JobService {
                     .getAsString(new StringRequestListener() {
                         @Override
                         public void onResponse(String response) {
-                            Log.d("responsePostt", response);
+                            Log.d("responsePost", response);
                             if (response.contains(docNo)) {
                                 if(helper.deletePayRec_Header(iTransId,iDocType,docNo)){
                                     if(helper.delete_PayRec_Body(iDocType,iTransId)){

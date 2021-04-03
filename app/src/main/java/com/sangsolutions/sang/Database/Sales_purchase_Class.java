@@ -5,6 +5,7 @@ Sales_purchase_Class {
     String sDocNo,sDate,sNarration,processTime;
     int iTransId,iDocType,iAccount1,iAccount2,iUser,status;
 
+    int iTransReturnId;
 
     //body
     Float fRate,fVat,fvatPer,fDiscount,fAddCharges,net;
@@ -12,6 +13,14 @@ Sales_purchase_Class {
     int iTag1,iTag2,iTag3,iTag4,iTag5,iTag6,iTag7,iTag8,iProduct,fqty;
     String sRemarks,unit;
 
+
+    public int getiTransReturnId() {
+        return iTransReturnId;
+    }
+
+    public void setiTransReturnId(int iTransReturnId) {
+        this.iTransReturnId = iTransReturnId;
+    }
 
     public String getProcessTime() {
         return processTime;
@@ -247,7 +256,6 @@ Sales_purchase_Class {
     public static  String I_ACCOUNT_1="iAccount1";
     public static  String I_ACCOUNT_2="iAccount2";
     public static  String S_NARRATION="sNarration";
-    public static  String I_USER="iUser";
     public static  String PROCESS_TIME="processTime";
     public static  String STATUS="status";
 
@@ -275,6 +283,11 @@ Sales_purchase_Class {
     public static  String S_REMARKS="sRemarks";
     public static  String S_UNITS="sUnits";
     public static  String F_NET="fNet";
+
+
+//  RETURN
+    public static  String I_TRANS_RETURN_ID="iTransReturnId";
+
 
     public Sales_purchase_Class() {
     }

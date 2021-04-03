@@ -62,6 +62,7 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.Sales_purchase_Class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -216,7 +217,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
         bodyPartAdapter=new BodyPartAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-        initialValueSettingHeader();
+
         ///////////////////////////////////////////
 
 
@@ -355,6 +356,8 @@ public class SalesPurchaseReturnFragment extends Fragment {
             }
         }
 
+        initialValueSettingHeader();
+
 
         binding.deleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -415,44 +418,47 @@ public class SalesPurchaseReturnFragment extends Fragment {
         binding.addByDoc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                docNoList.clear();
-                if(iCustomer!=0 && !binding.customer.getText().toString().equals("")){
-                AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
-                bindingDialogue =DocNoDialogueBinding.inflate(getLayoutInflater());
-                bindingDialogue.RVDocNo.setLayoutManager(new LinearLayoutManager(requireActivity()));
-                builder.setView(bindingDialogue.getRoot());
-                alertDialog_docNo=builder.create();
+                if(Tools.isConnected(requireContext())) {
+                    docNoList.clear();
+                    if (iCustomer != 0 && !binding.customer.getText().toString().equals("")) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                        bindingDialogue = DocNoDialogueBinding.inflate(getLayoutInflater());
+                        bindingDialogue.RVDocNo.setLayoutManager(new LinearLayoutManager(requireActivity()));
+                        builder.setView(bindingDialogue.getRoot());
+                        alertDialog_docNo = builder.create();
 
 //            alertDialog_invoice.setCancelable(false);
-                bindingDialogue.RVDocNo.setAdapter(docNoAdapter);
-                alertDialog_docNo.show();
-                bindingDialogue.cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alertDialog_docNo.dismiss();
+                        bindingDialogue.RVDocNo.setAdapter(docNoAdapter);
+                        alertDialog_docNo.show();
+                        bindingDialogue.cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog_docNo.dismiss();
+                            }
+                        });
+                        bindingDialogue.searchDocNo.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                                addProductByDocNo(s);
+                            }
+                        });
+
+                    } else {
+                        binding.customer.setError("select customer");
                     }
-                });
-                bindingDialogue.searchDocNo.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                        addProductByDocNo(s);
-                    }
-                });
-
-                }
-                else {
-                    binding.customer.setError("select customer");
+                }else {
+                    Toast.makeText(requireContext(), "You are Offline", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -711,89 +717,206 @@ public class SalesPurchaseReturnFragment extends Fragment {
     }
 
     private void saveMain() {
-        JSONObject jsonObjectMain=new JSONObject();
-        try{
-            jsonObjectMain.put("iTransId",iTransId);
-            jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
-            jsonObjectMain.put("iDocType",iDocType);
-            jsonObjectMain.put("iAccount1",iCustomer);
-            jsonObjectMain.put("iAccount2",0);
-            jsonObjectMain.put("sNarration",binding.description.getText().toString());
-            assert userIdS != null;
-            jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
 
-            Log.d("jsonObjecMain",jsonObjectMain.get("iTransId")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("sDocNo")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iDocType")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iAccount1")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iAccount2")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("sNarration")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iUser")+"");
+        if (Tools.isConnected(requireContext())) {
+            JSONObject jsonObjectMain = new JSONObject();
+            try {
+                jsonObjectMain.put("iTransId", iTransId);
+                jsonObjectMain.put("sDocNo", docNo);
+                jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
+                jsonObjectMain.put("iDocType", iDocType);
+                jsonObjectMain.put("iAccount1", iCustomer);
+                jsonObjectMain.put("iAccount2", 0);
+                jsonObjectMain.put("sNarration", binding.description.getText().toString());
+                assert userIdS != null;
+                jsonObjectMain.put("iUser", Integer.parseInt(userIdS));
+
+                Log.d("jsonObjecMain", jsonObjectMain.get("iTransId") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("sDocNo") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iDocType") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iAccount1") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iAccount2") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("sNarration") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iUser") + "");
 
 
-            JSONArray jsonArray=new JSONArray();
-            for (int i=0;i<bodyPartList.size();i++){
-                JSONObject jsonObject=new JSONObject();
+                JSONArray jsonArray = new JSONArray();
+                for (int i = 0; i < bodyPartList.size(); i++) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("iTransReturnId", bodyPartList.get(i).getiTransReturnId());
+                    Log.d("bodyPartList size", bodyPartList.size() + "" + i);
 
-                jsonObject.put("iTransReturnId",bodyPartList.get(i).getiTransReturnId());
+                    for (int j = 1; j <= tagTotalNumber; j++) {
+                        if (hashMapHeader.containsKey(j)) {
+                            jsonObject.put("iTag" + j, hashMapHeader.get(j));
+                        } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                            jsonObject.put("iTag" + j, bodyPartList.get(i).hashMapBody.get(j));
+                        } else {
+                            jsonObject.put("iTag" + j, 0);
+                        }
 
-                Log.d("bodyPartList size",bodyPartList.size()+""+i);
 
-                for (int j=1;j<=tagTotalNumber;j++){
-                    if(hashMapHeader.containsKey(j)){
-                        jsonObject.put("iTag"+j,hashMapHeader.get(j));
                     }
-                    else if(bodyPartList.get(i).hashMapBody.containsKey(j)){
-                        jsonObject.put("iTag"+j, bodyPartList.get(i).hashMapBody.get(j));
-                    }
-                    else {
-                        jsonObject.put("iTag"+j,0);
-                    }
 
 
+                    jsonObject.put("iProduct", bodyPartList.get(i).getiProduct());
+                    jsonObject.put("fQty", bodyPartList.get(i).getQty());
+                    jsonObject.put("fRate", bodyPartList.get(i).getRate());
+                    jsonObject.put("fDiscount", bodyPartList.get(i).getDiscount());
+                    jsonObject.put("fAddCharges", bodyPartList.get(i).getAddCharges());
+                    jsonObject.put("fVatPer", bodyPartList.get(i).getVatPer());
+                    jsonObject.put("fVAT", bodyPartList.get(i).getVat());
+                    if (bodyPartList.get(i).getRemarks().equals("")) {
+                        jsonObject.put("sRemarks", "");
+                    } else {
+                        jsonObject.put("sRemarks", bodyPartList.get(i).getRemarks());
+                    }
+                    jsonObject.put("sUnits", bodyPartList.get(i).getUnit());
+                    jsonObject.put("fNet", bodyPartList.get(i).getNet());
+
+
+                    Log.d("jsonObjecttIproduct", jsonObject.get("iProduct") + "");
+                    Log.d("jsonObjecttQty", jsonObject.get("fQty") + "");
+                    Log.d("jsonObjecttrate", jsonObject.get("fRate") + "");
+                    Log.d("jsonObjecttdis", jsonObject.get("fDiscount") + "");
+                    Log.d("jsonObjecttaddcha", jsonObject.get("fAddCharges") + "");
+                    Log.d("jsonObjecttvarper", jsonObject.get("fVatPer") + "");
+                    Log.d("jsonObjecttvat", jsonObject.get("fVAT") + "");
+                    Log.d("jsonObjecttrema", jsonObject.get("sRemarks") + "");
+
+
+                    jsonArray.put(jsonObject);
                 }
+                jsonObjectMain.put("Body", jsonArray);
+
+                uploadToAPI(jsonObjectMain);
 
 
-
-                jsonObject.put("iProduct",bodyPartList.get(i).getiProduct());
-                jsonObject.put("fQty",bodyPartList.get(i).getQty());
-                jsonObject.put("fRate",bodyPartList.get(i).getRate());
-                jsonObject.put("fDiscount",bodyPartList.get(i).getDiscount());
-                jsonObject.put("fAddCharges",bodyPartList.get(i).getAddCharges());
-                jsonObject.put("fVatPer",bodyPartList.get(i).getVatPer());
-                jsonObject.put("fVAT",bodyPartList.get(i).getVat());
-                if(bodyPartList.get(i).getRemarks().equals("")){
-                    jsonObject.put("sRemarks","");
-                }else {
-                    jsonObject.put("sRemarks",bodyPartList.get(i).getRemarks());
-                }
-                jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
-                jsonObject.put("fNet",bodyPartList.get(i).getNet());
-
-
-
-                Log.d("jsonObjecttIproduct",jsonObject.get("iProduct")+"");
-                Log.d("jsonObjecttQty",jsonObject.get("fQty")+"");
-                Log.d("jsonObjecttrate",jsonObject.get("fRate")+"");
-                Log.d("jsonObjecttdis",jsonObject.get("fDiscount")+"");
-                Log.d("jsonObjecttaddcha",jsonObject.get("fAddCharges")+"");
-                Log.d("jsonObjecttvarper",jsonObject.get("fVatPer")+"");
-                Log.d("jsonObjecttvat",jsonObject.get("fVAT")+"");
-                Log.d("jsonObjecttrema",jsonObject.get("sRemarks")+"");
-
-
-
-                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                Log.d("exception", e.getMessage());
+                e.printStackTrace();
             }
-            jsonObjectMain.put("Body",jsonArray);
+        }else {
+            saveLocally();
+        }
+    }
 
-            uploadToAPI(jsonObjectMain);
+    private void saveLocally() {
+
+        Sales_purchase_Class sp_class=new Sales_purchase_Class();
+        Cursor cursor1=helper.getDataFromS_P_return_Header();
+        if(!EditMode) {
+            if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
+                iTransId = Tools.getNewDocNoLocally(cursor1);
+            }
+        }
+        sp_class.setiTransId(iTransId);
+        sp_class.setsDocNo(docNo);
+        sp_class.setsDate(binding.date.getText().toString());
+        sp_class.setiDocType(iDocType);
+        sp_class.setiAccount1(iCustomer);
+        sp_class.setiAccount2(0);
+        sp_class.setsNarration(binding.description.getText().toString());
+        sp_class.setProcessTime(DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"");
+        sp_class.setStatus(0);
+        Log.d("responseStatus", sp_class.getStatus()+"");
+        if(helper.deleteSP_return_Header(iTransId,iDocType,docNo)) {
+            if (helper.insert_S_P_return_Header(sp_class)) {
+                InsertBodyPart_DB();
+            }
+        }
 
 
-        } catch (JSONException e) {
-            Log.d("exception",e.getMessage());
-            e.printStackTrace();
+    }
+
+    private void InsertBodyPart_DB() {
+
+        if(helper.delete_S_P_return_Body(iDocType,iTransId)) {
+            for (int i = 0; i < bodyPartList.size(); i++) {
+                Sales_purchase_Class sp_classBody = new Sales_purchase_Class();
+                Log.d("bodyPartList size", bodyPartList.size() + "" + i);
+
+                for (int j = 1; j <= tagTotalNumber; j++) {
+                    if (hashMapHeader.containsKey(j)) {
+                        loadDataTags(sp_classBody, j, hashMapHeader.get(j));
+                    } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                        loadDataTags(sp_classBody, j, bodyPartList.get(i).hashMapBody.get(j));
+                    } else {
+                        loadDataTags(sp_classBody, j, 0);
+                    }
+                }
+
+                sp_classBody.setiTransReturnId(bodyPartList.get(i).getiTransReturnId());
+                sp_classBody.setiProduct(bodyPartList.get(i).getiProduct());
+                sp_classBody.setFqty(bodyPartList.get(i).getQty());
+                sp_classBody.setfRate(bodyPartList.get(i).getRate());
+                sp_classBody.setfDiscount(bodyPartList.get(i).getDiscount());
+                sp_classBody.setfAddCharges(bodyPartList.get(i).getAddCharges());
+                sp_classBody.setFvatPer(bodyPartList.get(i).getVatPer());
+                sp_classBody.setfVat(bodyPartList.get(i).getVat());
+                sp_classBody.setsRemarks(bodyPartList.get(i).getRemarks());
+                sp_classBody.setUnit(bodyPartList.get(i).getUnit());
+                sp_classBody.setNet(bodyPartList.get(i).getNet());
+                sp_classBody.setsDocNo(docNo);
+                sp_classBody.setiDocType(iDocType);
+                sp_classBody.setiTransId(iTransId);
+                Log.d("DataBodyInsert", bodyPartList.get(i).getiTransReturnId() + " " +
+                        bodyPartList.get(i).getiProduct() + " " +
+                        bodyPartList.get(i).getQty() + " " +
+                        bodyPartList.get(i).getRate() + " " +
+                        bodyPartList.get(i).getDiscount());
+
+                if (helper.insert_S_P_return_Body(sp_classBody)) {
+                    Log.d("DataBodyInsert", "SUCCESS");
+
+                    if (i + 1 == bodyPartList.size()) {
+                        Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
+                        NavDirections actions = SalesPurchaseReturnFragmentDirections
+                                .actionSalesPurchaseReturnFragmentToSalesPurchaseReturnHistoryFragment(toolTitle, iDocType);
+                        navController.navigate(actions);
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
+    private void loadDataTags(Sales_purchase_Class sp_class, int j, Integer iTag) {
+        switch (j){
+            case 1:{
+                sp_class.setiTag1(iTag);
+                break;
+            }
+            case 2:{
+                sp_class.setiTag2(iTag);
+                break;
+            }
+            case 3:{
+                sp_class.setiTag3(iTag);
+                break;
+            }
+            case 4:{
+                sp_class.setiTag4(iTag);
+                break;
+            }
+            case 5:{
+                sp_class.setiTag5(iTag);
+                break;
+            }
+            case 6:{
+                sp_class.setiTag6(iTag);
+                break;
+            } case 7:{
+                sp_class.setiTag7(iTag);
+                break;
+            }
+            case 8:{
+                sp_class.setiTag8(iTag);
+                break;
+            }
+
         }
     }
 
@@ -811,13 +934,18 @@ public class SalesPurchaseReturnFragment extends Fragment {
                         public void onResponse(String response) {
                             if (response.contains(docNo)) {
                                 alertDialog.dismiss();
-                                Log.d("responsePost ", "successfully");
-                                Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
-                                bodyPartList.clear();
-                                NavDirections actions = SalesPurchaseReturnFragmentDirections
-                                        .actionSalesPurchaseReturnFragmentToSalesPurchaseReturnHistoryFragment(toolTitle,iDocType);
+                                if(helper.deleteSP_return_Header(iTransId,iDocType,docNo)){
+                                    if(helper.delete_S_P_return_Body(iDocType,iTransId)){
+                                        Log.d("responsePost ", "successfully");
+                                        Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
+                                        bodyPartList.clear();
+                                        NavDirections actions = SalesPurchaseReturnFragmentDirections
+                                                .actionSalesPurchaseReturnFragmentToSalesPurchaseReturnHistoryFragment(toolTitle,iDocType);
 
-                                navController.navigate(actions);
+                                        navController.navigate(actions);
+                                    }
+                                }
+
                             }
                         }
 
@@ -827,12 +955,6 @@ public class SalesPurchaseReturnFragment extends Fragment {
                             Log.d("responsePost", anError.getErrorDetail() + anError.getErrorBody() + anError.toString());
                         }
                     });
-        }
-        else {
-            Snackbar snackbar=Snackbar.make(binding.getRoot(),"No Internet",Snackbar.LENGTH_LONG);
-            snackbar.setBackgroundTint(Color.RED);
-            snackbar.setTextColor(Color.WHITE);
-            snackbar.show();
         }
     }
 
@@ -971,7 +1093,11 @@ public class SalesPurchaseReturnFragment extends Fragment {
                 int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
                 int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
                 Cursor cursor = helper.getTagName(tagId, tagDetails);
-                autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                if(tagDetails!=0){
+                    autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                }else {
+                    autoText_B_list.get(i).setText("");
+                }
                 hashMapBody.put(tagId, tagDetails);
             }
         }catch (Exception e){
@@ -1242,15 +1368,15 @@ public class SalesPurchaseReturnFragment extends Fragment {
         } else {
             toolTitle = "Sale Return History";
         }
-
+        Cursor cursor = helper.getUserCode(userIdS);
+        if (cursor!=null) {
+            userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        }
         if(Tools.isConnected(requireActivity())) {
             if (EditMode) {
                 EditValueFromAPI();
             } else {
-                Cursor cursor = helper.getUserCode(userIdS);
-                if (cursor!=null) {
-                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
-                }
+
                 ///////
 
                 AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransReturnSummary)
@@ -1289,12 +1415,106 @@ public class SalesPurchaseReturnFragment extends Fragment {
             }
         }else {
             alertDialog.dismiss();
-            Toast.makeText(requireActivity(),"No Internet", Toast.LENGTH_SHORT).show();
-            NavDirections actions = SalesPurchaseReturnFragmentDirections
-                    .actionSalesPurchaseReturnFragmentToSalesPurchaseReturnHistoryFragment(toolTitle,iDocType);
-            navController.navigate(actions);
+            Toast.makeText(requireActivity(),"Offline", Toast.LENGTH_SHORT).show();
+            if(EditMode){
+                editfromlocaldb();
+            }else {
+                Cursor cursor1=helper.getDataFromS_P_return_Header();
+//                int count=cursor1.getCount()+1;
+
+                if(cursor1.getCount()>0) {
+                    int count= Tools.getNewDocNoLocally(cursor1);
+                    Log.d("status",count+"");
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) +"-L"+ "-" + "000" + count;
+                }else {
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date() )+"-L"+ "-" + "000" + 1;
+
+                }
+            }
+
+            binding.docNo.setText(docNo);
         }
 
+    }
+
+    private void editfromlocaldb() {
+        Cursor cursorEdit_H=helper.getEditValuesHeaderS_P_return(iTransId,iDocType);
+        if(cursorEdit_H.moveToFirst()&& cursorEdit_H.getCount()>0){
+            iTransId=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Sales_purchase_Class.I_TRANS_ID));
+            docNo=cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_Class.S_DOC_NO));
+            binding.docNo.setText(docNo);
+            binding.date.setText( cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_Class.S_DATE)));
+            binding.description.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_Class.S_NARRATION)));
+            iCustomer=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Sales_purchase_Class.I_ACCOUNT_1));
+            binding.customer.setText(helper.getCustomerUsingId(iCustomer));
+            changeStatus(iTransId,docNo,1);
+        }
+        Cursor cursorEdit_B=helper.getEditValuesBodyS_P_return(iTransId,iDocType);
+        Log.d("cursorEdit_B",cursorEdit_B.getCount()+"");
+        if(cursorEdit_B.moveToFirst() && cursorEdit_B.getCount()>0) {
+            for (int i = 0; i < cursorEdit_B.getCount(); i++) {
+                for (int k = 0; k < headerListTags.size(); k++) {
+
+                    int tagDetails = cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + headerListTags.get(k)));
+                    hashMapHeader.put(headerListTags.get(k), tagDetails);
+                    Cursor tagNameCursor = helper.getTagName(headerListTags.get(k), tagDetails);
+                    if (tagDetails != 0) {
+                        autoText_H_list.get(k).setText(tagNameCursor.getString(tagNameCursor.getColumnIndex(TagDetails.S_NAME)));
+                    } else {
+                        autoText_H_list.get(k).setText("");
+                    }
+                }
+                    for (int k = 0; k < bodyListTags.size(); k++) {
+                        hashMapBody.put(bodyListTags.get(k),cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ bodyListTags.get(k))));
+                    }
+
+
+
+                float gross= cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_QTY))* cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_RATE));
+
+                BodyPart bodyPart=new BodyPart();
+                bodyPart.setiProduct( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.I_PRODUCT)));
+
+                String productName=helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.I_PRODUCT)));
+
+                bodyPart.setProductName(productName);
+                bodyPart.setQty( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_QTY)));
+                bodyPart.setGross(gross);
+                bodyPart.setNet( cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_NET)));
+                bodyPart.setRate( cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_RATE)));
+                bodyPart.setDiscount( cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_DISCOUNT)));
+                bodyPart.setAddCharges(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_ADD_CHARGES)));
+                bodyPart.setVatPer(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_VAT_PER)));
+                bodyPart.setVat(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_VAT)));
+                bodyPart.setRemarks(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(Sales_purchase_Class.S_REMARKS)));
+                bodyPart.setUnit(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(Sales_purchase_Class.S_UNITS)));
+                bodyPart.setiTransReturnId(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_Class.I_TRANS_RETURN_ID)));
+                bodyPart.setHashMapBody(hashMapBody);
+
+                bodyPartList.add(bodyPart);
+                bodyPartAdapter.notifyDataSetChanged();
+                hashMapBody=new HashMap<>();
+                if(cursorEdit_B.getCount()==i+1){
+                    binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    alertDialog.dismiss();
+                    bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(BodyPart bodyPart, int position) {
+//                            productDialogue();
+
+                            editingProductField(bodyPart,position);
+                        }
+                    });
+                }
+                cursorEdit_B.moveToNext();
+            }
+        }
+    }
+
+    private void changeStatus(int transId, String docNo, int iStatus) {
+        if(helper.changeStatus_S_P_return(transId,docNo,iStatus)){
+            Log.d("statusChange","successfully");
+        }
     }
 
     private void EditValueFromAPI() {

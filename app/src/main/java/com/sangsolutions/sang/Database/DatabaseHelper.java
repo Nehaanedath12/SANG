@@ -42,6 +42,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static  final String TABLE_SALE_PURCHASE_BODY = "t1_sale_purchase_Body";
     private static  final String TABLE_PAYMENT_RECEIPT_HEADER = "t1_payment_receipt_Header";
     private static  final String TABLE_PAYMENT_RECEIPT_BODY = "t1_payment_receipt_body";
+    private static  final String TABLE_SALE_PURCHASE_RETURN_HEADER = "t1_sale_purchase_return_Header";
+    private static  final String TABLE_SALE_PURCHASE_RETURN_BODY = "t1_sale_purchase_return_Body";
+
+    private static  final String TABLE_SALE_PURCHASE_ORDER_HEADER = "t1_sale_purchase_order_Header";
+    private static  final String TABLE_SALE_PURCHASE_ORDER_BODY = "t1_sale_purchase_order_Body";
 
 
 
@@ -187,6 +192,81 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             ");";
 
+    private static final String CREATE_TABLE_SALE_PURCHASE_RETURN_HEADER =" create table if not exists " + TABLE_SALE_PURCHASE_RETURN_HEADER + " (" +
+            "" + Sales_purchase_Class.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_ACCOUNT_1 +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_ACCOUNT_2 +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + Sales_purchase_Class.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_Class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_Class.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_Class.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+    private static final String CREATE_TABLE_SALE_PURCHASE_RETURN_BODY =" create table if not exists " + TABLE_SALE_PURCHASE_RETURN_BODY + " (" +
+            "" + Sales_purchase_Class.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+            "" + Sales_purchase_Class.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.F_QTY+  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.F_RATE + "  TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_Class.F_DISCOUNT +  " TEXT(50) DEFAULT null , "  +
+            "" + Sales_purchase_Class.F_ADD_CHARGES + " TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_Class.F_VAT_PER + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.F_VAT + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.F_NET + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_Class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_Class.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_Class.I_TRANS_RETURN_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
+
+
+    private static final String CREATE_TABLE_SALE_PURCHASE_ORDER_HEADER=" create table if not exists " + TABLE_SALE_PURCHASE_ORDER_HEADER + " (" +
+            "" + Sales_purchase_order_class.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_ACCOUNT_1 +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_ACCOUNT_2 +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + Sales_purchase_order_class.S_DEL_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + Sales_purchase_order_class.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_order_class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_order_class.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_order_class.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+
+    private static final String CREATE_TABLE_SALE_PURCHASE_ORDER_BODY =" create table if not exists " + TABLE_SALE_PURCHASE_ORDER_BODY + " (" +
+            "" + Sales_purchase_order_class.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+            "" + Sales_purchase_order_class.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.F_QTY+  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_order_class.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_order_class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_order_class.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
 
     private SQLiteDatabase db;
 
@@ -210,6 +290,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_SALE_PURCHASE_BODY);
         db.execSQL(CREATE_TABLE_PAYMENT_RECEIPT_HEADER);
         db.execSQL(CREATE_TABLE_PAYMENT_RECEIPT_BODY);
+        db.execSQL(CREATE_TABLE_SALE_PURCHASE_RETURN_HEADER);
+        db.execSQL(CREATE_TABLE_SALE_PURCHASE_RETURN_BODY);
+        db.execSQL(CREATE_TABLE_SALE_PURCHASE_ORDER_BODY);
+        db.execSQL(CREATE_TABLE_SALE_PURCHASE_ORDER_HEADER);
     }
 
     @Override
@@ -797,7 +881,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getDataFromS_P_by_Itype(int iDocType) {
         this.db=getReadableDatabase();
         Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_HEADER+" where "
-                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"'",null);
+                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"' order by "+Sales_purchase_Class.I_TRANS_ID,null);
         cursor.moveToFirst();
         return cursor;
 
@@ -987,7 +1071,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getDataFromPayRec_by_Itype(int iDocType) {
         this.db=getReadableDatabase();
         Cursor cursor=db.rawQuery("select * from "+TABLE_PAYMENT_RECEIPT_HEADER+" where "
-                +Payment_Receipt_class.I_DOC_TYPE+"='"+iDocType+"'",null);
+                +Payment_Receipt_class.I_DOC_TYPE+"='"+iDocType+"' order by "+Payment_Receipt_class.I_TRANS_ID,null);
         cursor.moveToFirst();
         return cursor;
     }
@@ -1036,5 +1120,305 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         return cursor;
 
+    }
+
+    public Cursor getDataFromS_P_return_Header() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_RETURN_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean deleteSP_return_Header(int iTransId, int iDocType, String sDocNo) {
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_RETURN_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_RETURN_HEADER, Sales_purchase_Class.S_DOC_NO + " =  ? and "
+                    + Sales_purchase_Class.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+
+    }
+
+    public boolean insert_S_P_return_Header(Sales_purchase_Class sp_class) {
+
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(Sales_purchase_Class.I_TRANS_ID,sp_class.getiTransId());
+        cv.put(Sales_purchase_Class.S_DOC_NO,sp_class.getsDocNo());
+        cv.put(Sales_purchase_Class.I_DOC_TYPE,sp_class.getiDocType());
+        cv.put(Sales_purchase_Class.I_ACCOUNT_1,sp_class.getiAccount1());
+        cv.put(Sales_purchase_Class.I_ACCOUNT_2,sp_class.getiAccount2());
+        cv.put(Sales_purchase_Class.S_NARRATION,sp_class.getsNarration());
+        cv.put(Sales_purchase_Class.S_DATE,sp_class.getsDate());
+        cv.put(Sales_purchase_Class.PROCESS_TIME,sp_class.getProcessTime());
+        cv.put(Sales_purchase_Class.STATUS,sp_class.getStatus());
+
+
+        float status = db.insert(TABLE_SALE_PURCHASE_RETURN_HEADER, null, cv);
+        return status != -1;
+    }
+
+    public boolean insert_S_P_return_Body(Sales_purchase_Class sp) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(Sales_purchase_Class.I_TAG_1,sp.getiTag1());
+        cv.put(Sales_purchase_Class.I_TAG_2,sp.getiTag2());
+        cv.put(Sales_purchase_Class.I_TAG_3,sp.getiTag3());
+        cv.put(Sales_purchase_Class.I_TAG_4,sp.getiTag4());
+        cv.put(Sales_purchase_Class.I_TAG_5,sp.getiTag5());
+        cv.put(Sales_purchase_Class.I_TAG_6,sp.getiTag6());
+        cv.put(Sales_purchase_Class.I_TAG_7,sp.getiTag7());
+        cv.put(Sales_purchase_Class.I_TAG_8,sp.getiTag8());
+
+        cv.put(Sales_purchase_Class.I_PRODUCT,sp.getiProduct());
+        cv.put(Sales_purchase_Class.F_QTY,sp.getFqty());
+        cv.put(Sales_purchase_Class.F_RATE,sp.getfRate());
+        cv.put(Sales_purchase_Class.F_DISCOUNT,sp.getfDiscount());
+        cv.put(Sales_purchase_Class.F_ADD_CHARGES,sp.getfAddCharges());
+        cv.put(Sales_purchase_Class.F_VAT_PER,sp.getFvatPer());
+        cv.put(Sales_purchase_Class.F_VAT,sp.getfVat());
+        cv.put(Sales_purchase_Class.S_REMARKS,sp.getsRemarks());
+        cv.put(Sales_purchase_Class.S_UNITS,sp.getUnit());
+        cv.put(Sales_purchase_Class.F_NET,sp.getNet());
+
+        cv.put(Sales_purchase_Class.S_DOC_NO,sp.getsDocNo());
+        cv.put(Sales_purchase_Class.I_DOC_TYPE,sp.getiDocType());
+        cv.put(Sales_purchase_Class.I_TRANS_ID,sp.getiTransId());
+        cv.put(Sales_purchase_Class.I_TRANS_RETURN_ID,sp.getiTransReturnId());
+
+        float status = db.insert(TABLE_SALE_PURCHASE_RETURN_BODY, null, cv);
+        return status != -1;
+    }
+
+    public Cursor getDataFromS_P_return_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_RETURN_HEADER+" where "
+                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"' order by "+Sales_purchase_Class.I_TRANS_ID,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean delete_S_P_return_Body(int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_RETURN_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_RETURN_BODY, Sales_purchase_Class.I_DOC_TYPE + " =  ? and "
+                    + Sales_purchase_Class.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+    }
+
+    public Cursor getEditValuesHeaderS_P_return(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_RETURN_HEADER+" where "
+                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"' and "+Sales_purchase_Class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatus_S_P_return(int transId, String docNo, int iStatus) {
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(Sales_purchase_Class.STATUS,iStatus);
+        float status=db.update(TABLE_PAYMENT_RECEIPT_HEADER,cv,  Sales_purchase_Class.I_TRANS_ID + " = ? and " + Sales_purchase_Class.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+
+    }
+
+    public Cursor getEditValuesBodyS_P_return(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_RETURN_BODY+" where "
+                +Sales_purchase_Class.I_DOC_TYPE+"='"+iDocType+"' and "+Sales_purchase_Class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public Cursor getDataFromS_P_return_HeaderPost() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_RETURN_HEADER+
+                " where status=0 union select * from "+TABLE_SALE_PURCHASE_RETURN_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getDataFromS_P_Order_Header() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean deleteSP_Order_Header(int iTransId, int iDocType, String sDocNo) {
+
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_ORDER_HEADER, Sales_purchase_order_class.S_DOC_NO + " =  ? and "
+                    + Sales_purchase_order_class.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public boolean insert_S_P_Order_Header(Sales_purchase_order_class sp_class) {
+
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(Sales_purchase_order_class.I_TRANS_ID,sp_class.getiTransId());
+        cv.put(Sales_purchase_order_class.S_DOC_NO,sp_class.getsDocNo());
+        cv.put(Sales_purchase_order_class.I_DOC_TYPE,sp_class.getiDocType());
+        cv.put(Sales_purchase_order_class.I_ACCOUNT_1,sp_class.getiAccount1());
+        cv.put(Sales_purchase_order_class.I_ACCOUNT_2,sp_class.getiAccount2());
+        cv.put(Sales_purchase_order_class.S_NARRATION,sp_class.getsNarration());
+        cv.put(Sales_purchase_order_class.S_DATE,sp_class.getsDate());
+        cv.put(Sales_purchase_order_class.S_DEL_DATE,sp_class.getsDelDate());
+        cv.put(Sales_purchase_order_class.PROCESS_TIME,sp_class.getProcessTime());
+        cv.put(Sales_purchase_order_class.STATUS,sp_class.getStatus());
+
+
+        float status = db.insert(TABLE_SALE_PURCHASE_ORDER_HEADER, null, cv);
+        return status != -1;
+    }
+
+    public boolean delete_S_P_Order_Body(int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_ORDER_BODY, Sales_purchase_order_class.I_DOC_TYPE + " =  ? and "
+                    + Sales_purchase_order_class.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+    }
+
+    public boolean insert_S_P_Order_Body(Sales_purchase_order_class sp_Order) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(Sales_purchase_order_class.I_TAG_1,sp_Order.getiTag1());
+        cv.put(Sales_purchase_order_class.I_TAG_2,sp_Order.getiTag2());
+        cv.put(Sales_purchase_order_class.I_TAG_3,sp_Order.getiTag3());
+        cv.put(Sales_purchase_order_class.I_TAG_4,sp_Order.getiTag4());
+        cv.put(Sales_purchase_order_class.I_TAG_5,sp_Order.getiTag5());
+        cv.put(Sales_purchase_order_class.I_TAG_6,sp_Order.getiTag6());
+        cv.put(Sales_purchase_order_class.I_TAG_7,sp_Order.getiTag7());
+        cv.put(Sales_purchase_order_class.I_TAG_8,sp_Order.getiTag8());
+
+        cv.put(Sales_purchase_order_class.I_PRODUCT,sp_Order.getiProduct());
+        cv.put(Sales_purchase_order_class.F_QTY,sp_Order.getFqty());
+        cv.put(Sales_purchase_order_class.S_REMARKS,sp_Order.getsRemarks());
+        cv.put(Sales_purchase_order_class.S_UNITS,sp_Order.getUnit());
+
+        cv.put(Sales_purchase_order_class.S_DOC_NO,sp_Order.getsDocNo());
+        cv.put(Sales_purchase_order_class.I_DOC_TYPE,sp_Order.getiDocType());
+        cv.put(Sales_purchase_order_class.I_TRANS_ID,sp_Order.getiTransId());
+
+        float status = db.insert(TABLE_SALE_PURCHASE_ORDER_BODY, null, cv);
+        return status != -1;
+    }
+
+    public Cursor getEditValuesHeaderS_P_Order(int iTransId, int iDocType) {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_HEADER+" where "
+                +Sales_purchase_order_class.I_DOC_TYPE+"='"+iDocType+"' and "+Sales_purchase_order_class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatus_S_P_Order(int transId, String docNo, int iStatus) {
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(Sales_purchase_order_class.STATUS,iStatus);
+        float status=db.update(TABLE_SALE_PURCHASE_ORDER_HEADER,cv,  Sales_purchase_order_class.I_TRANS_ID +
+                " = ? and " + Sales_purchase_order_class.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+    }
+
+    public Cursor getEditValuesBodyS_P_Order(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_BODY+" where "
+                +Sales_purchase_order_class.I_DOC_TYPE+"='"+iDocType+"' and "+Sales_purchase_order_class.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean deleteSP_Header_Order(int iTransId, int iDocType, String sDocNo) {
+
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_ORDER_HEADER, Sales_purchase_order_class.S_DOC_NO + " =  ? and "
+                    + Sales_purchase_order_class.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public boolean delete_S_P_Body_Order(int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_SALE_PURCHASE_ORDER_BODY, Sales_purchase_order_class.I_DOC_TYPE + " =  ? and "
+                    + Sales_purchase_order_class.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+
+    }
+
+    public Cursor getDataFromS_P_Order_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_HEADER+" where "
+                +Sales_purchase_order_class.I_DOC_TYPE+"='"+iDocType+"' order by "+Sales_purchase_order_class.I_TRANS_ID,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getDataFromS_P_Order_HeaderPost() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_SALE_PURCHASE_ORDER_HEADER+
+                " where status=0 union select * from "+TABLE_SALE_PURCHASE_ORDER_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
     }
 }

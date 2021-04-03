@@ -54,7 +54,7 @@ public class GetAccountsService extends JobService {
 
                     @Override
                     public void onError(ANError anError) {
-                        Toast.makeText(GetAccountsService.this, "enter valid Ip Address", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GetAccountsService.this, "check Ip or Internet", Toast.LENGTH_SHORT).show();
                         Log.d("response",anError.toString());
                     }
                 });
