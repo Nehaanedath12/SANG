@@ -20,15 +20,19 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
+import com.sangsolutions.sang.Adapter.QuotationAdapter.QuotationClass;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.SP_QuotationClass;
+import com.sangsolutions.sang.Database.Sales_purchase_Class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -70,6 +74,7 @@ public class QuotationHistoryFragment extends Fragment {
         historyList=new ArrayList<>();
         historyAdapter=new SalesPurchaseHistoryAdapter(requireActivity(),historyList);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerView.setAdapter(historyAdapter);
         slideDown = AnimationUtils.loadAnimation(getContext(), R.anim.move_down);
         slideUp = AnimationUtils.loadAnimation(getContext(), R.anim.move_up);
         binding.fabDelete.setVisibility(View.GONE);
@@ -97,6 +102,19 @@ public class QuotationHistoryFragment extends Fragment {
                         .actionQuotationHistoryFragmentToQuotationFragment(toolTitle).setEditMode(false)
                         .setITransId(0).setIDocType(iDocType);
                 navController.navigate(action);
+            }
+        });
+        binding.refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                binding.refresh.setRefreshing(false);
+                if(!Tools.isConnected(requireContext())){
+                    Toast.makeText(requireContext(), "No Internet!!", Toast.LENGTH_SHORT).show();
+                }
+                navController.navigate(R.id.homeFragment);
+                NavDirections action=HomeFragmentDirections.actionHomeFragmentToQuotationHistoryFragment(iDocType,toolTitle+" History");
+                navController.navigate(action);
+
             }
         });
 
@@ -152,7 +170,11 @@ public class QuotationHistoryFragment extends Fragment {
         for (int i =0;i<listSelectedItem.size();i++) {
             for (int j =0;j<historyList.size();j++) {
                 if (listSelectedItem.get(i) == j) {
-                    deleteFromAPI(historyList.get(j).getiTransId());
+                    if(Tools.isConnected(requireContext())) {
+                        deleteFromAPI(historyList.get(j).getiTransId());
+                    }else {
+                        deleteFromDB(historyList.get(j).getiTransId(),historyList.get(j).getsDocNo());
+                    }
                 }
             }
 
@@ -166,27 +188,113 @@ public class QuotationHistoryFragment extends Fragment {
 
     private void getHistoryDatas() {
         alertDialog.show();
-        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.GetTransQuotationSummary)
-                .addQueryParameter("iDocType",String.valueOf(iDocType))
-                .addQueryParameter("iUser",userIdS)
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+        Log.d("doctypee",iDocType+"");
+        if(Tools.isConnected(requireContext())) {
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransQuotationSummary)
+                    .addQueryParameter("iDocType", String.valueOf(iDocType))
+                    .addQueryParameter("iUser", userIdS)
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONArray(new JSONArrayRequestListener() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d("responseHistory", response.toString());
+
+                            loadDatas(response);
+
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            Log.d("responseHistory", anError.toString());
+
+                            alertDialog.dismiss();
+                        }
+                    });
+        }else {
+            loadDatasFromDB();
+        }
+
+    }
+
+    private void loadDatasFromDB() {
+
+        historyList.clear();
+        historyAdapter.notifyDataSetChanged();
+        alertDialog.dismiss();
+
+        Cursor cursor=helper.getDataFromQuotation_by_Itype(iDocType);
+        if(cursor.moveToFirst() && cursor!=null) {
+
+            Log.d("doctypee", cursor.getCount() + "");
+
+            for (int i = 0; i < cursor.getCount(); i++) {
+
+                SalesPurchaseHistory history=new SalesPurchaseHistory();
+                Log.d("historyList",cursor.getString(cursor.getColumnIndex(SP_QuotationClass.S_DATE))+"");
+
+                history.setsDate(cursor.getString(cursor.getColumnIndex(SP_QuotationClass.S_DATE)));
+                history.setsDocNo(cursor.getString(cursor.getColumnIndex(SP_QuotationClass.S_DOC_NO)));
+                history.setiTransId(cursor.getInt(cursor.getColumnIndex(SP_QuotationClass.I_TRANS_ID)));
+
+                int iCustomer=cursor.getInt(cursor.getColumnIndex(SP_QuotationClass.I_ACCOUNT_1));
+                String customerName=helper.getCustomerUsingId(iCustomer);
+                history.setsAccount1(customerName);
+
+                historyList.add(history);
+                historyAdapter.notifyDataSetChanged();
+                Log.d("historyList",history.getsDate()+"");
+                historyAdapter.setOnClickListener(new SalesPurchaseHistoryAdapter.OnClickListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
-                        Log.d("responseHistory",response.toString());
-
-                        loadDatas(response);
-
+                    public void onItemClick(int iTransId, int position) {
+                        if(!Tools.isConnected(requireContext())) {
+                            adapterOnItemClick(iTransId,position);
+                        }else {
+                            Toast.makeText(requireContext(), "Please Refresh", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
-                    public void onError(ANError anError) {
-                        Log.d("responseHistory",anError.toString());
+                    public void onItemLongClick(int position) {
+                        enableActionMode(position);
+                        selectionActive = true;
+                    }
 
-                        alertDialog.dismiss();
+                    @Override
+                    public void onDeleteClick(int iTransId, String sDocNo) {
+
+                        deleteFromDB(iTransId,sDocNo);
+                        loadDatasFromDB();
                     }
                 });
+                cursor.moveToNext();
+            }
+        }
+
+    }
+
+    private void deleteFromDB(int iTransId, String sDocNo) {
+
+        if(helper.deleteQuotationHeader(iTransId,iDocType,sDocNo)){
+            if(helper.delete_Quotation_Body(iDocType,iTransId)){
+                Toast.makeText(requireContext(), " Deleted from Device", Toast.LENGTH_SHORT).show();
+                historyAdapter.notifyDataSetChanged();
+
+            }
+        }
+    }
+
+    private void adapterOnItemClick(int iTransId, int position) {
+        if(!selectionActive) {
+                NavDirections action=QuotationHistoryFragmentDirections
+                        .actionQuotationHistoryFragmentToQuotationFragment(toolTitle).setEditMode(true)
+                        .setITransId(iTransId).setIDocType(iDocType);
+                navController.navigate(action);
+        }
+        else {
+            enableActionMode(position);
+        }
+
     }
 
     private void loadDatas(JSONArray response) {
@@ -214,23 +322,15 @@ public class QuotationHistoryFragment extends Fragment {
                 historyAdapter.notifyDataSetChanged();
                 if(i+1==jsonArray.length()){
                     alertDialog.dismiss();
-                    binding.recyclerView.setAdapter(historyAdapter);
+
 
                     historyAdapter.setOnClickListener(new SalesPurchaseHistoryAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(int iTransId, int position) {
-                            if(!selectionActive) {
-                                if (Tools.isConnected(requireContext())) {
-                                    NavDirections action=QuotationHistoryFragmentDirections
-                                            .actionQuotationHistoryFragmentToQuotationFragment(toolTitle).setEditMode(true)
-                                            .setITransId(iTransId).setIDocType(iDocType);
-                                    navController.navigate(action);
-                                } else {
-                                    Toast.makeText(requireContext(), "no Internet", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                            else {
-                                enableActionMode(position);
+                            if(Tools.isConnected(requireContext())) {
+                                adapterOnItemClick(iTransId,position);
+                            }else {
+                                Toast.makeText(requireContext(), "Please Refresh", Toast.LENGTH_SHORT).show();
                             }
                         }
 

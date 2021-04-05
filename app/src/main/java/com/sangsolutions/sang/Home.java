@@ -439,6 +439,9 @@ public class Home extends AppCompatActivity {
                     schedulepost.Post_PaymentReceipt(Home.this);
                     schedulepost.Post_SalePurchase_Return(Home.this);
                     schedulepost.Post_SalePurchase_Order(Home.this);
+                    schedulepost.Post_EnquiryRequest(Home.this);
+                    schedulepost.Post_Quotation(Home.this);
+                    schedulepost.Post_StockCount(Home.this);
                 }
                 handler.postDelayed(this, delay);
             }
@@ -720,6 +723,10 @@ public class Home extends AppCompatActivity {
                 return true;
             }
             else if(navController.getCurrentDestination().getId()==R.id.stockCountFragment){
+                backAlert();
+                return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.requestFragment){
                 backAlert();
                 return true;
             }

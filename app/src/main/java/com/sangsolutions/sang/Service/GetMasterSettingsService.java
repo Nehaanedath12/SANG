@@ -18,6 +18,7 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.SchedulerJob;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
@@ -31,10 +32,12 @@ public class GetMasterSettingsService extends JobService {
     DatabaseHelper helper;
     JobParameters params;
     MasterSettings settings;
+    SchedulerJob schedulerJob;
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
+        schedulerJob = new SchedulerJob();
         GetMaster();
         AndroidNetworking.initialize(this);
         return true;
@@ -105,6 +108,7 @@ public class GetMasterSettingsService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        return false;
+//        schedulerJob.SyncProduct(GetMasterSettingsService.this);
+        return true;
     }
 }

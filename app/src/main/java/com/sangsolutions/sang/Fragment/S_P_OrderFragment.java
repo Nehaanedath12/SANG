@@ -818,7 +818,11 @@ public class S_P_OrderFragment extends Fragment {
                 int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
                 int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
                 Cursor cursor = helper.getTagName(tagId, tagDetails);
-                autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                if(tagDetails!=0){
+                    autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                }else {
+                    autoText_B_list.get(i).setText("");
+                }
                 hashMapBody.put(tagId, tagDetails);
             }
         }catch (Exception e){
@@ -1187,9 +1191,6 @@ public class S_P_OrderFragment extends Fragment {
                 for (int k = 0; k < bodyListTags.size(); k++) {
                     hashMapBody.put(bodyListTags.get(k),cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ bodyListTags.get(k))));
                 }
-
-
-
 
                 BodyPart bodyPart=new BodyPart();
                 bodyPart.setiProduct( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.I_PRODUCT)));

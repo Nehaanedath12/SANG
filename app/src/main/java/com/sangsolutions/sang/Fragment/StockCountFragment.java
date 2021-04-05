@@ -59,6 +59,8 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.Sales_purchase_order_class;
+import com.sangsolutions.sang.Database.StockCountDBClass;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -189,7 +191,7 @@ public class StockCountFragment extends Fragment {
         orderBodyAdapter=new OrderBodyAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-        initialValueSettingHeader();
+
 
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -303,6 +305,9 @@ public class StockCountFragment extends Fragment {
             }
 
         }
+
+        initialValueSettingHeader();
+
         binding.barcodeI.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -483,73 +488,176 @@ public class StockCountFragment extends Fragment {
     }
 
     private void saveMain() {
+        if (Tools.isConnected(requireContext())) {
+            JSONObject jsonObjectMain = new JSONObject();
+            try {
+                jsonObjectMain.put("iTransId", iTransId);
+                jsonObjectMain.put("sDocNo", docNo);
+                jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
+                jsonObjectMain.put("sStockDate", Tools.dateFormat(binding.stockDate.getText().toString()));
+                jsonObjectMain.put("iDocType", iDocType);
+                jsonObjectMain.put("sNarration", binding.description.getText().toString());
+                assert userIdS != null;
+                jsonObjectMain.put("iUser", Integer.parseInt(userIdS));
 
-        JSONObject jsonObjectMain=new JSONObject();
-        try{
-            jsonObjectMain.put("iTransId",iTransId);
-            jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
-            jsonObjectMain.put("sStockDate",Tools.dateFormat(binding.stockDate.getText().toString()));
-            jsonObjectMain.put("iDocType",iDocType);
-            jsonObjectMain.put("sNarration",binding.description.getText().toString());
-            assert userIdS != null;
-            jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
+                Log.d("jsonObjecMain", jsonObjectMain.get("iTransId") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("sDocNo") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iDocType") + "");
 
-            Log.d("jsonObjecMain",jsonObjectMain.get("iTransId")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("sDocNo")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iDocType")+"");
-
-            Log.d("jsonObjecMain",jsonObjectMain.get("sNarration")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iUser")+"");
-
-
-            JSONArray jsonArray=new JSONArray();
-            for (int i=0;i<bodyPartList.size();i++){
-                JSONObject jsonObject=new JSONObject();
+                Log.d("jsonObjecMain", jsonObjectMain.get("sNarration") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iUser") + "");
 
 
-                Log.d("bodyPartList size",bodyPartList.size()+""+i);
+                JSONArray jsonArray = new JSONArray();
+                for (int i = 0; i < bodyPartList.size(); i++) {
+                    JSONObject jsonObject = new JSONObject();
 
-                for (int j=1;j<=tagTotalNumber;j++){
-                    if(hashMapHeader.containsKey(j)){
-                        jsonObject.put("iTag"+j,hashMapHeader.get(j));
+
+                    Log.d("bodyPartList size", bodyPartList.size() + "" + i);
+
+                    for (int j = 1; j <= tagTotalNumber; j++) {
+                        if (hashMapHeader.containsKey(j)) {
+                            jsonObject.put("iTag" + j, hashMapHeader.get(j));
+                        } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                            jsonObject.put("iTag" + j, bodyPartList.get(i).hashMapBody.get(j));
+                        } else {
+                            jsonObject.put("iTag" + j, 0);
+                        }
+
+
                     }
-                    else if(bodyPartList.get(i).hashMapBody.containsKey(j)){
-                        jsonObject.put("iTag"+j, bodyPartList.get(i).hashMapBody.get(j));
+
+                    jsonObject.put("iProduct", bodyPartList.get(i).getiProduct());
+                    jsonObject.put("fQty", bodyPartList.get(i).getQty());
+                    if (bodyPartList.get(i).getRemarks().equals("")) {
+                        jsonObject.put("sRemarks", "");
+                    } else {
+                        jsonObject.put("sRemarks", bodyPartList.get(i).getRemarks());
                     }
-                    else {
-                        jsonObject.put("iTag"+j,0);
-                    }
+                    jsonObject.put("sUnits", bodyPartList.get(i).getUnit());
 
 
+                    Log.d("jsonObjecttIproduct", jsonObject.get("iProduct") + "");
+                    Log.d("jsonObjecttQty", jsonObject.get("fQty") + "");
+                    Log.d("jsonObjecttrema", jsonObject.get("sRemarks") + "");
+
+
+                    jsonArray.put(jsonObject);
                 }
+                jsonObjectMain.put("Body", jsonArray);
 
-                jsonObject.put("iProduct",bodyPartList.get(i).getiProduct());
-                jsonObject.put("fQty",bodyPartList.get(i).getQty());
-                if(bodyPartList.get(i).getRemarks().equals("")){
-                    jsonObject.put("sRemarks","");
-                }else {
-                    jsonObject.put("sRemarks",bodyPartList.get(i).getRemarks());
-                }
-                jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
+                uploadToAPI(jsonObjectMain);
 
 
-                Log.d("jsonObjecttIproduct",jsonObject.get("iProduct")+"");
-                Log.d("jsonObjecttQty",jsonObject.get("fQty")+"");
-                Log.d("jsonObjecttrema",jsonObject.get("sRemarks")+"");
-
-
-
-                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                Log.d("exception", e.getMessage());
+                e.printStackTrace();
             }
-            jsonObjectMain.put("Body",jsonArray);
+        }else {
+            saveLocally();
+        }
+    }
 
-            uploadToAPI(jsonObjectMain);
+    private void saveLocally() {
+
+        StockCountDBClass stock_class=new StockCountDBClass();
+        Cursor cursor1=helper.getDataFromStockCountHeader();
+
+        if(!EditMode) {
+            if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
+                iTransId = Tools.getNewDocNoLocally(cursor1);
+            }
+        }
+
+        stock_class.setiTransId(iTransId);
+        stock_class.setsDocNo(docNo);
+        stock_class.setsDate(binding.date.getText().toString());
+        stock_class.setStockDate(binding.stockDate.getText().toString());
+        stock_class.setiDocType(iDocType);
+        stock_class.setsNarration(binding.description.getText().toString());
+        stock_class.setProcessTime(DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"");
+        stock_class.setStatus(0);
+        Log.d("responsePost", stock_class.getStatus()+""+iTransId+" "+iDocType+" "+docNo);
+        if(helper.deleteStockCountHeader(iTransId,iDocType,docNo)) {
+            if (helper.insertStockCount_Header(stock_class)) {
+                InsertBodyPart_DB();
+            }
+
+        }
+    }
+
+    private void InsertBodyPart_DB() {
+        if(helper.delete_StockCount_Body(iDocType,iTransId)) {
+            for (int i = 0; i < bodyPartList.size(); i++) {
+                StockCountDBClass stockClass = new StockCountDBClass();
+
+                for (int j = 1; j <= tagTotalNumber; j++) {
+                    if (hashMapHeader.containsKey(j)) {
+                        loadDataTags(stockClass, j, hashMapHeader.get(j));
+                    } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                        loadDataTags(stockClass, j, bodyPartList.get(i).hashMapBody.get(j));
+                    } else {
+                        loadDataTags(stockClass, j, 0);
+                    }
+                }
+                stockClass.setiProduct(bodyPartList.get(i).getiProduct());
+                stockClass.setFqty(bodyPartList.get(i).getQty());
+                stockClass.setsRemarks(bodyPartList.get(i).getRemarks());
+                stockClass.setUnit(bodyPartList.get(i).getUnit());
+                stockClass.setsDocNo(docNo);
+                stockClass.setiDocType(iDocType);
+                stockClass.setiTransId(iTransId);
+                if (helper.insertStockClassBody(stockClass)) {
+                    Log.d("DataBodyInsert", "SUCCESS");
+
+                    if (i + 1 == bodyPartList.size()) {
+                        Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
+                        NavDirections actions =StockCountFragmentDirections
+                                .actionStockCountFragmentToStockCountHistoryFragment(iDocType);
+                        navController.navigate(actions);
+                    }
+                }
 
 
-        } catch (JSONException e) {
-            Log.d("exception",e.getMessage());
-            e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void loadDataTags(StockCountDBClass stockClass, int j, Integer iTag) {
+        switch (j){
+            case 1:{
+                stockClass.setiTag1(iTag);
+                break;
+            }
+            case 2:{
+                stockClass.setiTag2(iTag);
+                break;
+            }
+            case 3:{
+                stockClass.setiTag3(iTag);
+                break;
+            }
+            case 4:{
+                stockClass.setiTag4(iTag);
+                break;
+            }
+            case 5:{
+                stockClass.setiTag5(iTag);
+                break;
+            }
+            case 6:{
+                stockClass.setiTag6(iTag);
+                break;
+            } case 7:{
+                stockClass.setiTag7(iTag);
+                break;
+            }
+            case 8:{
+                stockClass.setiTag8(iTag);
+                break;
+            }
+
         }
     }
 
@@ -565,12 +673,16 @@ public class StockCountFragment extends Fragment {
                         public void onResponse(String response) {
                             if (response.contains(docNo)) {
                                 alertDialog.dismiss();
-                                Log.d("responsePost ", "successfully");
-                                Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
-                                bodyPartList.clear();
-                                NavDirections actions =StockCountFragmentDirections
-                                        .actionStockCountFragmentToStockCountHistoryFragment(iDocType);
-                                navController.navigate(actions);
+                                if(helper.deleteStockCountHeader(iTransId,iDocType,docNo)) {
+                                    if (helper.delete_StockCount_Body(iDocType, iTransId)) {
+                                        Log.d("responsePost ", "successfully");
+                                        Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
+                                        bodyPartList.clear();
+                                        NavDirections actions = StockCountFragmentDirections
+                                                .actionStockCountFragmentToStockCountHistoryFragment(iDocType);
+                                        navController.navigate(actions);
+                                    }
+                                }
                             }
                         }
 
@@ -581,12 +693,7 @@ public class StockCountFragment extends Fragment {
                         }
                     });
         }
-        else {
-            Snackbar snackbar=Snackbar.make(binding.getRoot(),"No Internet",Snackbar.LENGTH_LONG);
-            snackbar.setBackgroundTint(Color.RED);
-            snackbar.setTextColor(Color.WHITE);
-            snackbar.show();
-        }
+
 
     }
 
@@ -650,7 +757,11 @@ public class StockCountFragment extends Fragment {
                 int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
                 int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
                 Cursor cursor = helper.getTagName(tagId, tagDetails);
-                autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                if(tagDetails!=0){
+                    autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                }else {
+                    autoText_B_list.get(i).setText("");
+                }
                 hashMapBody.put(tagId, tagDetails);
             }
         }catch (Exception e){
@@ -903,15 +1014,16 @@ public class StockCountFragment extends Fragment {
         StringDate=df.format(new Date());
         binding.date.setText(StringDate);
         binding.stockDate.setText(StringDate);
+        Cursor cursor = helper.getUserCode(userIdS);
+        if (cursor!=null) {
+            userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        }
 
         if(Tools.isConnected(requireActivity())) {
             if (EditMode) {
                 EditValueFromAPI();
             } else {
-                Cursor cursor = helper.getUserCode(userIdS);
-                if (cursor!=null) {
-                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
-                }
+
 
 
                 ///////
@@ -953,14 +1065,96 @@ public class StockCountFragment extends Fragment {
         }else {
             alertDialog.dismiss();
             Toast.makeText(requireActivity(),"No Internet", Toast.LENGTH_SHORT).show();
-            NavDirections actions =StockCountFragmentDirections
-                    .actionStockCountFragmentToStockCountHistoryFragment(iDocType);
-            navController.navigate(actions);
+            if (EditMode) {
+                editfromlocaldb();
+            } else {
+                Cursor cursor1 = helper.getDataFromStockCountHeader();
+                if (cursor1.getCount() > 0) {
+                    int count = Tools.getNewDocNoLocally(cursor1);
+                    Log.d("status", count + "");
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + count;
+                } else {
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + 1;
+
+                }
+            }
+
+            binding.docNo.setText(docNo);
         }
         ///
 
 
     }
+
+    private void editfromlocaldb() {
+        Cursor cursorEdit_H=helper.getEditValuesHeaderStockCount(iTransId,iDocType);
+        if(cursorEdit_H.moveToFirst()&& cursorEdit_H.getCount()>0){
+            iTransId=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(StockCountDBClass.I_TRANS_ID));
+            docNo=cursorEdit_H.getString(cursorEdit_H.getColumnIndex(StockCountDBClass.S_DOC_NO));
+            binding.docNo.setText(docNo);
+            binding.date.setText( cursorEdit_H.getString(cursorEdit_H.getColumnIndex(StockCountDBClass.S_DATE)));
+            binding.stockDate.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(StockCountDBClass.STOCK_DATE)));
+            binding.description.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(StockCountDBClass.S_NARRATION)));
+            changeStatus(iTransId,docNo,1);
+        }
+
+        Cursor cursorEdit_B=helper.getEditValuesBodyStockCount(iTransId,iDocType);
+
+        if(cursorEdit_B.moveToFirst() && cursorEdit_B.getCount()>0) {
+            for (int i = 0; i < cursorEdit_B.getCount(); i++) {
+
+                for (int k = 0; k < headerListTags.size(); k++) {
+                    int tagDetails = cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + headerListTags.get(k)));
+                    hashMapHeader.put(headerListTags.get(k), tagDetails);
+                    Cursor tagNameCursor = helper.getTagName(headerListTags.get(k), tagDetails);
+                    if (tagDetails != 0) {
+                        autoText_H_list.get(k).setText(tagNameCursor.getString(tagNameCursor.getColumnIndex(TagDetails.S_NAME)));
+
+                    } else {
+                        autoText_H_list.get(k).setText("");
+                    }
+                }
+                for (int k = 0; k < bodyListTags.size(); k++) {
+                    hashMapBody.put(bodyListTags.get(k),cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ bodyListTags.get(k))));
+                }
+
+                BodyPart bodyPart=new BodyPart();
+                bodyPart.setiProduct( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(StockCountDBClass.I_PRODUCT)));
+
+                String productName=helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(StockCountDBClass.I_PRODUCT)));
+
+                bodyPart.setProductName(productName);
+                bodyPart.setQty( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(StockCountDBClass.F_QTY)));
+                bodyPart.setRemarks(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(StockCountDBClass.S_REMARKS)));
+                bodyPart.setUnit(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(StockCountDBClass.S_UNITS)));
+                bodyPart.setHashMapBody(hashMapBody);
+
+                bodyPartList.add(bodyPart);
+                orderBodyAdapter.notifyDataSetChanged();
+                hashMapBody=new HashMap<>();
+
+                if(cursorEdit_B.getCount()==i+1){
+                    binding.boyPartRV.setAdapter(orderBodyAdapter);
+                    alertDialog.dismiss();
+                    orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(BodyPart bodyPart, int position) {
+                            editingProductField(bodyPart,position);
+                        }
+                    });
+
+                }
+                cursorEdit_B.moveToNext();
+
+            }
+        }
+    }
+
+    private void changeStatus(int transId, String docNo, int iStatus) {
+
+        if(helper.changeStatus_StockCount(transId,docNo,iStatus)){
+            Log.d("statusChange","successfully");
+        }    }
 
     private void EditValueFromAPI() {
 

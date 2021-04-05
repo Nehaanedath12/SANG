@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -88,7 +87,7 @@ public class RequestHistoryAdapter extends RecyclerView.Adapter<RequestHistoryAd
 
         void onItemLongClick(int position);
 
-        void onDeleteClick(int iTransId);
+        void onDeleteClick(int iTransId, String sDocNo);
 
         void onPDFclick(int iTransId, int position);
     }
@@ -140,7 +139,7 @@ public class RequestHistoryAdapter extends RecyclerView.Adapter<RequestHistoryAd
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        onClickListener.onDeleteClick(list.get(position).iTransId);
+                        onClickListener.onDeleteClick(list.get(position).iTransId,list.get(position).sDocNo);
                         dialog.dismiss();
                     }
                 });

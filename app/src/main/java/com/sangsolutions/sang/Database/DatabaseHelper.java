@@ -1,5 +1,6 @@
 package com.sangsolutions.sang.Database;
 
+import android.app.usage.StorageStats;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -48,7 +49,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static  final String TABLE_SALE_PURCHASE_ORDER_HEADER = "t1_sale_purchase_order_Header";
     private static  final String TABLE_SALE_PURCHASE_ORDER_BODY = "t1_sale_purchase_order_Body";
 
+    private static  final String TABLE_REQUEST_ENQUIRY_HEADER = "t1_request_enquiry_Header";
+    private static  final String TABLE_REQUEST_ENQUIRY_BODY = "t1_request_enquiry_body";
 
+    private static  final String TABLE_QUOTATION_HEADER = "t1_quotation_Header";
+    private static  final String TABLE_QUOTATION_BODY = "t1_quotation_body";
+
+    private static  final String TABLE_STOCK_COUNT_HEADER = "t1_stock_count_Header";
+    private static  final String TABLE_STOCK_COUNT_BODY = "t1_stock_count_body";
 
     private static  final String IID = "iId";
     private static  final String USER_ID = "user_Id";
@@ -268,6 +276,106 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             ");";
 
+
+    private static final String CREATE_TABLE_REQUEST_ENQUIRY_HEADER=" create table if not exists " + TABLE_REQUEST_ENQUIRY_HEADER + " (" +
+            "" + Sales_purchase_order_class.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + Sales_purchase_order_class.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + Sales_purchase_order_class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_order_class.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_order_class.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+    private static final String CREATE_TABLE_REQUEST_ENQUIRY_BODY =" create table if not exists " + TABLE_REQUEST_ENQUIRY_BODY + " (" +
+            "" + Sales_purchase_order_class.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+            "" + Sales_purchase_order_class.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.F_QTY+  " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_order_class.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+            "" + Sales_purchase_order_class.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + Sales_purchase_order_class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + Sales_purchase_order_class.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
+
+    private static final String CREATE_TABLE_QUOTATION_HEADER =" create table if not exists " + TABLE_QUOTATION_HEADER + " (" +
+            "" + SP_QuotationClass.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_ACCOUNT_1 +  " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_ACCOUNT_2 +  " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + SP_QuotationClass.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + SP_QuotationClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + SP_QuotationClass.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + SP_QuotationClass.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+    private static final String CREATE_TABLE_QUOTATION_BODY =" create table if not exists " + TABLE_QUOTATION_BODY + " (" +
+            "" + SP_QuotationClass.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+            "" + SP_QuotationClass.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.F_QTY+  " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.F_RATE + "  TEXT(50) DEFAULT null , " +
+            "" + SP_QuotationClass.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+            "" + SP_QuotationClass.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+            "" + SP_QuotationClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + SP_QuotationClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + SP_QuotationClass.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
+
+
+    private static final String CREATE_TABLE_STOCK_COUNT_HEADER=" create table if not exists " + TABLE_STOCK_COUNT_HEADER + " (" +
+            "" + StockCountDBClass.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + StockCountDBClass.STOCK_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + StockCountDBClass.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + StockCountDBClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + StockCountDBClass.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + StockCountDBClass.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+
+    private static final String CREATE_TABLE_STOCK_COUNT_BODY =" create table if not exists " + TABLE_STOCK_COUNT_BODY + " (" +
+            "" + StockCountDBClass.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+            "" + StockCountDBClass.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.F_QTY+  " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+            "" + StockCountDBClass.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+            "" + StockCountDBClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + StockCountDBClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + StockCountDBClass.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
+
     private SQLiteDatabase db;
 
     public DatabaseHelper(@Nullable Context context) {
@@ -286,6 +394,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_CURRENT_LOGIN);
         db.execSQL(CREATE_TABLE_TAG_DETAILS);
         db.execSQL(CREATE_TABLE_BANK);
+
         db.execSQL(CREATE_TABLE_SALE_PURCHASE_HEADER);
         db.execSQL(CREATE_TABLE_SALE_PURCHASE_BODY);
         db.execSQL(CREATE_TABLE_PAYMENT_RECEIPT_HEADER);
@@ -294,6 +403,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_SALE_PURCHASE_RETURN_BODY);
         db.execSQL(CREATE_TABLE_SALE_PURCHASE_ORDER_BODY);
         db.execSQL(CREATE_TABLE_SALE_PURCHASE_ORDER_HEADER);
+
+        db.execSQL(CREATE_TABLE_REQUEST_ENQUIRY_HEADER);
+        db.execSQL(CREATE_TABLE_REQUEST_ENQUIRY_BODY);
+
+        db.execSQL(CREATE_TABLE_QUOTATION_HEADER);
+        db.execSQL(CREATE_TABLE_QUOTATION_BODY);
+
+        db.execSQL(CREATE_TABLE_STOCK_COUNT_HEADER);
+        db.execSQL(CREATE_TABLE_STOCK_COUNT_BODY);
+
     }
 
     @Override
@@ -1420,5 +1539,408 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
         cursor.moveToFirst();
         return cursor;
+    }
+
+    public Cursor getDataFromRequestEnquiry_Header() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean deleteRequestEnquiry_Header(int iTransId, int iDocType, String sDocNo) {
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_REQUEST_ENQUIRY_HEADER, RequestEnquiryClass.S_DOC_NO + " =  ? and "
+                    + RequestEnquiryClass.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public boolean insertRequestEnquiry_Header(RequestEnquiryClass sp_class) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(RequestEnquiryClass.I_TRANS_ID,sp_class.getiTransId());
+        cv.put(RequestEnquiryClass.S_DOC_NO,sp_class.getsDocNo());
+        cv.put(RequestEnquiryClass.I_DOC_TYPE,sp_class.getiDocType());
+
+        cv.put(RequestEnquiryClass.S_NARRATION,sp_class.getsNarration());
+        cv.put(RequestEnquiryClass.S_DATE,sp_class.getsDate());
+        cv.put(RequestEnquiryClass.PROCESS_TIME,sp_class.getProcessTime());
+        cv.put(RequestEnquiryClass.STATUS,sp_class.getStatus());
+
+
+        float status = db.insert(TABLE_REQUEST_ENQUIRY_HEADER, null, cv);
+        return status != -1;
+    }
+
+    public boolean deleteRequestEnquiry_Body(int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_REQUEST_ENQUIRY_BODY, RequestEnquiryClass.I_DOC_TYPE + " =  ? and "
+                    + RequestEnquiryClass.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+    }
+
+    public boolean insertRequestEnquiry_Body(RequestEnquiryClass reClass) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(RequestEnquiryClass.I_TAG_1,reClass.getiTag1());
+        cv.put(RequestEnquiryClass.I_TAG_2,reClass.getiTag2());
+        cv.put(RequestEnquiryClass.I_TAG_3,reClass.getiTag3());
+        cv.put(RequestEnquiryClass.I_TAG_4,reClass.getiTag4());
+        cv.put(RequestEnquiryClass.I_TAG_5,reClass.getiTag5());
+        cv.put(RequestEnquiryClass.I_TAG_6,reClass.getiTag6());
+        cv.put(RequestEnquiryClass.I_TAG_7,reClass.getiTag7());
+        cv.put(RequestEnquiryClass.I_TAG_8,reClass.getiTag8());
+
+        cv.put(RequestEnquiryClass.I_PRODUCT,reClass.getiProduct());
+        cv.put(RequestEnquiryClass.F_QTY,reClass.getFqty());
+        cv.put(RequestEnquiryClass.S_REMARKS,reClass.getsRemarks());
+        cv.put(RequestEnquiryClass.S_UNITS,reClass.getUnit());
+
+        cv.put(RequestEnquiryClass.S_DOC_NO,reClass.getsDocNo());
+        cv.put(RequestEnquiryClass.I_DOC_TYPE,reClass.getiDocType());
+        cv.put(RequestEnquiryClass.I_TRANS_ID,reClass.getiTransId());
+
+        float status = db.insert(TABLE_REQUEST_ENQUIRY_BODY, null, cv);
+        return status != -1;
+    }
+
+    public Cursor getDataFromRequestEnquiry_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_HEADER+" where "
+                +RequestEnquiryClass.I_DOC_TYPE+"='"+iDocType+"' order by "+RequestEnquiryClass.I_TRANS_ID,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getEditValuesHeadeReqEnq(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_HEADER+" where "
+                +RequestEnquiryClass.I_DOC_TYPE+"='"+iDocType+"' and "+RequestEnquiryClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatusReqEnq(int transId, String docNo, int iStatus) {
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(RequestEnquiryClass.STATUS,iStatus);
+        float status=db.update(TABLE_REQUEST_ENQUIRY_HEADER,cv,  RequestEnquiryClass.I_TRANS_ID +
+                " = ? and " + RequestEnquiryClass.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+    }
+
+    public Cursor getEditValuesBodyReqEnq(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_BODY+" where "
+                +RequestEnquiryClass.I_DOC_TYPE+"='"+iDocType+"' and "+RequestEnquiryClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public Cursor getDataFromEnquiryRequestHeaderPost() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_HEADER+
+                " where status=0 union select * from "+TABLE_REQUEST_ENQUIRY_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public Cursor getEditValuesBodyRequestEnquiry(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_REQUEST_ENQUIRY_BODY+" where "
+                +RequestEnquiryClass.I_DOC_TYPE+"='"+iDocType+"' and "+RequestEnquiryClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+
+    public Cursor getDataFromQuotation_Header() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_QUOTATION_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean deleteQuotationHeader(int iTransId, int iDocType, String sDocNo) {
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_QUOTATION_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_QUOTATION_HEADER, SP_QuotationClass.S_DOC_NO + " =  ? and "
+                    + SP_QuotationClass.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public boolean insert_Quotation_Header(SP_QuotationClass quotationClass) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(SP_QuotationClass.I_TRANS_ID,quotationClass.getiTransId());
+        cv.put(SP_QuotationClass.S_DOC_NO,quotationClass.getsDocNo());
+        cv.put(SP_QuotationClass.I_DOC_TYPE,quotationClass.getiDocType());
+        cv.put(SP_QuotationClass.I_ACCOUNT_1,quotationClass.getiAccount1());
+        cv.put(SP_QuotationClass.I_ACCOUNT_2,quotationClass.getiAccount2());
+        cv.put(SP_QuotationClass.S_NARRATION,quotationClass.getsNarration());
+        cv.put(SP_QuotationClass.S_DATE,quotationClass.getsDate());
+        cv.put(SP_QuotationClass.PROCESS_TIME,quotationClass.getProcessTime());
+        cv.put(SP_QuotationClass.STATUS,quotationClass.getStatus());
+
+
+        float status = db.insert(TABLE_QUOTATION_HEADER, null, cv);
+        return status != -1;
+    }
+
+    public boolean delete_Quotation_Body(int iDocType, int iTransId) {
+
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_QUOTATION_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_QUOTATION_BODY, SP_QuotationClass.I_DOC_TYPE + " =  ? and "
+                    + SP_QuotationClass.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+    }
+
+    public boolean insert_Quotation_Body(SP_QuotationClass qClass) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(SP_QuotationClass.I_TAG_1,qClass.getiTag1());
+        cv.put(SP_QuotationClass.I_TAG_2,qClass.getiTag2());
+        cv.put(SP_QuotationClass.I_TAG_3,qClass.getiTag3());
+        cv.put(SP_QuotationClass.I_TAG_4,qClass.getiTag4());
+        cv.put(SP_QuotationClass.I_TAG_5,qClass.getiTag5());
+        cv.put(SP_QuotationClass.I_TAG_6,qClass.getiTag6());
+        cv.put(SP_QuotationClass.I_TAG_7,qClass.getiTag7());
+        cv.put(SP_QuotationClass.I_TAG_8,qClass.getiTag8());
+
+        cv.put(SP_QuotationClass.I_PRODUCT,qClass.getiProduct());
+        cv.put(SP_QuotationClass.F_QTY,qClass.getFqty());
+        cv.put(SP_QuotationClass.F_RATE,qClass.getfRate());
+        cv.put(SP_QuotationClass.S_REMARKS,qClass.getsRemarks());
+        cv.put(SP_QuotationClass.S_UNITS,qClass.getUnit());
+
+        cv.put(SP_QuotationClass.S_DOC_NO,qClass.getsDocNo());
+        cv.put(SP_QuotationClass.I_DOC_TYPE,qClass.getiDocType());
+        cv.put(SP_QuotationClass.I_TRANS_ID,qClass.getiTransId());
+
+        float status = db.insert(TABLE_QUOTATION_BODY, null, cv);
+        return status != -1;
+
+    }
+
+    public Cursor getDataFromQuotation_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_QUOTATION_HEADER+" where "
+                +SP_QuotationClass.I_DOC_TYPE+"='"+iDocType+"' order by "+SP_QuotationClass.I_TRANS_ID,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public Cursor getEditValuesQuotation(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_QUOTATION_HEADER+" where "
+                +SP_QuotationClass.I_DOC_TYPE+"='"+iDocType+"' and "+SP_QuotationClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatusQuotation(int transId, String docNo, int iStatus) {
+
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(Sales_purchase_Class.STATUS,iStatus);
+        float status=db.update(TABLE_QUOTATION_HEADER,cv,  SP_QuotationClass.I_TRANS_ID +
+                " = ? and " + SP_QuotationClass.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+    }
+
+    public Cursor getEditValuesBodyQuotation(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_QUOTATION_BODY+" where "
+                +SP_QuotationClass.I_DOC_TYPE+"='"+iDocType+"' and "+SP_QuotationClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getDataFromQuotation_HeaderPost() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_QUOTATION_HEADER+
+                " where status=0 union select * from "+TABLE_QUOTATION_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getDataFromStockCountHeader() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_STOCK_COUNT_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean deleteStockCountHeader(int iTransId, int iDocType, String docNo) {
+
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_STOCK_COUNT_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_STOCK_COUNT_HEADER, StockCountDBClass.S_DOC_NO + " =  ? and "
+                    + StockCountDBClass.I_DOC_TYPE + " = ?", new String[]{docNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public boolean insertStockCount_Header(StockCountDBClass sp_class) {
+
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(StockCountDBClass.I_TRANS_ID,sp_class.getiTransId());
+        cv.put(StockCountDBClass.S_DOC_NO,sp_class.getsDocNo());
+        cv.put(StockCountDBClass.I_DOC_TYPE,sp_class.getiDocType());
+
+        cv.put(StockCountDBClass.S_NARRATION,sp_class.getsNarration());
+        cv.put(StockCountDBClass.S_DATE,sp_class.getsDate());
+        cv.put(StockCountDBClass.STOCK_DATE,sp_class.getStockDate());
+        cv.put(StockCountDBClass.PROCESS_TIME,sp_class.getProcessTime());
+        cv.put(StockCountDBClass.STATUS,sp_class.getStatus());
+
+
+        float status = db.insert(TABLE_STOCK_COUNT_HEADER, null, cv);
+        return status != -1;
+    }
+
+    public boolean delete_StockCount_Body(int iDocType, int iTransId) {
+
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_STOCK_COUNT_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_STOCK_COUNT_BODY, StockCountDBClass.I_DOC_TYPE + " =  ? and "
+                    + StockCountDBClass.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+    }
+
+    public boolean insertStockClassBody(StockCountDBClass stockClass) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(StockCountDBClass.I_TAG_1,stockClass.getiTag1());
+        cv.put(StockCountDBClass.I_TAG_2,stockClass.getiTag2());
+        cv.put(StockCountDBClass.I_TAG_3,stockClass.getiTag3());
+        cv.put(StockCountDBClass.I_TAG_4,stockClass.getiTag4());
+        cv.put(StockCountDBClass.I_TAG_5,stockClass.getiTag5());
+        cv.put(StockCountDBClass.I_TAG_6,stockClass.getiTag6());
+        cv.put(StockCountDBClass.I_TAG_7,stockClass.getiTag7());
+        cv.put(StockCountDBClass.I_TAG_8,stockClass.getiTag8());
+
+        cv.put(StockCountDBClass.I_PRODUCT,stockClass.getiProduct());
+        cv.put(StockCountDBClass.F_QTY,stockClass.getFqty());
+        cv.put(StockCountDBClass.S_REMARKS,stockClass.getsRemarks());
+        cv.put(StockCountDBClass.S_UNITS,stockClass.getUnit());
+
+        cv.put(StockCountDBClass.S_DOC_NO,stockClass.getsDocNo());
+        cv.put(StockCountDBClass.I_DOC_TYPE,stockClass.getiDocType());
+        cv.put(StockCountDBClass.I_TRANS_ID,stockClass.getiTransId());
+
+        float status = db.insert(TABLE_STOCK_COUNT_BODY, null, cv);
+        return status != -1;
+
+    }
+
+    public Cursor getDataFromStockCount_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_STOCK_COUNT_HEADER+" where "
+                +StockCountDBClass.I_DOC_TYPE+"='"+iDocType+"' order by "+StockCountDBClass.I_TRANS_ID,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getEditValuesHeaderStockCount(int iTransId, int iDocType) {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_STOCK_COUNT_HEADER+" where "
+                +StockCountDBClass.I_DOC_TYPE+"='"+iDocType+"' and "+StockCountDBClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatus_StockCount(int transId, String docNo, int iStatus) {
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(Sales_purchase_order_class.STATUS,iStatus);
+        float status=db.update(TABLE_STOCK_COUNT_HEADER,cv,  StockCountDBClass.I_TRANS_ID +
+                " = ? and " + StockCountDBClass.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+
+    }
+
+    public Cursor getEditValuesBodyStockCount(int iTransId, int iDocType) {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_STOCK_COUNT_BODY+" where "
+                +StockCountDBClass.I_DOC_TYPE+"='"+iDocType+"' and "+StockCountDBClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getDataFromStockCountHeaderPost() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_STOCK_COUNT_HEADER+
+                " where status=0 union select * from "+TABLE_STOCK_COUNT_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+
     }
 }

@@ -22,6 +22,7 @@ public class SchedulerJob {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void SyncMasterSettings(Context context) {
+        Log.d("SyncMasterSettings","SyncMasterSettings");
 
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
@@ -36,6 +37,7 @@ public class SchedulerJob {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void SyncAccounts(Context context) {
+        Log.d("SyncAccounts","SyncAccounts");
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobInfo job = new JobInfo.Builder(

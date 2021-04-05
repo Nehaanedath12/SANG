@@ -49,6 +49,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
 import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
+import com.sangsolutions.sang.Adapter.OrderBodyAdapter.OrderBodyAdapter;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.Products.ProductsAdapter;
 import com.sangsolutions.sang.Adapter.RequestBodyAdapter.RequestBodyAdapter;
@@ -59,6 +60,8 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.RequestEnquiryClass;
+import com.sangsolutions.sang.Database.Sales_purchase_order_class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -193,7 +196,7 @@ public class RequestFragment extends Fragment {
         bodyPartAdapter=new RequestBodyAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-        initialValueSettingHeader();
+
 
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -311,6 +314,8 @@ public class RequestFragment extends Fragment {
                 }
             }
         }
+
+        initialValueSettingHeader();
 
         binding.barcodeI.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -481,72 +486,172 @@ public class RequestFragment extends Fragment {
     }
 
     private void saveMain() {
-        JSONObject jsonObjectMain=new JSONObject();
-        try{
-            jsonObjectMain.put("iTransId",iTransId);
-            jsonObjectMain.put("sDocNo",docNo);
-            jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
-            jsonObjectMain.put("iDocType",iDocType);
-            jsonObjectMain.put("sNarration",binding.description.getText().toString());
-            assert userIdS != null;
-            jsonObjectMain.put("iUser",Integer.parseInt(userIdS));
+        if (Tools.isConnected(requireContext())) {
+            JSONObject jsonObjectMain = new JSONObject();
+            try {
+                jsonObjectMain.put("iTransId", iTransId);
+                jsonObjectMain.put("sDocNo", docNo);
+                jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
+                jsonObjectMain.put("iDocType", iDocType);
+                jsonObjectMain.put("sNarration", binding.description.getText().toString());
+                assert userIdS != null;
+                jsonObjectMain.put("iUser", Integer.parseInt(userIdS));
 
-            Log.d("jsonObjecMain",jsonObjectMain.get("iTransId")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("sDocNo")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("sNarration")+"");
-            Log.d("jsonObjecMain",jsonObjectMain.get("iUser")+"");
-
-
-            JSONArray jsonArray=new JSONArray();
-            for (int i=0;i<bodyPartList.size();i++){
-                JSONObject jsonObject=new JSONObject();
+                Log.d("jsonObjecMain", jsonObjectMain.get("iTransId") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("sDocNo") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("sNarration") + "");
+                Log.d("jsonObjecMain", jsonObjectMain.get("iUser") + "");
 
 
-                Log.d("bodyPartList size",bodyPartList.size()+""+i);
+                JSONArray jsonArray = new JSONArray();
+                for (int i = 0; i < bodyPartList.size(); i++) {
+                    JSONObject jsonObject = new JSONObject();
 
-                for (int j=1;j<=tagTotalNumber;j++){
-                    if(hashMapHeader.containsKey(j)){
-                        jsonObject.put("iTag"+j,hashMapHeader.get(j));
+
+                    Log.d("bodyPartList size", bodyPartList.size() + "" + i);
+
+                    for (int j = 1; j <= tagTotalNumber; j++) {
+                        if (hashMapHeader.containsKey(j)) {
+                            jsonObject.put("iTag" + j, hashMapHeader.get(j));
+                        } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                            jsonObject.put("iTag" + j, bodyPartList.get(i).hashMapBody.get(j));
+                        } else {
+                            jsonObject.put("iTag" + j, 0);
+                        }
+
+
                     }
-                    else if(bodyPartList.get(i).hashMapBody.containsKey(j)){
-                        jsonObject.put("iTag"+j, bodyPartList.get(i).hashMapBody.get(j));
+
+                    jsonObject.put("iProduct", bodyPartList.get(i).getiProduct());
+                    jsonObject.put("fQty", bodyPartList.get(i).getQty());
+                    if (bodyPartList.get(i).getRemarks().equals("")) {
+                        jsonObject.put("sRemarks", "");
+                    } else {
+                        jsonObject.put("sRemarks", bodyPartList.get(i).getRemarks());
                     }
-                    else {
-                        jsonObject.put("iTag"+j,0);
-                    }
+                    jsonObject.put("sUnits", bodyPartList.get(i).getUnit());
 
 
+                    Log.d("jsonObjecttIproduct", jsonObject.get("iProduct") + "");
+                    Log.d("jsonObjecttQty", jsonObject.get("fQty") + "");
+                    Log.d("jsonObjecttrema", jsonObject.get("sRemarks") + "");
+
+
+                    jsonArray.put(jsonObject);
                 }
+                jsonObjectMain.put("Body", jsonArray);
 
-                jsonObject.put("iProduct",bodyPartList.get(i).getiProduct());
-                jsonObject.put("fQty",bodyPartList.get(i).getQty());
-                if(bodyPartList.get(i).getRemarks().equals("")){
-                    jsonObject.put("sRemarks","");
-                }else {
-                    jsonObject.put("sRemarks",bodyPartList.get(i).getRemarks());
-                }
-                jsonObject.put("sUnits",bodyPartList.get(i).getUnit());
+                uploadToAPI(jsonObjectMain);
 
 
-
-                Log.d("jsonObjecttIproduct",jsonObject.get("iProduct")+"");
-                Log.d("jsonObjecttQty",jsonObject.get("fQty")+"");
-                Log.d("jsonObjecttrema",jsonObject.get("sRemarks")+"");
-
-
-
-                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                Log.d("exception", e.getMessage());
+                e.printStackTrace();
             }
-            jsonObjectMain.put("Body",jsonArray);
-
-            uploadToAPI(jsonObjectMain);
-
-
-        } catch (JSONException e) {
-            Log.d("exception",e.getMessage());
-            e.printStackTrace();
+        }else {
+            saveLocally();
         }
 
+    }
+
+    private void saveLocally() {
+        RequestEnquiryClass re_class=new RequestEnquiryClass();
+        Cursor cursor1=helper.getDataFromRequestEnquiry_Header();
+        if(!EditMode) {
+            if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
+                iTransId = Tools.getNewDocNoLocally(cursor1);
+            }
+        }
+        re_class.setiTransId(iTransId);
+        re_class.setsDocNo(docNo);
+        re_class.setsDate(binding.date.getText().toString());
+        re_class.setiDocType(iDocType);
+        re_class.setsNarration(binding.description.getText().toString());
+        re_class.setProcessTime(DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"");
+        re_class.setStatus(0);
+        Log.d("responsePost", re_class.getStatus()+"");
+        if(helper.deleteRequestEnquiry_Header(iTransId,iDocType,docNo)) {
+            if (helper.insertRequestEnquiry_Header(re_class)) {
+                InsertBodyPart_DB();
+            }
+
+        }
+
+
+    }
+
+    private void InsertBodyPart_DB() {
+        if(helper.deleteRequestEnquiry_Body(iDocType,iTransId)) {
+
+            for (int i = 0; i < bodyPartList.size(); i++) {
+                RequestEnquiryClass reClass = new RequestEnquiryClass();
+                for (int j = 1; j <= tagTotalNumber; j++) {
+                    if (hashMapHeader.containsKey(j)) {
+                        loadDataTags(reClass, j, hashMapHeader.get(j));
+                    } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
+                        loadDataTags(reClass, j, bodyPartList.get(i).hashMapBody.get(j));
+                    } else {
+                        loadDataTags(reClass, j, 0);
+                    }
+                }
+
+                reClass.setiProduct(bodyPartList.get(i).getiProduct());
+                reClass.setFqty(bodyPartList.get(i).getQty());
+                reClass.setsRemarks(bodyPartList.get(i).getRemarks());
+                reClass.setUnit(bodyPartList.get(i).getUnit());
+                reClass.setsDocNo(docNo);
+                reClass.setiDocType(iDocType);
+                reClass.setiTransId(iTransId);
+                Log.d("DataBodyInsert", "deleted");
+                if (helper.insertRequestEnquiry_Body(reClass)) {
+                    Log.d("DataBodyInsert", "SUCCESS");
+
+                    if (i + 1 == bodyPartList.size()) {
+                        Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
+                        NavDirections actions = RequestFragmentDirections
+                                .actionRequestFragmentToRequestHistoryFragment(iDocType,toolTitle);
+                        navController.navigate(actions);
+                    }
+                }
+            }
+        }
+    }
+
+    private void loadDataTags(RequestEnquiryClass re_class, int j, Integer iTag) {
+        switch (j){
+            case 1:{
+                re_class.setiTag1(iTag);
+                break;
+            }
+            case 2:{
+                re_class.setiTag2(iTag);
+                break;
+            }
+            case 3:{
+                re_class.setiTag3(iTag);
+                break;
+            }
+            case 4:{
+                re_class.setiTag4(iTag);
+                break;
+            }
+            case 5:{
+                re_class.setiTag5(iTag);
+                break;
+            }
+            case 6:{
+                re_class.setiTag6(iTag);
+                break;
+            } case 7:{
+                re_class.setiTag7(iTag);
+                break;
+            }
+            case 8:{
+                re_class.setiTag8(iTag);
+                break;
+            }
+
+        }
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain) {
@@ -563,12 +668,17 @@ public class RequestFragment extends Fragment {
                         public void onResponse(String response) {
                             if (response.contains(docNo)) {
                                 alertDialog.dismiss();
-                                Log.d("responsePost ", "successfully");
-                                Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
-                                bodyPartList.clear();
-                                NavDirections actions = RequestFragmentDirections
-                                        .actionRequestFragmentToRequestHistoryFragment(iDocType,toolTitle);
-                                navController.navigate(actions);
+                                if(helper.deleteRequestEnquiry_Header(iTransId,iDocType,docNo)) {
+                                    if (helper.deleteRequestEnquiry_Body(iDocType, iTransId)) {
+
+                                        Log.d("responsePost ", "successfully");
+                                        Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
+                                        bodyPartList.clear();
+                                        NavDirections actions = RequestFragmentDirections
+                                                .actionRequestFragmentToRequestHistoryFragment(iDocType, toolTitle);
+                                        navController.navigate(actions);
+                                    }
+                                }
                             }
                         }
 
@@ -579,12 +689,7 @@ public class RequestFragment extends Fragment {
                         }
                     });
         }
-        else {
-            Snackbar snackbar=Snackbar.make(binding.getRoot(),"No Internet",Snackbar.LENGTH_LONG);
-            snackbar.setBackgroundTint(Color.RED);
-            snackbar.setTextColor(Color.WHITE);
-            snackbar.show();
-        }
+
     }
 
     private void saveBodyPartProduct() {
@@ -651,6 +756,11 @@ public class RequestFragment extends Fragment {
                 int tagId = (int) bodyPartList.get(position).hashMapBody.keySet().toArray()[i];
                 int tagDetails = (int) bodyPartList.get(position).hashMapBody.values().toArray()[i];
                 Cursor cursor = helper.getTagName(tagId, tagDetails);
+                if(tagDetails!=0){
+                    autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+                }else {
+                    autoText_B_list.get(i).setText("");
+                }
                 autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
                 hashMapBody.put(tagId, tagDetails);
             }
@@ -887,17 +997,15 @@ public class RequestFragment extends Fragment {
             toolTitle = "Enquiry Summary";
         }
 
+        Cursor cursor = helper.getUserCode(userIdS);
+        if (cursor!=null) {
+            userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        }
 
         if(Tools.isConnected(requireActivity())) {
             if (EditMode) {
                 EditValueFromAPI();
             } else {
-                Cursor cursor = helper.getUserCode(userIdS);
-                if (cursor!=null) {
-                    userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
-                }
-
-
                 ///////
 
                 AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransRequestSummary)
@@ -927,6 +1035,7 @@ public class RequestFragment extends Fragment {
                             @Override
                             public void onError(ANError anError) {
                                 Log.d("responseTotalNumber", anError.toString());
+                                Toast.makeText(requireContext(), anError.getErrorBody(), Toast.LENGTH_SHORT).show();
                                 alertDialog.dismiss();
                                 NavDirections actions = RequestFragmentDirections
                                         .actionRequestFragmentToRequestHistoryFragment(iDocType,toolTitle);
@@ -937,11 +1046,92 @@ public class RequestFragment extends Fragment {
         }else {
             alertDialog.dismiss();
             Toast.makeText(requireActivity(),"No Internet", Toast.LENGTH_SHORT).show();
-            NavDirections actions = RequestFragmentDirections
-                    .actionRequestFragmentToRequestHistoryFragment(iDocType,toolTitle);
-            navController.navigate(actions);
+            if (EditMode) {
+                editfromlocaldb();
+            } else {
+                Cursor cursor1 = helper.getDataFromRequestEnquiry_Header();
+                if (cursor1.getCount() > 0) {
+                    int count = Tools.getNewDocNoLocally(cursor1);
+                    Log.d("status", count + "");
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + count;
+                } else {
+                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + 1;
+
+                }
+            }
+
+            binding.docNo.setText(docNo);
         }
 
+    }
+
+    private void editfromlocaldb() {
+        Cursor cursorEdit_H=helper.getEditValuesHeadeReqEnq(iTransId,iDocType);
+
+        if(cursorEdit_H.moveToFirst()&& cursorEdit_H.getCount()>0){
+            iTransId=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(RequestEnquiryClass.I_TRANS_ID));
+            docNo=cursorEdit_H.getString(cursorEdit_H.getColumnIndex(RequestEnquiryClass.S_DOC_NO));
+            binding.docNo.setText(docNo);
+            binding.date.setText( cursorEdit_H.getString(cursorEdit_H.getColumnIndex(RequestEnquiryClass.S_DATE)));
+            binding.description.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(RequestEnquiryClass.S_NARRATION)));
+            changeStatus(iTransId,docNo,1);
+        }
+
+
+        Cursor cursorEdit_B=helper.getEditValuesBodyReqEnq(iTransId,iDocType);
+
+
+        if(cursorEdit_B.moveToFirst() && cursorEdit_B.getCount()>0) {
+            for (int i = 0; i < cursorEdit_B.getCount(); i++) {
+                for (int k = 0; k < headerListTags.size(); k++) {
+                    int tagDetails = cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + headerListTags.get(k)));
+                    hashMapHeader.put(headerListTags.get(k), tagDetails);
+                    Cursor tagNameCursor = helper.getTagName(headerListTags.get(k), tagDetails);
+                    if (tagDetails!=0) {
+                        autoText_H_list.get(k).setText(tagNameCursor.getString(tagNameCursor.getColumnIndex(TagDetails.S_NAME)));
+
+                    } else {
+                        autoText_H_list.get(k).setText("");
+                    }
+                }
+                for (int k = 0; k < bodyListTags.size(); k++) {
+                    hashMapBody.put(bodyListTags.get(k), cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + bodyListTags.get(k))));
+                }
+                RequestClass bodyPart=new RequestClass();
+                bodyPart.setiProduct( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(RequestEnquiryClass.I_PRODUCT)));
+
+                String productName=helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(RequestEnquiryClass.I_PRODUCT)));
+
+                bodyPart.setProductName(productName);
+                bodyPart.setQty( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(RequestEnquiryClass.F_QTY)));
+                bodyPart.setRemarks(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(RequestEnquiryClass.S_REMARKS)));
+                bodyPart.setUnit(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(RequestEnquiryClass.S_UNITS)));
+                bodyPart.setHashMapBody(hashMapBody);
+
+                bodyPartList.add(bodyPart);
+                bodyPartAdapter.notifyDataSetChanged();
+                hashMapBody=new HashMap<>();
+
+                if(cursorEdit_B.getCount()==i+1){
+                    binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    alertDialog.dismiss();
+
+                    bodyPartAdapter.setOnClickListener(new RequestBodyAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(RequestClass requestClass, int position) {
+                            editingProductField(bodyPart,position);
+                        }
+                    });
+                }
+                cursorEdit_B.moveToNext();
+            }
+        }
+    }
+
+    private void changeStatus(int transId, String docNo, int iStatus) {
+        if(helper.changeStatusReqEnq(transId,docNo,iStatus)){
+            Log.d("statusChange","successfully");
+        }
     }
 
     private void EditValueFromAPI() {
