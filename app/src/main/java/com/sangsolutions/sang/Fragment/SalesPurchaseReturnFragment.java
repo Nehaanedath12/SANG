@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
@@ -46,7 +45,6 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
 import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
@@ -83,8 +81,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
-import io.fotoapparat.parameter.Flash;
 
 public class SalesPurchaseReturnFragment extends Fragment {
 
@@ -369,7 +365,11 @@ public class SalesPurchaseReturnFragment extends Fragment {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    deleteAll();
+                                    if(Tools.isConnected(requireContext())) {
+                                        deleteAllFromAPI();
+                                    }else {
+                                        deleteAllFromDB();
+                                    }
 
                                 }
                             })
@@ -574,7 +574,20 @@ public class SalesPurchaseReturnFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void deleteAll() {
+    private void deleteAllFromDB() {
+
+        if(helper.deleteSP_return_Header(iTransId,iDocType,docNo)){
+            if(helper.delete_S_P_return_Body(iDocType,iTransId)){
+                Log.d("responsePost ", "successfully");
+                NavDirections actions = SalesPurchaseReturnFragmentDirections
+                        .actionSalesPurchaseReturnFragmentToSalesPurchaseReturnHistoryFragment(toolTitle,iDocType);
+                navController.navigate(actions);
+                Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void deleteAllFromAPI() {
         AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransReturn)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
@@ -721,6 +734,9 @@ public class SalesPurchaseReturnFragment extends Fragment {
         if (Tools.isConnected(requireContext())) {
             JSONObject jsonObjectMain = new JSONObject();
             try {
+                if(docNo.contains("L")){
+                    iTransId=0;
+                }
                 jsonObjectMain.put("iTransId", iTransId);
                 jsonObjectMain.put("sDocNo", docNo);
                 jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
@@ -965,7 +981,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("")){
-                if(!binding.rateProduct.getText().toString().equals("")){
+                if(!binding.rateProduct.getText().toString().equals("") && !binding.rateProduct.getText().toString().equals(".")){
 
 
                     BodyPart bodyPart=new BodyPart();
@@ -976,15 +992,15 @@ public class SalesPurchaseReturnFragment extends Fragment {
                     gross=qty*rate;
 
 
-                    if(!binding.disProduct.getText().toString().equals("")){
+                    if(!binding.disProduct.getText().toString().equals("")&& !binding.disProduct.getText().toString().equals(".")){
                         discount=Float.parseFloat(binding.disProduct.getText().toString());
                     }
 
 
-                    if(!binding.addChargesProduct.getText().toString().equals("")){
+                    if(!binding.addChargesProduct.getText().toString().equals("")&& !binding.addChargesProduct.getText().toString().equals(".")){
                         addCharges=Float.parseFloat(binding.addChargesProduct.getText().toString());
                     }
-                    if(!binding.vatPerProduct.getText().toString().equals("")){
+                    if(!binding.vatPerProduct.getText().toString().equals("")&& !binding.vatPerProduct.getText().toString().equals(".")){
                         vatPer=Float.parseFloat(binding.vatPerProduct.getText().toString());
                         vat=((vatPer/100)*(gross-discount+addCharges));
                     }
@@ -1043,8 +1059,8 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
                     ////////////////////////////////////////editProduct
 
-                }else {binding.rateProduct.setError("no Rate");}
-            }else {binding.qtyProduct.setError("no qty");}
+                }else {binding.rateProduct.setError("Enter Rate");}
+            }else {binding.qtyProduct.setError("Enter qty");}
         }else {binding.productName.setError("enter valid product");}
 
 
@@ -1379,7 +1395,7 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
                 ///////
 
-                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransReturnSummary)
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetNextDocNo)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -1387,14 +1403,12 @@ public class SalesPurchaseReturnFragment extends Fragment {
                         .getAsJSONArray(new JSONArrayRequestListener() {
                             @Override
                             public void onResponse(JSONArray response) {
-                                Log.d("responseHistory", response.toString());
+                                Log.d("responseDocNo", response.toString());
                                 try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
                                     if(jsonArray.length()>0) {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
-                                    }else {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + 1;
-
+                                        JSONObject jsonObject=jsonArray.getJSONObject(0);
+                                        docNo=jsonObject.getString("Column1");
                                     }
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
@@ -1425,9 +1439,9 @@ public class SalesPurchaseReturnFragment extends Fragment {
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("status",count+"");
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) +"-L"+ "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
                 }else {
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date() )+"-L"+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
 
                 }
             }

@@ -63,7 +63,12 @@ public class Post_SalePurchase_ReturnService extends JobService {
                         JSONObject jsonObjectMain=new JSONObject();
                         try {
 
-                            jsonObjectMain.put("iTransId", "0");
+                            if(docNo.contains("L")) {
+                                jsonObjectMain.put("iTransId", "0");
+                            }
+                            else {
+                                jsonObjectMain.put("iTransId", iTransId);
+                            }
                             jsonObjectMain.put("sDocNo", cursorHeader.getString(cursorHeader.getColumnIndex(Sales_purchase_Class.S_DOC_NO)));
                             jsonObjectMain.put("sDate", Tools.dateFormat(cursorHeader.getString(cursorHeader.getColumnIndex(Sales_purchase_Class.S_DATE))));
                             jsonObjectMain.put("iDocType",  cursorHeader.getInt(cursorHeader.getColumnIndex(Sales_purchase_Class.I_DOC_TYPE)));
@@ -135,7 +140,7 @@ public class Post_SalePurchase_ReturnService extends JobService {
                 .getAsString(new StringRequestListener() {
                     @Override
                     public void onResponse(String response) {
-                        if (response.contains(docNo)) {
+                        if (response.contains("-")) {
                             if(helper.deleteSP_return_Header(iTransId,iDocType,docNo)){
                                 if(helper.delete_S_P_return_Body(iDocType,iTransId)){
                                     Log.d("responsePost ", "successfully");

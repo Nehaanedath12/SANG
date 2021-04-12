@@ -5,10 +5,7 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -38,23 +35,93 @@ public class GetMasterTagDetails extends JobService {
         this.params=params;
         Log.d("homeFragment","homeFragmentS"+"initial");
 
-        GetAllTag();
+
+        if(helper.getTagDetailsCount()==0) {
+            GetAllTag();
+        }else {
+            UpdateTagAllDetails();
+        }
         return true;
     }
+
+    private void UpdateTagAllDetails() {
+        for (int i=1;i<=8;i++) {
+            UpdateTag_Details(i);
+            Log.d("homeFragment","homeFragmentUp"+i);
+        }
+    }
+
+    private void UpdateTag_Details(int iType) {
+        int maxId=helper.getTagDetailsMaxId();
+        AndroidNetworking.get("http://"+  new Tools().getIP(GetMasterTagDetails.this) +URLs.GetUpdateMasterTagDetails)
+                .addQueryParameter("MaxId", String.valueOf(maxId))
+                .addQueryParameter("iType", String.valueOf(iType))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseTag_Details",response.toString());
+                        updateTagDetailsValues(response,String.valueOf(iType));
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseMaster",anError.toString());
+                    }
+                });
+    }
+
+    private void updateTagDetailsValues(JSONObject response, String iType) {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                JSONArray jsonArray = null;
+                try {
+                    jsonArray = new JSONArray(response.getString("Table"));
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    int iStatus = jsonObject.getInt("iStatus");
+                    Log.d("iStatus", iStatus + "");
+                    details = new TagDetails(
+                            jsonObject.getString(TagDetails.S_CODE),
+                            jsonObject.getString(TagDetails.S_NAME),
+                            jsonObject.getString(TagDetails.S_ALT_NAME),
+                            jsonObject.getInt(TagDetails.I_ID),
+                            iType);
+
+                    if (iStatus == 0) {
+                        if (helper.insertMasterTag(details)) {
+                            Log.d("successUpdate", "Tag UpdateInsert successfully" + i);
+                        }
+                    } else if (iStatus == 1) {
+                        if (helper.editTagDetails(details,iType)) {
+                            Log.d("successUpdate", "Tag UpdateEdit successfully " + i);
+
+                        }
+                    }
+                    else if(iStatus==2){
+                        if(helper.deleteTagDetails(details,iType)){
+                            Log.d("successUpdate", "Tag Update Delete successfully " + i);
+                        }
+                    }
+
+                }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };asyncTask.execute();
+
+        }
 
     private void GetAllTag() {
         for (int i=1;i<=8;i++) {
             GetTag_Details(i);
             Log.d("homeFragment","homeFragmentS"+i);
-            if(i==8){
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    public void run() {
-                        Toast.makeText(GetMasterTagDetails.this, "TAG Synced", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-            }
         }
     }
 
@@ -93,12 +160,7 @@ public class GetMasterTagDetails extends JobService {
                                 jsonObject.getString(TagDetails.S_ALT_NAME),
                                 jsonObject.getInt(TagDetails.I_ID),
                                 iType);
-                        if(helper.checkTagDetailsById(jsonObject.getString(TagDetails.I_ID),iType)){
-                            if(helper.checkAllDataMasterTag(details)){
-                                Log.d("success","tag details Updated successfully "+i);
-                            }
-                        }
-                        else if( helper.insertMasterTag(details)){
+                      if( helper.insertMasterTag(details)){
                             Log.d("success","tag details  added successfully "+i);
                         }
 

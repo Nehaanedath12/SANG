@@ -581,9 +581,9 @@ public class Sale_Purchase_Fragment extends Fragment {
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("status",count+"");
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) +"-L"+ "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
                 }else {
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date() )+"-L"+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
 
                 }
             }
@@ -820,6 +820,9 @@ public class Sale_Purchase_Fragment extends Fragment {
         if (Tools.isConnected(requireContext())) {
             JSONObject jsonObjectMain = new JSONObject();
             try {
+                if(docNo.contains("L")){
+                   iTransId=0;
+                }
                 jsonObjectMain.put("iTransId", iTransId);
                 jsonObjectMain.put("sDocNo", docNo);
                 jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
@@ -1051,8 +1054,8 @@ public class Sale_Purchase_Fragment extends Fragment {
         int qty;
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
-            if(!binding.qtyProduct.getText().toString().equals("")){
-                if(!binding.rateProduct.getText().toString().equals("")){
+            if(!binding.qtyProduct.getText().toString().equals("") ){
+                if(!binding.rateProduct.getText().toString().equals("") && ! binding.rateProduct.getText().toString().equals(".")){
 
                     BodyPart bodyPart=new BodyPart();
 
@@ -1063,15 +1066,15 @@ public class Sale_Purchase_Fragment extends Fragment {
                         gross=qty*rate;
 
 
-                    if(!binding.disProduct.getText().toString().equals("")){
+                    if(!binding.disProduct.getText().toString().equals("") && !binding.disProduct.getText().toString().equals(".")){
                         discount=Float.parseFloat(binding.disProduct.getText().toString());
                     }
 
 
-                    if(!binding.addChargesProduct.getText().toString().equals("")){
+                    if(!binding.addChargesProduct.getText().toString().equals("") && !binding.addChargesProduct.getText().toString().equals(".")){
                         addCharges=Float.parseFloat(binding.addChargesProduct.getText().toString());
                     }
-                    if(!binding.vatPerProduct.getText().toString().equals("")){
+                    if(!binding.vatPerProduct.getText().toString().equals("") && !binding.vatPerProduct.getText().toString().equals(".")){
                             vatPer=Float.parseFloat(binding.vatPerProduct.getText().toString());
                         vat=((vatPer/100)*(gross-discount+addCharges));
                         }
@@ -1119,8 +1122,8 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                         ////////////////////////////////////////editProduct
 
-                }else {binding.rateProduct.setError("no Rate");}
-            }else {binding.qtyProduct.setError("no qty");}
+                }else {binding.rateProduct.setError("Enter Rate");}
+            }else {binding.qtyProduct.setError("Enter qty");}
         }else {binding.productName.setError("enter valid product");}
 
 

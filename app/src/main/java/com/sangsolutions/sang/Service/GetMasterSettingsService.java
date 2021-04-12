@@ -38,10 +38,74 @@ public class GetMasterSettingsService extends JobService {
         helper=new DatabaseHelper(this);
         this.params=params;
         schedulerJob = new SchedulerJob();
-        GetMaster();
         AndroidNetworking.initialize(this);
+        GetMaster();
+
         return true;
     }
+
+    private void UpdateMaster() {
+        int maxId=helper.getTagDetailsMaxId();
+        AndroidNetworking.get("http://"+  new Tools().getIP(GetMasterSettingsService.this) +URLs.GetUpdateMasterTagDetails)
+                .addQueryParameter("MaxId", String.valueOf(maxId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseMasterUp",response.toString());
+                        updateMasterValues(response);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseMaster",anError.toString());
+                    }
+                });
+
+    }
+
+    private void updateMasterValues(JSONObject response) {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                try {
+                    JSONArray jsonArray = new JSONArray(response.getString("Table"));
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        int iStatus = jsonObject.getInt("iStatus");
+                        Log.d("iStatus", iStatus + "");
+                        settings = new MasterSettings(
+                                jsonObject.getString(MasterSettings.S_NAME),
+                                jsonObject.getString(MasterSettings.S_ALT_NAME),
+                                jsonObject.getInt(MasterSettings.I_ID));
+
+                        if (iStatus == 0) {
+                            if (helper.insertMasterSettings(settings)) {
+                                Log.d("successUpdate", "Master UpdateInsert successfully" + i);
+                            }
+                        } else if (iStatus == 1) {
+                            if (helper.editMasterSettings(settings)) {
+                                Log.d("successUpdate", "Master UpdateEdit successfully " + i);
+
+                            }
+                        }
+                        else if(iStatus==2){
+                            if(helper.deleteMaster(settings)){
+                                Log.d("successUpdate", "Master Update Delete successfully " + i);
+                            }
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };asyncTask.execute();
+
+        }
 
     private void GetMaster() {
 
@@ -52,7 +116,9 @@ public class GetMasterSettingsService extends JobService {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("responseMaster",response.toString());
-                        loadMasterData(response);
+                        if(helper.deleteMasterAll()) {
+                            loadMasterData(response);
+                        }
                     }
 
                     @Override
@@ -76,12 +142,7 @@ public class GetMasterSettingsService extends JobService {
                                  jsonObject.getString(MasterSettings.S_NAME),
                                  jsonObject.getString(MasterSettings.S_ALT_NAME),
                                  jsonObject.getInt(MasterSettings.I_ID));
-                         if(helper.checkMasterById(jsonObject.getString(MasterSettings.I_ID))){
-                             if(helper.checkAllDataMaster(settings)){
-                                 Log.d("success","Master Updated successfully "+i);
-                             }
-                         }
-                        else if( helper.insertMasterSettings(settings)){
+                    if( helper.insertMasterSettings(settings)){
                             Log.d("success","Master added successfully "+i);
                         }
 

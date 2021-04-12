@@ -66,16 +66,15 @@ public class Login extends AppCompatActivity {
 
         }
         if(Tools.isConnected(this)) {
-            syncData();
+             schedulerJob.SyncUser(Login.this);
         }else {
             Toast.makeText(this, "No Internet", Toast.LENGTH_SHORT).show();
         }
         binding.save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        schedulerJob.SyncBank(Login.this);
-                        schedulerJob.SyncUser(Login.this);
-                        syncData();
+
+//                        syncData();
 
                     if(!binding.userName.getText().toString().isEmpty()){
                     if(!binding.password.getText().toString().isEmpty()){
@@ -88,17 +87,16 @@ public class Login extends AppCompatActivity {
 
                                             schedulerJob.SyncUser(Login.this);
                                             if (helper.GetUser()) {
-                                            syncData();
                                             if (helper.loginUser(u)) {
                                             if (helper.InsertCurrentLoginUser(u)) {
-                                            if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
+//                                            if (Objects.equals(preferences.getString(Commons.TRANSACTION_SETTINGS, "false"), "true")) {
                                             startActivity(new Intent(Login.this, Home.class));
                                             finish();
 
-                                            } else
-                                            {
-                                            Toast.makeText(Login.this, "Sync not completed!", Toast.LENGTH_SHORT).show();
-                                            }
+//                                            } else
+//                                            {
+//                                            Toast.makeText(Login.this, "Sync not completed!", Toast.LENGTH_SHORT).show();
+//                                            }
                                             }
                                         else {
                                         Toast.makeText(Login.this, "syncing not completed", Toast.LENGTH_SHORT).show();
@@ -137,5 +135,6 @@ public class Login extends AppCompatActivity {
         schedulerJob.SyncUser(Login.this);
         schedulerJob.SyncAccounts(Login.this);
         schedulerJob.SyncBank(Login.this);
+        schedulerJob.syncMasterTagDetails(Login.this);
     }
 }

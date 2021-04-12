@@ -44,11 +44,15 @@ import com.sangsolutions.sang.Adapter.ExpandedMenuModel;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
+import com.sangsolutions.sang.Fragment.MasterFragment;
+import com.sangsolutions.sang.Fragment.MasterFragmentDirections;
+import com.sangsolutions.sang.Fragment.MasterHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.P_R_ReportFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
 import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.QuotationHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
+import com.sangsolutions.sang.Fragment.RequestFragmentDirections;
 import com.sangsolutions.sang.Fragment.RequestHistoryFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderFragmentDirections;
 import com.sangsolutions.sang.Fragment.S_P_OrderHistoryFragmentDirections;
@@ -69,6 +73,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Home extends AppCompatActivity {
@@ -82,6 +87,7 @@ public class Home extends AppCompatActivity {
     String userName;
     Cursor tagCursor;
     SchedulePost schedulepost;
+    SchedulerJob schedulerJob;
     List<Integer>tagList;
     int lockmode;
     ExpandableListAdapter mMenuAdapter;
@@ -172,6 +178,9 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.stockCountFragment){
             backAlert();
         }
+        else if(navController.getCurrentDestination().getId()==R.id.masterFragment){
+            backAlert();
+        }
 
 
     }
@@ -186,6 +195,8 @@ public class Home extends AppCompatActivity {
         helper=new DatabaseHelper(this);
 
         schedulepost =new SchedulePost();
+        schedulerJob = new SchedulerJob();
+
         toolbar=binding.toolbar;
         drawer=binding.drawerLayout;
         navigationView=binding.navView;
@@ -225,7 +236,7 @@ public class Home extends AppCompatActivity {
                                     navController.navigate(R.id.homeFragment);
                                     navController.navigate(action);
                             }else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
 
                         }break;
@@ -237,7 +248,7 @@ public class Home extends AppCompatActivity {
                                         navController.navigate(R.id.homeFragment);
                                         navController.navigate(action);
                                 } else {
-                                    Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                                 }
                         }
                         break;
@@ -249,6 +260,8 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
 
+                            } else {
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -260,7 +273,7 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(action);
                             }
                             else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync Data's", Toast.LENGTH_SHORT).show();
                             }
 
                         }break;
@@ -272,7 +285,7 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(action);
                             }
                             else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -285,7 +298,7 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(action);
                             }
                             else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync Datas", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -303,7 +316,7 @@ public class Home extends AppCompatActivity {
                                     navController.navigate(R.id.homeFragment);
                                     navController.navigate(action);
                             }else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -316,7 +329,7 @@ public class Home extends AppCompatActivity {
                                     navController.navigate(action);
 
                             }else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -327,7 +340,7 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             } else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -337,6 +350,8 @@ public class Home extends AppCompatActivity {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(12, "Purchase Order History");
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
+                            }else {
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -348,7 +363,7 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(action);
                             }
                             else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync Data's", Toast.LENGTH_SHORT).show();
                             }
                         }break;
 
@@ -361,7 +376,7 @@ public class Home extends AppCompatActivity {
                                 navController.navigate(action);
                             }
                             else {
-                                Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
 
                         }break;
@@ -408,7 +423,7 @@ public class Home extends AppCompatActivity {
                             return true;
                         }
                         else {
-                            Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Home.this, "please sync Datas", Toast.LENGTH_SHORT).show();
                         }
                     }break;
                     case 5:{
@@ -420,9 +435,16 @@ public class Home extends AppCompatActivity {
                             drawer.closeDrawer(GravityCompat.START);
                             return true;
                         }else {
-                            Toast.makeText(Home.this, "please sync tags", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Home.this, "please sync Datas", Toast.LENGTH_SHORT).show();
                         }
                     }break;
+                    case 6:{
+                        NavDirections action= HomeFragmentDirections.actionHomeFragmentToMasterHistoryFragment();
+                        navController.navigate(R.id.homeFragment);
+                        navController.navigate(action);
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                    break;
                 }
                 return false;
             }
@@ -435,13 +457,16 @@ public class Home extends AppCompatActivity {
                 Log.d("kkk","kk");
                 if(Tools.isConnected(Home.this)){
                     Log.d("kkk","connected");
+                    schedulepost.Post_CustomerMaster(Home.this);
                     schedulepost.Post_SalePurchase(Home.this);
                     schedulepost.Post_PaymentReceipt(Home.this);
                     schedulepost.Post_SalePurchase_Return(Home.this);
                     schedulepost.Post_SalePurchase_Order(Home.this);
                     schedulepost.Post_EnquiryRequest(Home.this);
                     schedulepost.Post_Quotation(Home.this);
+
                     schedulepost.Post_StockCount(Home.this);
+
                 }
                 handler.postDelayed(this, delay);
             }
@@ -455,7 +480,7 @@ public class Home extends AppCompatActivity {
                 R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment,
                 R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment,
                 R.id.s_P_OrderHistoryFragment,R.id.requestHistoryFragment,R.id.quotationHistoryFragment,
-                R.id.stockCountHistoryFragment)
+                R.id.stockCountHistoryFragment,R.id.masterHistoryFragment)
                 .setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -486,6 +511,15 @@ public class Home extends AppCompatActivity {
                 }
                 else if(navController.getCurrentDestination().getId()==R.id.reportFragment){
                     NavDirections action= S_P_ReportFragmentDirections.actionReportFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+
+                else  if(navController.getCurrentDestination().getId()==R.id.requestFragment){
+                    NavDirections action= RequestFragmentDirections.actionRequestFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.requestHistoryFragment){
+                    NavDirections action=RequestHistoryFragmentDirections.actionRequestHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
 
@@ -531,6 +565,14 @@ public class Home extends AppCompatActivity {
                     NavDirections action= StockCountFragmentDirections.actionStockCountFragmentToHomeFragment();
                     navController.navigate(action);
                 }
+                else if(navController.getCurrentDestination().getId()==R.id.masterFragment){
+                    NavDirections action= MasterFragmentDirections.actionMasterFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.masterHistoryFragment){
+                    NavDirections action=  MasterHistoryFragmentDirections.actionMasterHistoryFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
 
 
                 }
@@ -553,11 +595,11 @@ public class Home extends AppCompatActivity {
         listDataHeader = new ArrayList<ExpandedMenuModel>();
         listDataChild = new HashMap<ExpandedMenuModel, List<String>>();
 
-        ExpandedMenuModel item0 = new ExpandedMenuModel();
-        item0.setIconName("Home");
-        item0.setIconImg(R.drawable.ic_home);
+        ExpandedMenuModel item = new ExpandedMenuModel();
+        item.setIconName("Home");
+        item.setIconImg(R.drawable.ic_home);
         // Adding data header
-        listDataHeader.add(item0);
+        listDataHeader.add(item);
 
         ExpandedMenuModel item1 = new ExpandedMenuModel();
         item1.setIconName("Sales");
@@ -585,6 +627,12 @@ public class Home extends AppCompatActivity {
         item5.setIconName("Report");
         item5.setIconImg(R.drawable.ic_report);
         listDataHeader.add(item5);
+
+        ExpandedMenuModel item6 = new ExpandedMenuModel();
+        item6.setIconName("Master History");
+        item6.setIconImg(R.drawable.ic_profile);
+        // Adding data header
+        listDataHeader.add(item6);
 
 
         // Adding child data
@@ -616,68 +664,20 @@ public class Home extends AppCompatActivity {
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void syncTag() {
-        AndroidNetworking.initialize(this);
-        for (int i=1;i<=8;i++) {
-            GetTag_Details(i);
-            if(i==8){
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    public void run() {
-                        Toast.makeText(Home.this, "TAG Synced", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+
+        Log.d("ipppp","new Tools().getIP(Login.this)");
+        schedulerJob.SyncMasterSettings(Home.this);
+//        schedulerJob.SyncToken(this);
+        schedulerJob.SyncProduct(Home.this);
+        schedulerJob.SyncTransSalePurchase(Home.this);
+        schedulerJob.SyncBank(Home.this);
+        schedulerJob.SyncAccounts(Home.this);
+        schedulerJob.SyncUser(Home.this);
+        schedulerJob.syncMasterTagDetails(Home.this);
         }
-    }
 
-    private void GetTag_Details(int iType) {
-        AndroidNetworking.get("http://"+ new Tools().getIP(Home.this) +URLs.GetMasterTagDetails)
-                .addQueryParameter("iType",String.valueOf(iType))
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("responseTag",response.toString());
-                        loadTagData(response,String.valueOf(iType));
-                    }
-
-                    @Override
-                    public void onError(ANError anError) {
-                        Log.d("response",anError.toString());
-                    }
-                });
-    }
-
-    private void loadTagData(JSONObject response, String iType) {
-        tagList=new ArrayList<>();
-        try {
-            JSONArray jsonArray = new JSONArray(response.getString("Data"));
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                TagDetails details = new TagDetails(
-                        jsonObject.getString(TagDetails.S_CODE),
-                        jsonObject.getString(TagDetails.S_NAME),
-                        jsonObject.getString(TagDetails.S_ALT_NAME),
-                        jsonObject.getInt(TagDetails.I_ID),
-                        iType);
-                tagList.add(jsonObject.getInt(TagDetails.I_ID));
-
-                if (helper.checkTagDetailsById(jsonObject.getString(TagDetails.I_ID), iType)) {
-                    if (helper.checkAllDataMasterTag(details)) {
-
-                        Log.d("successTag","updated successfully");
-                    }
-                } else if (helper.insertMasterTag(details)) {
-                    Log.d("successTag", "tag details  added successfully " + i);
-                }
-            }
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void logoutAlert() {
 
@@ -727,6 +727,10 @@ public class Home extends AppCompatActivity {
                 return true;
             }
             else if(navController.getCurrentDestination().getId()==R.id.requestFragment){
+                backAlert();
+                return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.masterFragment){
                 backAlert();
                 return true;
             }

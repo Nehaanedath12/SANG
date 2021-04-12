@@ -65,7 +65,12 @@ public class Post_SalePurchase_OrderService extends JobService {
 
                         JSONObject jsonObjectMain = new JSONObject();
                         try {
-                            jsonObjectMain.put("iTransId", "0");
+                            if(docNo.contains("L")) {
+                                jsonObjectMain.put("iTransId", "0");
+                            }
+                            else {
+                                jsonObjectMain.put("iTransId", iTransId);
+                            }
                             jsonObjectMain.put("sDocNo", cursorHeader.getString(cursorHeader.getColumnIndex(Sales_purchase_order_class.S_DOC_NO)));
                             jsonObjectMain.put("sDate", Tools.dateFormat(cursorHeader.getString(cursorHeader.getColumnIndex(Sales_purchase_order_class.S_DATE))));
                             jsonObjectMain.put("sDeliveryDate", Tools.dateFormat(cursorHeader.getString(cursorHeader.getColumnIndex(Sales_purchase_order_class.S_DEL_DATE))));
@@ -128,7 +133,7 @@ public class Post_SalePurchase_OrderService extends JobService {
                 .getAsString(new StringRequestListener() {
                     @Override
                     public void onResponse(String response) {
-                        if (response.contains(docNo)) {
+                        if (response.contains("-")) {
                             if(helper.deleteSP_Header_Order(iTransId,iDocType,docNo)) {
                                 if (helper.delete_S_P_Body_Order(iDocType, iTransId)) {
                                     Log.d("responsePost ", "successfully");

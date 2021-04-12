@@ -92,6 +92,8 @@ public class GetTransactionSettingService extends JobService {
                     JSONArray jsonArray = new JSONArray(response.getString("Data"));
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        int iDocType=   jsonObject.getInt(TransSetting.I_DOC_TYPE);
+                        int tagId=   jsonObject.getInt(TransSetting.I_TAG_ID);
                         transSalePurchase=new TransSetting(
                                 jsonObject.getInt(TransSetting.I_DOC_TYPE),
                                 jsonObject.getInt(TransSetting.I_TAG_ID),
@@ -99,13 +101,16 @@ public class GetTransactionSettingService extends JobService {
                                 jsonObject.getString(TransSetting.B_MANDATORY),
                                 jsonObject.getInt(TransSetting.I_TAG_POSITION));
 
-                        if(helper.checkTransSettingById(jsonObject.getString(TransSetting.I_DOC_TYPE),jsonObject.getString(TransSetting.I_TAG_ID))){
-                            if(helper.checkAllDataTransSetting(transSalePurchase)){
-                                Log.d("successtrans","transSalePurchase Updated successfully "+i);
+//                        if(helper.checkTransSettingById(jsonObject.getString(TransSetting.I_DOC_TYPE),jsonObject.getString(TransSetting.I_TAG_ID))){
+//                            if(helper.checkAllDataTransSetting(transSalePurchase)){
+//                                Log.d("successtrans","transSalePurchase Updated successfully "+i);
+//                            }
+//                        }
+//                        else
+                        if(helper.deleteTranSetting(iDocType,tagId)) {
+                            if (helper.insertTransSetting(transSalePurchase)) {
+                                Log.d("transactionn", jsonObject.getInt(TransSetting.I_DOC_TYPE) + "transSalePurchase added successfully " + i);
                             }
-                        }
-                        else if( helper.insertTransSetting(transSalePurchase)){
-                            Log.d("successtrans","transSalePurchase added successfully "+i);
                         }
 
                         if(i+1==jsonArray.length()){
@@ -113,7 +118,8 @@ public class GetTransactionSettingService extends JobService {
                             handler.post(new Runnable() {
                                 public void run() {
                                         try {
-                                        if( jsonObject.getInt(TransSetting.I_DOC_TYPE)==2){
+                                        if( jsonObject.getInt(TransSetting.I_DOC_TYPE)==40){
+                                            Log.d("transactionn","completed1");
                                             Toast.makeText(GetTransactionSettingService.this, " Syncing completed", Toast.LENGTH_SHORT).show();
                                         }
                                         } catch (JSONException e) {
@@ -132,6 +138,7 @@ public class GetTransactionSettingService extends JobService {
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                Log.d("transactionn","completed2");
                 editor.putString(Commons.TRANSACTION_SETTINGS,"true").apply();
                 jobFinished(params,false);
             }
@@ -141,6 +148,7 @@ public class GetTransactionSettingService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        return false;
+        Log.d("transactionn","completed3");
+        return true;
     }
 }

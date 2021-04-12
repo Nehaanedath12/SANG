@@ -45,9 +45,6 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.material.snackbar.Snackbar;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
@@ -486,7 +483,11 @@ public class QuotationFragment extends Fragment {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    deleteAll();
+                                    if(Tools.isConnected(requireContext())) {
+                                        deleteAllFromAPI();
+                                    }else {
+                                        deleteAllFromDB();
+                                    }
 
                                 }
                             })
@@ -508,7 +509,19 @@ public class QuotationFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void deleteAll() {
+    private void deleteAllFromDB() {
+        if(helper.deleteQuotationHeader(iTransId,iDocType,docNo)){
+            if(helper.delete_Quotation_Body(iDocType,iTransId)){
+                Log.d("responsePost ", "successfully");
+                NavDirections actions =QuotationFragmentDirections
+                        .actionQuotationFragmentToQuotationHistoryFragment(iDocType,toolTitle);
+                navController.navigate(actions);
+                Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void deleteAllFromAPI() {
 
         AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransQuotation)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
@@ -537,6 +550,9 @@ public class QuotationFragment extends Fragment {
         if (Tools.isConnected(requireContext())) {
             JSONObject jsonObjectMain = new JSONObject();
             try {
+                if(docNo.contains("L")){
+                    iTransId=0;
+                }
                 jsonObjectMain.put("iTransId", iTransId);
                 jsonObjectMain.put("sDocNo", docNo);
                 jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
@@ -765,7 +781,7 @@ public class QuotationFragment extends Fragment {
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("")){
-                if(!binding.rateProduct.getText().toString().equals("")){
+                if(!binding.rateProduct.getText().toString().equals("")&& !binding.rateProduct.getText().toString().equals(".")){
 
                     QuotationClass bodyPart=new QuotationClass();
 
@@ -1119,7 +1135,7 @@ public class QuotationFragment extends Fragment {
 
                 ///////
 
-                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransQuotationSummary)
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetNextDocNo)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .addQueryParameter("iUser", userIdS)
                         .setPriority(Priority.MEDIUM)
@@ -1127,14 +1143,13 @@ public class QuotationFragment extends Fragment {
                         .getAsJSONArray(new JSONArrayRequestListener() {
                             @Override
                             public void onResponse(JSONArray response) {
-                                Log.d("responseHistory", response.toString());
+
+                                Log.d("responseDocNo", response.toString());
                                 try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
                                     if(jsonArray.length()>0) {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
-                                    }else {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + 1;
-
+                                        JSONObject jsonObject=jsonArray.getJSONObject(0);
+                                        docNo=jsonObject.getString("Column1");
                                     }
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
@@ -1163,9 +1178,9 @@ public class QuotationFragment extends Fragment {
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("status",count+"");
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) +"-L"+ "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
                 }else {
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date() )+"-L"+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
 
                 }
             }

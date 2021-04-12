@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_homeFragment_to_stockCountHistoryFragment"
             app:destination="@id/stockCountHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_masterHistoryFragment"
+            app:destination="@id/masterHistoryFragment" />
 
 
     </fragment>
@@ -515,6 +518,42 @@
             app:destination="@id/report_selection_fragment" />
         <action
             android:id="@+id/action_stockCountReport_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/masterFragment"
+        android:name="com.sangsolutions.sang.Fragment.MasterFragment"
+        android:label="Master Setting"
+        tools:layout="@layout/fragment_master">
+        <argument
+            android:name="EditMode"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="0" />
+
+        <action
+            android:id="@+id/action_masterFragment_to_masterHistoryFragment"
+            app:destination="@id/masterHistoryFragment" />
+        <action
+            android:id="@+id/action_masterFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/masterHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.MasterHistoryFragment"
+        android:label="Master History"
+        tools:layout="@layout/fragment_master_history">
+
+        <action
+            android:id="@+id/action_masterHistoryFragment_to_masterFragment"
+            app:destination="@id/masterFragment" />
+        <action
+            android:id="@+id/action_masterHistoryFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 

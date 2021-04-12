@@ -67,7 +67,12 @@ public class Post_StockCountService extends JobService {
 
                         JSONObject jsonObjectMain = new JSONObject();
                         try {
-                            jsonObjectMain.put("iTransId", "0");
+                            if(docNo.contains("L")) {
+                                jsonObjectMain.put("iTransId", "0");
+                            }
+                            else {
+                                jsonObjectMain.put("iTransId", iTransId);
+                            }
                             jsonObjectMain.put("sDocNo", cursorHeader.getString(cursorHeader.getColumnIndex(StockCountDBClass.S_DOC_NO)));
                             jsonObjectMain.put("sDate", Tools.dateFormat(cursorHeader.getString(cursorHeader.getColumnIndex(StockCountDBClass.S_DATE))));
                             jsonObjectMain.put("sStockDate", Tools.dateFormat(cursorHeader.getString(cursorHeader.getColumnIndex(StockCountDBClass.STOCK_DATE))));
@@ -130,7 +135,7 @@ public class Post_StockCountService extends JobService {
                 .getAsString(new StringRequestListener() {
                     @Override
                     public void onResponse(String response) {
-                        if (response.contains(docNo)) {
+                        if (response.contains("-")) {
                             if(helper.deleteStockCountHeader(iTransId,iDocType,docNo)) {
                                 if (helper.delete_StockCount_Body(iDocType, iTransId)) {
                                     Log.d("responsePostStockCont ", "successfully");

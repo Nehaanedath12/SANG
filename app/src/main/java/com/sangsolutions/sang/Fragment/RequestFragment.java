@@ -45,11 +45,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.material.snackbar.Snackbar;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
-import com.sangsolutions.sang.Adapter.OrderBodyAdapter.OrderBodyAdapter;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.Products.ProductsAdapter;
 import com.sangsolutions.sang.Adapter.RequestBodyAdapter.RequestBodyAdapter;
@@ -61,7 +57,6 @@ import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.RequestEnquiryClass;
-import com.sangsolutions.sang.Database.Sales_purchase_order_class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -73,7 +68,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -440,7 +434,11 @@ public class RequestFragment extends Fragment {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    deleteAll();
+                                    if(Tools.isConnected(requireContext())) {
+                                        deleteAllFromAPI();
+                                    }else {
+                                        deleteAllFromDB();
+                                    }
 
                                 }
                             })
@@ -460,7 +458,20 @@ public class RequestFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void deleteAll() {
+    private void deleteAllFromDB() {
+        if(helper.deleteRequestEnquiry_Header(iTransId,iDocType,docNo)){
+            if(helper.deleteRequestEnquiry_Body(iDocType,iTransId)){
+                Log.d("responsePost ", "successfully");
+                NavDirections actions = RequestFragmentDirections
+                        .actionRequestFragmentToRequestHistoryFragment(iDocType,toolTitle);
+                navController.navigate(actions);
+                Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    private void deleteAllFromAPI() {
 
         AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransRequest)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
@@ -489,6 +500,9 @@ public class RequestFragment extends Fragment {
         if (Tools.isConnected(requireContext())) {
             JSONObject jsonObjectMain = new JSONObject();
             try {
+                if(docNo.contains("L")){
+                    iTransId=0;
+                }
                 jsonObjectMain.put("iTransId", iTransId);
                 jsonObjectMain.put("sDocNo", docNo);
                 jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
@@ -671,7 +685,9 @@ public class RequestFragment extends Fragment {
                                 if(helper.deleteRequestEnquiry_Header(iTransId,iDocType,docNo)) {
                                     if (helper.deleteRequestEnquiry_Body(iDocType, iTransId)) {
 
-                                        Log.d("responsePost ", "successfully");
+                                        if(helper.changeStatusForAll()) {
+                                            Log.d("status ", " changed successfully");
+                                        }
                                         Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
                                         bodyPartList.clear();
                                         NavDirections actions = RequestFragmentDirections
@@ -1008,7 +1024,7 @@ public class RequestFragment extends Fragment {
             } else {
                 ///////
 
-                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransRequestSummary)
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetNextDocNo)
                         .addQueryParameter("iUser", userIdS)
                         .addQueryParameter("iDocType", String.valueOf(iDocType))
                         .setPriority(Priority.MEDIUM)
@@ -1016,14 +1032,12 @@ public class RequestFragment extends Fragment {
                         .getAsJSONArray(new JSONArrayRequestListener() {
                             @Override
                             public void onResponse(JSONArray response) {
-                                Log.d("responseHistory", response.toString());
+                                Log.d("responseDocNo", response.toString());
                                 try {
                                     JSONArray jsonArray = new JSONArray(response.toString());
                                     if(jsonArray.length()>0) {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + Tools.getDocNo(response);
-                                    }else {
-                                        docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + 1;
-
+                                        JSONObject jsonObject=jsonArray.getJSONObject(0);
+                                        docNo=jsonObject.getString("Column1");
                                     }
                                     binding.docNo.setText(docNo);
                                     alertDialog.dismiss();
@@ -1053,9 +1067,9 @@ public class RequestFragment extends Fragment {
                 if (cursor1.getCount() > 0) {
                     int count = Tools.getNewDocNoLocally(cursor1);
                     Log.d("status", count + "");
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + count;
-                } else {
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) + "-L" + "-" + "000" + 1;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
+                }else {
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
 
                 }
             }

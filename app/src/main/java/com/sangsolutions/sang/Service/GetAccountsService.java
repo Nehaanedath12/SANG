@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Database.DatabaseHelper;
@@ -36,37 +37,113 @@ public class GetAccountsService extends JobService {
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
+        Log.d("responseAccounts","response.toString()");
         AndroidNetworking.initialize(this);
-        GetAccounts();
+
+        if(helper.getAccounts()==0) {
+            GetAccounts();
+        }else {
+            UpdateAccounts();
+        }
         return true;
+    }
+
+    private void UpdateAccounts() {
+        int maxId=helper.getAccountsMaxId();
+        AndroidNetworking.get("http://"+  new Tools().getIP(GetAccountsService.this) +URLs.GetUpdateCustomer)
+                .addQueryParameter("MaxId", String.valueOf(maxId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseAccountsUp",response.toString());
+                        updateAccountsValues(response);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseAccounts",anError.toString());
+                    }
+                });
+    }
+
+    private void updateAccountsValues(JSONObject response) {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    JSONArray jsonArray = new JSONArray(response.getString("Table"));
+                    for (int i = 0; i < jsonArray.length(); i++) {
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    int iStatus=jsonObject.getInt("iStatus");
+                    Log.d("iStatus",iStatus+"");
+                    customer = new Customer(
+                            jsonObject.getString(Customer.S_CODE),
+                            jsonObject.getString(Customer.S_NAME),
+                            jsonObject.getString(Customer.S_ALT_NAME),
+                            jsonObject.getInt(Customer.I_ID));
+
+                    if(iStatus==0){
+                        if(helper.insertAccounts(customer)){
+                            Log.d("successUpdate", "Accounts UpdateInsert successfully"+i);
+                        }
+                    }
+                    else if(iStatus==1) {
+                        if (helper.editAccounts(customer)) {
+                            Log.d("successUpdate", "Accounts UpdateEdit successfully " + i);
+
+                        }
+                    }
+                    else if(iStatus==2){
+                        if(helper.deleteAccounts(customer)){
+                            Log.d("successUpdate", "Accounts Update Delete successfully " + i);
+
+                        }
+                    }
+                }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d("exceptionn",e.toString());
+                }
+
+
+                return null;
+            }
+        };asyncTask.execute();
+
     }
 
     private void GetAccounts() {
         AndroidNetworking.get("http://"+  new Tools().getIP(GetAccountsService.this) +URLs.GetAccounts)
                 .setPriority(Priority.MEDIUM)
                 .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
+                .getAsJSONArray(new JSONArrayRequestListener() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(JSONArray response) {
                         Log.d("responseAccounts",response.toString());
                         loadAccountsData(response);
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        Toast.makeText(GetAccountsService.this, "check Ip or Internet", Toast.LENGTH_SHORT).show();
-                        Log.d("response",anError.toString());
+                        Log.d("responseAccounts",anError.toString());
+
                     }
                 });
+
     }
 
-    private void loadAccountsData(JSONObject response) {
+    private void loadAccountsData(JSONArray response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    JSONArray jsonArray = new JSONArray(response.getString("Data"));
+                    JSONArray jsonArray = new JSONArray(response.toString());
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         customer =new Customer(
@@ -74,12 +151,8 @@ public class GetAccountsService extends JobService {
                                 jsonObject.getString(Customer.S_NAME),
                                 jsonObject.getString(Customer.S_ALT_NAME),
                                 jsonObject.getInt(Customer.I_ID));
-                        if(helper.checkAccountsById(jsonObject.getString(Customer.I_ID))){
-                            if(helper.checkAllDataAccounts(customer)){
-                                Log.d("success","accounts Updated successfully "+i);
-                            }
-                        }
-                        else if( helper.insertAccounts(customer)){
+
+                         if( helper.insertAccounts(customer)){
                             Log.d("success","accounts added successfully "+i);
                         }
 

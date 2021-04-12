@@ -9,6 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.sangsolutions.sang.Service.PostCustomerMasterService;
 import com.sangsolutions.sang.Service.PostPaymentReceiptService;
 import com.sangsolutions.sang.Service.PostSalePurchaseService;
 import com.sangsolutions.sang.Service.Post_EnquiryRequestService;
@@ -122,6 +123,21 @@ public class SchedulePost {
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .build();
         Log.d("Post_StockCount","Post_StockCount");
+        assert js != null;
+        js.schedule(job);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void Post_CustomerMaster(Context context) {
+        Log.d("Post_CustomerMaster","Post_CustomerMaster");
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                8,
+                new ComponentName(context, PostCustomerMasterService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        Log.d("Post_CustomerMaster","Post_CustomerMaster");
         assert js != null;
         js.schedule(job);
     }

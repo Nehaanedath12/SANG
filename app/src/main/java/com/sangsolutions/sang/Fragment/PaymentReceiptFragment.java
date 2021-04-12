@@ -369,7 +369,11 @@ public class PaymentReceiptFragment extends Fragment {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    deleteAll();
+                                    if(Tools.isConnected(requireContext())) {
+                                        deleteAllFromAPI();
+                                    }else {
+                                        deleteAllFromDB();
+                                    }
 
                                 }
                             })
@@ -404,6 +408,17 @@ public class PaymentReceiptFragment extends Fragment {
 
 
        return binding.getRoot();
+    }
+
+    private void deleteAllFromDB() {
+        if(helper.deletePayRec_Header(iTransId,iDocType,docNo)){
+            if(helper.delete_PayRec_Body(iDocType,iTransId)){
+                Log.d("responsePost ", "successfully");
+                NavDirections actions = PaymentReceiptFragmentDirections.actionPaymentReceiptFragmentToPaymentReceiptHistoryFragment(toolTitle,iDocType);
+                navController.navigate(actions);
+                Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void addCaptureImage() {
@@ -444,7 +459,7 @@ public class PaymentReceiptFragment extends Fragment {
     }
 
 
-    private void deleteAll() {
+    private void deleteAllFromAPI() {
         AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransReceipt_Payment)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
@@ -596,6 +611,9 @@ public class PaymentReceiptFragment extends Fragment {
             Log.d("jsonObjecMain",Image+"");
         JSONObject jsonObjectMain=new JSONObject();
         try{
+            if(docNo.contains("L")){
+                iTransId=0;
+            }
             jsonObjectMain.put("iTransId",iTransId);
             jsonObjectMain.put("sDocNo",docNo);
             jsonObjectMain.put("sDate",Tools.dateFormat(binding.date.getText().toString()));
@@ -1198,6 +1216,7 @@ public class PaymentReceiptFragment extends Fragment {
         List<String> list= Arrays.asList("Cash","Cheque");
         UnitAdapter unitAdapter = new UnitAdapter(list, requireActivity());
         binding.paymentSpinner.setAdapter(unitAdapter);
+
         StringDate = df.format(new Date());
         binding.date.setText(StringDate);
         binding.checkDate.setText(StringDate);
@@ -1260,9 +1279,9 @@ public class PaymentReceiptFragment extends Fragment {
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("statuss",count+"");
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date()) +"-L"+ "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
                 }else {
-                    docNo = userCode + "-" + DateFormat.format("MM", new Date() )+"-L"+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
 
                 }
             }

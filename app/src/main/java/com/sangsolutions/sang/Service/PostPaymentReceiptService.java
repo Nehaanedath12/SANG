@@ -84,7 +84,12 @@ public class PostPaymentReceiptService extends JobService {
 
                         JSONObject jsonObjectMain=new JSONObject();
                         try {
-                            jsonObjectMain.put("iTransId", "0");
+                            if(docNo.contains("L")) {
+                                jsonObjectMain.put("iTransId", "0");
+                            }
+                            else {
+                                jsonObjectMain.put("iTransId", iTransId);
+                            }
                             jsonObjectMain.put("sDocNo", cursorHeader.getString(cursorHeader.getColumnIndex(Payment_Receipt_class.S_DOC_NO)));
                             jsonObjectMain.put("sDate", Tools.dateFormat( cursorHeader.getString(cursorHeader.getColumnIndex(Payment_Receipt_class.S_DATE))));
                             jsonObjectMain.put("iDocType", iDocType);
@@ -155,7 +160,7 @@ public class PostPaymentReceiptService extends JobService {
                         @Override
                         public void onResponse(String response) {
                             Log.d("responsePost", response);
-                            if (response.contains(docNo)) {
+                            if (response.contains("-")) {
                                 if(helper.deletePayRec_Header(iTransId,iDocType,docNo)){
                                     if(helper.delete_PayRec_Body(iDocType,iTransId)){
                                         Log.d("responsePost ", "successfully");

@@ -66,7 +66,12 @@ public class Post_QuotationService extends JobService {
                         JSONObject jsonObjectMain=new JSONObject();
                         try {
 
-                            jsonObjectMain.put("iTransId", "0");
+                            if(docNo.contains("L")) {
+                                jsonObjectMain.put("iTransId", "0");
+                            }
+                            else {
+                                jsonObjectMain.put("iTransId", iTransId);
+                            }
                             jsonObjectMain.put("sDocNo", cursorHeader.getString(cursorHeader.getColumnIndex(SP_QuotationClass.S_DOC_NO)));
                             jsonObjectMain.put("sDate", Tools.dateFormat(cursorHeader.getString(cursorHeader.getColumnIndex(SP_QuotationClass.S_DATE))));
                             jsonObjectMain.put("iDocType", cursorHeader.getInt(cursorHeader.getColumnIndex(SP_QuotationClass.I_DOC_TYPE)));
@@ -135,7 +140,7 @@ public class Post_QuotationService extends JobService {
                     public void onResponse(String response) {
                         Log.d("responsePostQ ", response);
 
-                        if (response.contains(docNo)) {
+                        if (response.contains("-")) {
 
                             if(helper.deleteQuotationHeader(iTransId,iDocType,docNo)) {
                                 if (helper.delete_Quotation_Body(iDocType, iTransId)) {

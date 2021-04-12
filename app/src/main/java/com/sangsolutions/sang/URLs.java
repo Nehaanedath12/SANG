@@ -64,4 +64,18 @@ public class URLs {
 
     public static final String GetNextDocNo =domain+"GetNextDocNo";
 
+    //masterCustomer
+    public static final String PostCustomer =domain+"PostCustomer";
+    public static final String GetCustomerSummary =domain+"GetCustomerSummary";
+    public static final String DeleteCustomer =domain+"DeleteCustomer";
+    public static final String GetCustomerDetails =domain+"GetCustomerDetails";
+
+//UPDATE MASTERS
+    public static final String GetUpdateCustomer =domain+"GetUpdateCustomer";
+    public static final String GetUpdateBank =domain+"GetUpdateBank";
+    public static final String GetUpdateMasterTagDetails =domain+"GetUpdateMasterTagDetails";
+    public static final String GetUpdateProducts =domain+"GetUpdateProducts";
+
+
+
 }

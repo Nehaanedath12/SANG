@@ -16,6 +16,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.BankAdapter.Bank;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
@@ -34,12 +35,84 @@ public class GetBankService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
-        Log.d("bankk","bankk");
+        Log.d("bankk","banks");
         this.params=params;
-        GetBanks();
         AndroidNetworking.initialize(this);
+        if(helper.getBank()==0) {
+            GetBanks();
+        }else {
+            UpdateBank();
+        }
+
+
         return true;
     }
+
+    private void UpdateBank() {
+        int maxId=helper.getBankMaxId();
+        AndroidNetworking.get("http://"+  new Tools().getIP(GetBankService.this) +URLs.GetUpdateBank)
+                .addQueryParameter("MaxId", String.valueOf(maxId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseBankUp",response.toString());
+                        updateBankValues(response);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseBankUp",anError.toString());
+                    }
+                });
+    }
+
+    private void updateBankValues(JSONObject response) {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
+
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    JSONArray jsonArray = new JSONArray(response.toString());
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        int iStatus=jsonObject.getInt("iStatus");
+                        Log.d("iStatus",iStatus+"");
+                        bank = new Bank(
+                                jsonObject.getString(Bank.S_NAME),
+                                jsonObject.getString(Bank.S_CODE),
+                                jsonObject.getInt(Bank.I_ID));
+
+
+                        if(iStatus==0){
+                            if(helper.insertBanks(bank)){
+                                Log.d("successUpdate", "Banks UpdateInsert successfully"+i);
+                            }
+                        }
+                        else if(iStatus==1) {
+                            if (helper.editBanks(bank)) {
+                                Log.d("successUpdate", "Banks UpdateEdit successfully " + i);
+
+                            }
+                        }
+                        else if(iStatus==2){
+                            if(helper.deleteBanks(bank)){
+                                Log.d("successUpdate", "Banks Update Delete successfully " + i);
+
+                            }
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        };asyncTask.execute();
+
+        }
 
     private void GetBanks() {
 
@@ -76,12 +149,7 @@ public class GetBankService extends JobService {
                                 jsonObject.getString(Bank.S_NAME),
                                 jsonObject.getString(Bank.S_CODE),
                                 jsonObject.getInt(Bank.I_ID));
-                        if(helper.checkBankById(jsonObject.getString(Bank.I_ID))){
-                            if(helper.checkAllDataBank(bank)){
-                                Log.d("success", "Bank Updated successfully "+i);
-                            }
-                        }
-                        else if( helper.insertBanks(bank)){
+                     if( helper.insertBanks(bank)){
                             Log.d("success","bank added successfully "+i);
                         }
 

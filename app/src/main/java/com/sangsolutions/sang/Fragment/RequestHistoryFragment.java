@@ -352,7 +352,7 @@ public class RequestHistoryFragment extends Fragment {
                             if(Tools.isConnected(requireContext())) {
                                 adapterOnItemClick(iTransId,position);
                             }else {
-                                Toast.makeText(requireContext(), "Offline", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), "refresh", Toast.LENGTH_SHORT).show();
                             }
                         }
 

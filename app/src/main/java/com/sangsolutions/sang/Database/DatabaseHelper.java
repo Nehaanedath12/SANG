@@ -1,6 +1,6 @@
 package com.sangsolutions.sang.Database;
 
-import android.app.usage.StorageStats;
+import android.accounts.Account;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -57,6 +57,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static  final String TABLE_STOCK_COUNT_HEADER = "t1_stock_count_Header";
     private static  final String TABLE_STOCK_COUNT_BODY = "t1_stock_count_body";
+
+    private static  final String TABLE_CUSTOMER_MASTER= "t1_customer_master";
 
     private static  final String IID = "iId";
     private static  final String USER_ID = "user_Id";
@@ -376,6 +378,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             ");";
 
+    private static final String CREATE_TABLE_CUSTOMER_MASTER =" create table if not exists " + TABLE_CUSTOMER_MASTER + " (" +
+
+            "" + CustomerMasterClass.ID+ " INTEGER DEFAULT 0, " +
+            "" + CustomerMasterClass.NAME+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.CODE+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.ALT_NAME+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.I_TYPE+" INTEGER DEFAULT 0, "  +
+
+            "" + CustomerMasterClass.CREDIT_DAYS+" INTEGER DEFAULT 0, "  +
+            "" + CustomerMasterClass.CREDIT_AMOUNT+" INTEGER DEFAULT 0, "  +
+            "" + CustomerMasterClass.ADDRESS+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.CITY+" TEXT(50) DEFAULT null ,"  +
+
+            "" + CustomerMasterClass.COUNTRY+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.PIN_NO+" INTEGER DEFAULT 0, " +
+            "" + CustomerMasterClass.MOBILE_NO+" INTEGER DEFAULT 0 ,"  +
+            "" + CustomerMasterClass.PHONE_NO+" INTEGER DEFAULT 0 ," +
+
+            "" + CustomerMasterClass.FAX+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.EMAIL+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.WEBSITE+" TEXT(50) DEFAULT null ,"  +
+            "" + CustomerMasterClass.CONTACT_PERSON_NO+" INTEGER DEFAULT 0, " +
+            "" + CustomerMasterClass.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + CustomerMasterClass.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+
     private SQLiteDatabase db;
 
     public DatabaseHelper(@Nullable Context context) {
@@ -412,6 +442,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_TABLE_STOCK_COUNT_HEADER);
         db.execSQL(CREATE_TABLE_STOCK_COUNT_BODY);
+
+        db.execSQL(CREATE_TABLE_CUSTOMER_MASTER);
 
     }
 
@@ -488,25 +520,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean checkMasterById(String id) {
-        this.db=getReadableDatabase();
-        Cursor cursor=db.rawQuery("select  * from "+TABLE_MASTER_SETTINGS+
-                        " where "+MasterSettings.I_ID+"="+id,null);
-        return cursor.getCount() > 0;
-    }
 
-    public boolean checkAllDataMaster(MasterSettings settings) {
-        this.db=getReadableDatabase();
-        float status;
-        ContentValues cv=new ContentValues();
-        cv.put(MasterSettings.I_ID,settings.getiId());
-        cv.put(MasterSettings.S_NAME,settings.getsName());
-        cv.put(MasterSettings.S_ALT_NAME,settings.getsAltName());
-
-        status=db.update(TABLE_MASTER_SETTINGS,cv,MasterSettings.I_ID+" =? ",new String[]{String.valueOf(settings.getiId())});
-
-        return status!=-1;
-    }
 
     public boolean insertAccounts(Customer customer) {
         this.db=getReadableDatabase();
@@ -519,25 +533,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return status != -1;
     }
 
-    public boolean checkAccountsById(String id) {
-        this.db=getReadableDatabase();
-        Cursor cursor=db.rawQuery("select  * from "+TABLE_ACCOUNTS+
-                " where "+ Customer.I_ID+"="+id,null);
-        return cursor.getCount() > 0;
-    }
 
-    public boolean checkAllDataAccounts(Customer customer) {
-        this.db=getReadableDatabase();
-        float status;
-        ContentValues cv=new ContentValues();
-        cv.put(Customer.I_ID, customer.getiId());
-        cv.put(Customer.S_NAME, customer.getsName());
-        cv.put(Customer.S_ALT_NAME, customer.getsAltName());
-        cv.put(Customer.S_CODE, customer.getsCode());
-        status=db.update(TABLE_ACCOUNTS,cv, Customer.I_ID+" =? ",new String[]{String.valueOf(customer.getiId())});
-        return status!=-1;
 
-    }
 
     public boolean insertProducts(Products products) {
         this.db=getReadableDatabase();
@@ -552,25 +549,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return status != -1;
     }
 
-    public boolean checkProductsById(String id) {
-        this.db=getReadableDatabase();
-        Cursor cursor=db.rawQuery("select  * from "+TABLE_PRODUCT+
-                " where "+Products.I_ID+"="+id,null);
-        return cursor.getCount() > 0;    }
 
-    public boolean checkAllDataProducts(Products products) {
-        this.db=getReadableDatabase();
-        float status ;
-        ContentValues cv=new ContentValues();
-        cv.put(Products.I_ID,products.getiId());
-        cv.put(Products.S_NAME,products.getsName());
-        cv.put(Products.S_ALT_NAME,products.getsAltName());
-        cv.put(Products.S_CODE,products.getsCode());
-        cv.put(Products.S_UNIT,products.getsUnit());
-        cv.put(Products.S_BARCODE,products.getsBarcode());
-        status=db.update(TABLE_PRODUCT,cv,Products.I_ID+" =? ",new String[]{String.valueOf(products.getiId())});
-        return status!=-1;
-    }
 
     public boolean insertTransSetting(TransSetting transSetting) {
 
@@ -702,26 +681,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return status != -1;
     }
 
-    public boolean checkTagDetailsById(String id,String iType) {
-        this.db=getReadableDatabase();
-        Cursor cursor=db.rawQuery("select  * from "+TABLE_TAG_DETAILS+
-                " where "+TagDetails.I_ID+"="+id+ " and "+TagDetails.I_TYPE+"="+iType,null);
-        return cursor.getCount() > 0;
-    }
 
-    public boolean checkAllDataMasterTag(TagDetails details) {
-        this.db=getReadableDatabase();
-        this.db=getWritableDatabase();
-        float status;
-        ContentValues cv=new ContentValues();
-        cv.put(TagDetails.I_ID,details.getiId());
-        cv.put(TagDetails.S_NAME,details.getsName());
-        cv.put(TagDetails.S_CODE,details.getsCode());
-        cv.put(TagDetails.S_ALT_NAME,details.getsAltName());
-        cv.put(TagDetails.I_TYPE,details.getiType());
-        status=db.update(TABLE_TAG_DETAILS,cv,TagDetails.I_ID+" =? and "+TagDetails.I_TYPE+"=? ",new String[]{String.valueOf(details.getiId()),details.getiType()});
-        return status!=-1;
-    }
+
+
 
     public Cursor getCustomerbyKeyword(String s) {
         this.db = getReadableDatabase();
@@ -889,21 +851,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return status != -1;
     }
 
-    public boolean checkAllDataBank(Bank bank) {
-        this.db=getReadableDatabase();
-        float status;
-        ContentValues cv=new ContentValues();
-        cv.put(Bank.I_ID, bank.getiId());
-        cv.put(Bank.S_NAME, bank.getsName());
-        cv.put(Bank.S_CODE, bank.getsCode());
-        status=db.update(TABLE_BANK,cv, Bank.I_ID+" =? ",new String[]{String.valueOf(bank.getiId())});
-        return status!=-1;    }
 
-    public boolean checkBankById(String id) {
-        this.db=getReadableDatabase();
-        Cursor cursor=db.rawQuery("select  * from "+TABLE_BANK+
-                " where "+ Bank.I_ID+"="+id,null);
-        return cursor.getCount() > 0;    }
+
 
     public Cursor getBankyKeyword(String s) {
         this.db = getReadableDatabase();
@@ -1942,5 +1891,290 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         return cursor;
 
+    }
+
+
+    public boolean changeStatusForAll() {
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("status","0");
+        db.update(TABLE_SALE_PURCHASE_HEADER,cv,  "status" +
+                " = ?  " , new String[]{"1"});
+        db.update(TABLE_PAYMENT_RECEIPT_HEADER,cv,  "status" +
+                " = ?  " , new String[]{"1"});
+
+        db.update(TABLE_SALE_PURCHASE_RETURN_HEADER,cv,  "status" +
+                " = ?  " , new String[]{"1"});
+        db.update(TABLE_SALE_PURCHASE_ORDER_HEADER,cv,  "status" +
+                " = ?  " , new String[]{"1"});
+
+        db.update(TABLE_REQUEST_ENQUIRY_HEADER,cv,  "status" +
+                " = ?  " , new String[]{"1"});
+        db.update(TABLE_QUOTATION_HEADER,cv,  "status" +
+                " = ?  " , new String[]{"1"});
+
+        db.update(TABLE_STOCK_COUNT_HEADER,cv,  "status" +
+                " = ?  " , new String[]{"1"});
+        return  true;
+    }
+
+    public boolean insertMasterCustomer(CustomerMasterClass masterClass) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(CustomerMasterClass.ID,masterClass.getiId());
+        cv.put(CustomerMasterClass.NAME,masterClass.getName());
+        cv.put(CustomerMasterClass.CODE,masterClass.getCode());
+        cv.put(CustomerMasterClass.ALT_NAME,masterClass.getAltName());
+        cv.put(CustomerMasterClass.I_TYPE,masterClass.getiType());
+        cv.put(CustomerMasterClass.CREDIT_DAYS,masterClass.getCreditDays());
+
+        cv.put(CustomerMasterClass.CREDIT_AMOUNT,masterClass.getCreditAmount());
+        cv.put(CustomerMasterClass.ADDRESS,masterClass.getAddress());
+        cv.put(CustomerMasterClass.CITY,masterClass.getCity());
+        cv.put(CustomerMasterClass.COUNTRY,masterClass.getCountry());
+        cv.put(CustomerMasterClass.PIN_NO,masterClass.getPinNo());
+
+        cv.put(CustomerMasterClass.MOBILE_NO,masterClass.getMobile());
+        cv.put(CustomerMasterClass.PHONE_NO,masterClass.getPhone());
+        cv.put(CustomerMasterClass.CITY,masterClass.getCity());
+        cv.put(CustomerMasterClass.FAX,masterClass.getFax());
+        cv.put(CustomerMasterClass.EMAIL,masterClass.getEmail());
+
+        cv.put(CustomerMasterClass.WEBSITE,masterClass.getWebsite());
+        cv.put(CustomerMasterClass.CONTACT_PERSON_NO,masterClass.getContactPerson());
+
+        cv.put(CustomerMasterClass.STATUS,masterClass.getiStatus());
+        cv.put(CustomerMasterClass.PROCESS_TIME,masterClass.getProcessingTime());
+
+        float status = db.insert(TABLE_CUSTOMER_MASTER, null, cv);
+        return status != -1;
+    }
+
+    public Cursor getDataFromCustomerMaster() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_CUSTOMER_MASTER ,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean deleteMasterCustomer(int iId) {
+        String sId=String.valueOf(iId);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_CUSTOMER_MASTER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_CUSTOMER_MASTER, CustomerMasterClass.ID + " =  ? "
+               , new String[]{sId});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public Cursor getEditValuesCustomerMaster(int iId) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_CUSTOMER_MASTER+" where "
+                +CustomerMasterClass.ID+"='"+iId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatus_CustomerMaster(int iId, int iStatus) {
+        String sIid=String.valueOf(iId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(CustomerMasterClass.STATUS,iStatus);
+        float status=db.update(TABLE_CUSTOMER_MASTER,cv,  CustomerMasterClass.ID + " = ? " , new String[]{sIid});
+        return  status != -1;
+
+    }
+
+    public Cursor getDataFromCustomerMasterPost() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_CUSTOMER_MASTER+
+                " where status=0 union select * from "+TABLE_CUSTOMER_MASTER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public int getAccounts() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_ACCOUNTS,null);
+        cursor.moveToFirst();
+        return cursor.getCount();
+    }
+
+    public int getAccountsMaxId() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select max("+ Customer.I_ID+") from " +TABLE_ACCOUNTS,null);
+        cursor.moveToFirst();
+        Log.d("cursorId", cursor.getString(cursor.getColumnIndex("max(" + Customer.I_ID + ")")));
+        return cursor.getInt(cursor.getColumnIndex("max(" + Customer.I_ID + ")"));
+    }
+
+    public boolean editAccounts(Customer customer) {
+
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(Customer.I_ID, customer.getiId());
+        cv.put(Customer.S_NAME, customer.getsName());
+        cv.put(Customer.S_CODE, customer.getsCode());
+        cv.put(Customer.S_ALT_NAME, customer.getsAltName());
+        float status = db.update(TABLE_ACCOUNTS,cv,Customer.I_ID+"=?",new String[]{String.valueOf(customer.getiId())});
+        return status != -1;
+    }
+
+    public boolean deleteAccounts(Customer customer) {
+        this.db=getReadableDatabase();
+        float status = db.delete(TABLE_ACCOUNTS,Customer.I_ID+"=?",new String[]{String.valueOf(customer.getiId())});
+        return status != -1;
+    }
+
+    public int getBankMaxId() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select max("+ Bank.I_ID+") from " +TABLE_BANK,null);
+        cursor.moveToFirst();
+        Log.d("cursorIdBank", cursor.getString(cursor.getColumnIndex("max(" + Bank.I_ID + ")")));
+        return cursor.getInt(cursor.getColumnIndex("max(" + Bank.I_ID + ")"));
+    }
+
+    public boolean editBanks(Bank bank) {
+        this.db=getReadableDatabase();
+        float status;
+        ContentValues cv=new ContentValues();
+        cv.put(Bank.I_ID, bank.getiId());
+        cv.put(Bank.S_NAME, bank.getsName());
+        cv.put(Bank.S_CODE, bank.getsCode());
+        status=db.update(TABLE_BANK,cv, Bank.I_ID+" =? ",new String[]{String.valueOf(bank.getiId())});
+        return status!=-1;
+    }
+
+    public boolean deleteBanks(Bank bank) {
+        this.db=getReadableDatabase();
+        float status = db.delete(TABLE_BANK,Bank.I_ID+"=?",new String[]{String.valueOf(bank.getiId())});
+        return status != -1;
+    }
+
+    public int getBank() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BANK,null);
+        cursor.moveToFirst();
+        return cursor.getCount();
+
+    }
+
+    public int getTagDetailsCount() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_TAG_DETAILS,null);
+        cursor.moveToFirst();
+        return cursor.getCount();
+    }
+
+    public int getTagDetailsMaxId() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select max("+ TagDetails.I_ID+") from " +TABLE_TAG_DETAILS,null);
+        cursor.moveToFirst();
+        Log.d("cursorIdMaster", cursor.getString(cursor.getColumnIndex("max(" + TagDetails.I_ID + ")")));
+        return cursor.getInt(cursor.getColumnIndex("max(" + TagDetails.I_ID + ")"));
+    }
+
+    public boolean editMasterSettings(MasterSettings settings) {
+        this.db=getReadableDatabase();
+        float status;
+        ContentValues cv=new ContentValues();
+        cv.put(MasterSettings.I_ID,settings.getiId());
+        cv.put(MasterSettings.S_NAME,settings.getsName());
+        cv.put(MasterSettings.S_ALT_NAME,settings.getsAltName());
+
+        status=db.update(TABLE_MASTER_SETTINGS,cv,MasterSettings.I_ID+" =? ",new String[]{String.valueOf(settings.getiId())});
+
+        return status!=-1;
+    }
+
+    public boolean deleteMaster(MasterSettings settings) {
+        this.db=getReadableDatabase();
+        float status = db.delete(TABLE_MASTER_SETTINGS,MasterSettings.I_ID+"=?",new String[]{String.valueOf(settings.getiId())});
+        return status != -1;    }
+
+    public boolean editTagDetails(TagDetails details, String iType) {
+        this.db=getReadableDatabase();
+        this.db=getWritableDatabase();
+        float status;
+        ContentValues cv=new ContentValues();
+        cv.put(TagDetails.I_ID,details.getiId());
+        cv.put(TagDetails.S_NAME,details.getsName());
+        cv.put(TagDetails.S_CODE,details.getsCode());
+        cv.put(TagDetails.S_ALT_NAME,details.getsAltName());
+        cv.put(TagDetails.I_TYPE,details.getiType());
+        status=db.update(TABLE_TAG_DETAILS,cv,TagDetails.I_ID+" =? and "+TagDetails.I_TYPE+"=? ",new String[]{String.valueOf(details.getiId()),details.getiType()});
+        return status!=-1;
+    }
+
+    public boolean deleteTagDetails(TagDetails details, String iType) {
+        this.db=getReadableDatabase();
+        float status = db.delete(TABLE_TAG_DETAILS,TagDetails.I_ID+"=? and "+TagDetails.I_TYPE+"=? ",new String[]{String.valueOf(details.getiId()),iType});
+        return status != -1;
+    }
+
+    public int getProducts() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_PRODUCT,null);
+        cursor.moveToFirst();
+        return cursor.getCount();
+    }
+
+    public int getProductsMaxId() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select max("+ Products.I_ID+") from " +TABLE_PRODUCT,null);
+        cursor.moveToFirst();
+        Log.d("cursorIdpRODUCTS", cursor.getString(cursor.getColumnIndex("max(" + Products.I_ID + ")")));
+        return cursor.getInt(cursor.getColumnIndex("max(" + Products.I_ID + ")"));
+
+    }
+
+    public boolean editProducts(Products products) {
+        this.db=getReadableDatabase();
+        float status ;
+        ContentValues cv=new ContentValues();
+        cv.put(Products.I_ID,products.getiId());
+        cv.put(Products.S_NAME,products.getsName());
+        cv.put(Products.S_ALT_NAME,products.getsAltName());
+        cv.put(Products.S_CODE,products.getsCode());
+        cv.put(Products.S_UNIT,products.getsUnit());
+        cv.put(Products.S_BARCODE,products.getsBarcode());
+        status=db.update(TABLE_PRODUCT,cv,Products.I_ID+" =? ",new String[]{String.valueOf(products.getiId())});
+        return status!=-1;
+    }
+
+    public boolean deleteProducts(Products products) {
+        this.db=getReadableDatabase();
+        float status = db.delete(TABLE_PRODUCT,Products.I_ID+"=?",new String[]{String.valueOf(products.getiId())});
+        return status != -1;
+
+    }
+
+    public boolean deleteMasterAll() {
+        this.db=getReadableDatabase();
+        float status = db.delete(TABLE_MASTER_SETTINGS,null,null);
+        return status != -1;
+
+    }
+
+    public boolean deleteTranSetting(int iDocType, int tagId) {
+        this.db=getReadableDatabase();
+        float status = db.delete(TABLE_TRANSACTION_SETTING,
+                TransSetting.I_DOC_TYPE+"=? and "+TransSetting.I_TAG_ID+"=? ",
+                new String[]{String.valueOf(iDocType),String.valueOf(tagId)});
+        return status != -1;
     }
 }

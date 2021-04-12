@@ -35,10 +35,85 @@ public class GetProductService extends JobService {
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
-        GetProducts();
         AndroidNetworking.initialize(this);
+
+        Log.d("productss",helper.getProducts()+"");
+        if(helper.getProducts()==0) {
+            GetProducts();
+        }else {
+            UpdateProducts();
+        }
         return true;
     }
+
+    private void UpdateProducts() {
+        int maxId=helper.getProductsMaxId();
+        AndroidNetworking.get("http://"+  new Tools().getIP(GetProductService.this) +URLs.GetUpdateProducts)
+                .addQueryParameter("MaxId", String.valueOf(maxId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseProductsUp",response.toString());
+                        updateProductsValues(response);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseProducts",anError.toString());
+                    }
+                });
+    }
+
+    private void updateProductsValues(JSONObject response) {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                try {
+                    JSONArray jsonArray = new JSONArray(response.toString());
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        int iStatus=jsonObject.getInt("iStatus");
+                        Log.d("iStatus",iStatus+"");
+
+                        products = new Products(
+                                jsonObject.getString(Products.S_CODE),
+                                jsonObject.getString(Products.S_NAME),
+                                jsonObject.getString(Products.S_ALT_NAME),
+                                jsonObject.getInt(Products.I_ID),
+                                jsonObject.getString(Products.S_UNIT),
+                                jsonObject.getString(Products.S_BARCODE));
+
+                        if(iStatus==0){
+                            if(helper.insertProducts(products)){
+                                Log.d("successUpdate", "products UpdateInsert successfully"+i);
+                            }
+                        }
+                        else if(iStatus==1) {
+                            if (helper.editProducts(products)) {
+                                Log.d("successUpdate", "products UpdateEdit successfully " + i);
+
+                            }
+                        }
+                        else if(iStatus==2){
+                            if(helper.deleteProducts(products)){
+                                Log.d("successUpdate", "products Update Delete successfully " + i);
+
+                            }
+                        }
+
+
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };asyncTask.execute();
+
+        }
 
     private void GetProducts() {
         AndroidNetworking.get("http://" + new Tools().getIP(GetProductService.this) + URLs.GetProducts)
@@ -74,12 +149,7 @@ public class GetProductService extends JobService {
                                 jsonObject.getInt(Products.I_ID),
                                 jsonObject.getString(Products.S_UNIT),
                                 jsonObject.getString(Products.S_BARCODE));
-                        if(helper.checkProductsById(jsonObject.getString(Products.I_ID))){
-                            if(helper.checkAllDataProducts(products)){
-                                Log.d("success","products Updated successfully "+i+" "+jsonArray.length());
-                            }
-                        }
-                        else if( helper.insertProducts(products)){
+                     if( helper.insertProducts(products)){
                             Log.d("success","products added successfully "+i+"  "+jsonArray.length());
                         }
 
