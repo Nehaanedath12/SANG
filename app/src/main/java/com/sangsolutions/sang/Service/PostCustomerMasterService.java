@@ -60,11 +60,18 @@ public class PostCustomerMasterService extends JobService {
                 if(cursorHeader.moveToFirst() && cursorHeader.getCount()>0) {
                     for (int i = 0; i < cursorHeader.getCount(); i++) {
 
-                        int iId=cursorHeader.getInt(cursorHeader.getColumnIndex(CustomerMasterClass.ID));
 
+                        int iId=cursorHeader.getInt(cursorHeader.getColumnIndex(CustomerMasterClass.ID));
+                        String local=cursorHeader.getString(cursorHeader.getColumnIndex(CustomerMasterClass.LOCAL));
+                        Log.d("locallocal", local+" local");
                         JSONObject jsonObjectMain = new JSONObject();
                         try {
-                            jsonObjectMain.put("iId", iId);
+                            if(local.equals("1")) {
+                                jsonObjectMain.put("iId", 0);
+                            }else {
+                                jsonObjectMain.put("iId", iId);
+                            }
+
                             jsonObjectMain.put("sName",cursorHeader.getString(cursorHeader.getColumnIndex(CustomerMasterClass.NAME)));
                             jsonObjectMain.put("sCode",   cursorHeader.getString(cursorHeader.getColumnIndex(CustomerMasterClass.CODE)));
                             jsonObjectMain.put("sAltName",    cursorHeader.getString(cursorHeader.getColumnIndex(CustomerMasterClass.ALT_NAME)));

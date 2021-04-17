@@ -76,6 +76,8 @@ public class URLs {
     public static final String GetUpdateMasterTagDetails =domain+"GetUpdateMasterTagDetails";
     public static final String GetUpdateProducts =domain+"GetUpdateProducts";
 
+    public static final String PostTransAdvInvoice =domain+"PostTransAdvInvoice";
+    public static final String  DeleteTransAdvInvoice =domain+" DeleteTransAdvInvoice";
 
 
 }

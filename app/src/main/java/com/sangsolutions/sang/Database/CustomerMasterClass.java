@@ -4,6 +4,7 @@ public class CustomerMasterClass {
     public String name,code,altName,address,city,country,fax,website,pinNo,mobile,phone,
             contactPerson,creditAmount,creditDays,email,processingTime;
     public int iType,iId,iStatus;
+    public boolean local;
 
 
 
@@ -14,7 +15,8 @@ public class CustomerMasterClass {
                                String address, String city, String country,
                                String fax, String website, int iType, String creditDays,
                                String creditAmount, String pinNo, String mobile, String phone,
-                               String contactPerson, String email,int iId, String processingTime, int iStatus) {
+                               String contactPerson, String email,int iId, String processingTime,
+                               int iStatus,boolean local) {
         this.name = name;
         this.code = code;
         this.altName = altName;
@@ -34,6 +36,15 @@ public class CustomerMasterClass {
         this.iId=iId;
         this.iStatus=iStatus;
         this.processingTime=processingTime;
+        this.local=local;
+    }
+
+    public boolean isLocal() {
+        return local;
+    }
+
+    public void setLocal(boolean local) {
+        this.local = local;
     }
 
     public int getiId() {
@@ -188,6 +199,7 @@ public class CustomerMasterClass {
         this.iStatus = iStatus;
     }
 
+    public static  String LOCAL="local";
     public static  String ID="iId";
     public static  String NAME="name";
     public static  String CODE="code";

@@ -301,7 +301,33 @@ public class Home extends AppCompatActivity {
                                 Toast.makeText(Home.this, "please sync Datas", Toast.LENGTH_SHORT).show();
                             }
                         }break;
+                        case 6:{
+                            tagCursor=helper.getTagDetails();
+                            if(tagCursor.getCount()>0) {
 
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Advance Invoice History").setIDocType(16);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+//                            NavDirections action= HomeFragmentDirections.actionHomeFragmentToAdvanceInvoiceHistoryFragment();
+//                            navController.navigate(R.id.homeFragment);
+//                            navController.navigate(action);
+                                drawer.closeDrawer(GravityCompat.START);
+                                return true;
+                            }else {
+                                Toast.makeText(Home.this, "please sync Datas", Toast.LENGTH_SHORT).show();
+                            }
+                        }break;
+                        case 7:{
+                            tagCursor = helper.getTagDetails();
+                            if (tagCursor.getCount() > 0) {
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt AdvanceInv History", 17);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+                            } else {
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        break;
                     }
                     drawer.closeDrawer(GravityCompat.START);
                     return true;
@@ -380,6 +406,8 @@ public class Home extends AppCompatActivity {
                             }
 
                         }break;
+
+
                     }
 
                     drawer.closeDrawer(GravityCompat.START);
@@ -445,6 +473,7 @@ public class Home extends AppCompatActivity {
                         drawer.closeDrawer(GravityCompat.START);
                     }
                     break;
+
                 }
                 return false;
             }
@@ -480,7 +509,7 @@ public class Home extends AppCompatActivity {
                 R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment,
                 R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment,
                 R.id.s_P_OrderHistoryFragment,R.id.requestHistoryFragment,R.id.quotationHistoryFragment,
-                R.id.stockCountHistoryFragment,R.id.masterHistoryFragment)
+                R.id.stockCountHistoryFragment,R.id.masterHistoryFragment,R.id.advanceInvoiceHistoryFragment)
                 .setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -629,10 +658,17 @@ public class Home extends AppCompatActivity {
         listDataHeader.add(item5);
 
         ExpandedMenuModel item6 = new ExpandedMenuModel();
-        item6.setIconName("Master History");
+        item6.setIconName("Master Setting");
         item6.setIconImg(R.drawable.ic_profile);
         // Adding data header
         listDataHeader.add(item6);
+
+//        ExpandedMenuModel item7 = new ExpandedMenuModel();
+//        item7.setIconName("Advance Invoice");
+//        item7.setIconImg(R.drawable.ic_sales);
+//        // Adding data header
+//        listDataHeader.add(item7);
+
 
 
         // Adding child data
@@ -643,6 +679,8 @@ public class Home extends AppCompatActivity {
         heading1.add("Sales Order");
         heading1.add("Enquiry");
         heading1.add("Sales Quotation");
+        heading1.add("Advance Invoice");
+        heading1.add("Receipt Advance Invoice");
 
         List<String> heading2 = new ArrayList<String>();
         heading2.add("Purchase");
@@ -651,10 +689,6 @@ public class Home extends AppCompatActivity {
         heading2.add("Purchase Order");
         heading2.add("Request");
         heading2.add("Purchase Quotation");
-
-
-
-
 
         listDataChild.put(listDataHeader.get(1), heading1);// Header, Child data
         listDataChild.put(listDataHeader.get(2), heading2);
@@ -668,14 +702,15 @@ public class Home extends AppCompatActivity {
     private void syncTag() {
 
         Log.d("ipppp","new Tools().getIP(Login.this)");
-        schedulerJob.SyncMasterSettings(Home.this);
+
 //        schedulerJob.SyncToken(this);
+        schedulerJob.SyncMasterSettings(Home.this);
+        schedulerJob.SyncAccounts(Home.this);
         schedulerJob.SyncProduct(Home.this);
         schedulerJob.SyncTransSalePurchase(Home.this);
         schedulerJob.SyncBank(Home.this);
-        schedulerJob.SyncAccounts(Home.this);
-        schedulerJob.SyncUser(Home.this);
         schedulerJob.syncMasterTagDetails(Home.this);
+        schedulerJob.SyncUser(Home.this);
         }
 
 

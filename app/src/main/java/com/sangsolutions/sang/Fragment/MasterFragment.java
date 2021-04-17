@@ -49,6 +49,7 @@ public class MasterFragment extends Fragment {
     NavController navController;
     boolean EditMode;
     AlertDialog alertDialog;
+    boolean local=false;
 
 
     @Nullable
@@ -158,6 +159,10 @@ public class MasterFragment extends Fragment {
         Cursor cursorEdit = helper.getEditValuesCustomerMaster(iId);
 
         if (cursorEdit.moveToFirst() && cursorEdit.getCount() > 0) {
+            if(cursorEdit.getString(cursorEdit.getColumnIndex(CustomerMasterClass.LOCAL)).equals("1")){
+                local=true;
+            }
+
             Log.d("iidd",cursorEdit.getInt(cursorEdit.getColumnIndex(CustomerMasterClass.ID))+"");
             binding.Name.setText(cursorEdit.getString(cursorEdit.getColumnIndex(CustomerMasterClass.NAME)));
             binding.code.setText(cursorEdit.getString(cursorEdit.getColumnIndex(CustomerMasterClass.CODE)));
@@ -290,7 +295,13 @@ public class MasterFragment extends Fragment {
     private void saveAPI() {
         JSONObject jsonObjectMain = new JSONObject();
         try {
-            jsonObjectMain.put("iId", iId);
+
+            if(local){
+                jsonObjectMain.put("iId", 0);
+            }else {
+                jsonObjectMain.put("iId", iId);
+            }
+            Log.d("locall","success "+local);
             jsonObjectMain.put("sName",    binding.Name.getText().toString());
             jsonObjectMain.put("sCode",    binding.code.getText().toString());
             jsonObjectMain.put("sAltName",    binding.altName.getText().toString());
@@ -308,7 +319,7 @@ public class MasterFragment extends Fragment {
             jsonObjectMain.put("sEmail",    binding.email.getText().toString());
             jsonObjectMain.put("sWebsite",    binding.webSite.getText().toString());
 
-            jsonObjectMain.put("sContactPersonNo",binding.contactPerson.getText().toString());
+            jsonObjectMain.put("sContactPersonNo",  binding.contactPerson.getText().toString());
             jsonObjectMain.put("iType",iType);
             jsonObjectMain.put("iUser", userId);
 
@@ -355,11 +366,14 @@ public class MasterFragment extends Fragment {
     private void saveLocally() {
 
         Cursor cursor1=helper.getDataFromCustomerMaster();
-        Log.d("legntghh",cursor1.getCount()+"");
+        Log.d("legnthh",cursor1.getCount()+"");
+
         if(!EditMode) {
+            local=true;
             if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
                 iId = cursor1.getCount();
                 Log.d("legntghhiId",iId+"");
+
             }
         }
         Log.d("legntghhiId",iId+"");
@@ -382,7 +396,7 @@ public class MasterFragment extends Fragment {
                 binding.email.getText().toString(),
                 iId,
                 DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"",
-                0);
+                0,local);
 
         if(helper.deleteMasterCustomer(iId)) {
             if (helper.insertMasterCustomer(masterClass)) {

@@ -1067,9 +1067,9 @@ public class RequestFragment extends Fragment {
                 if (cursor1.getCount() > 0) {
                     int count = Tools.getNewDocNoLocally(cursor1);
                     Log.d("status", count + "");
-                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-"  + count;
                 }else {
-                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-"  + 1;
 
                 }
             }

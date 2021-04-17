@@ -1050,9 +1050,10 @@ public class PaymentReceiptFragment extends Fragment {
         int itype=0;
         if(iDocType==15){
             itype=10;
-        }else if(iDocType==25)
-        {
+        }else if(iDocType==25) {
             itype=20;
+        }else if(iDocType==17) {
+            itype=16;
         }
         Log.d("icustomer",iCustomer+" "+iDocType);
                 AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetInvoiceList)
@@ -1223,9 +1224,12 @@ public class PaymentReceiptFragment extends Fragment {
 
         if (iDocType == 15) {
             binding.customer.setHint("Select Vendor");
-            toolTitle = "Payment Summary";
-        } else {
-            toolTitle = "Receipt Summary";
+            toolTitle = "Payment History";
+        } else if (iDocType == 25) {
+            toolTitle = "Receipt History";
+        }
+        else if (iDocType == 17) {
+            toolTitle = "Receipt AdvanceInv History";
         }
         Cursor cursor = helper.getUserCode(userIdS);
         if (cursor.moveToFirst() && cursor.getCount() > 0) {
@@ -1279,9 +1283,9 @@ public class PaymentReceiptFragment extends Fragment {
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("statuss",count+"");
-                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-"  + count;
                 }else {
-                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-"  + 1;
 
                 }
             }

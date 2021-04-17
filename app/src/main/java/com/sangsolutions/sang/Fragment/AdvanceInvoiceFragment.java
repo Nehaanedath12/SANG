@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -21,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,18 +38,16 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
+import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
-import com.sangsolutions.sang.Adapter.OrderBodyAdapter.OrderBodyAdapter;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.Products.ProductsAdapter;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
@@ -60,12 +56,11 @@ import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.DatabaseHelper;
-import com.sangsolutions.sang.Database.Sales_purchase_order_class;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
-import com.sangsolutions.sang.databinding.FragmentSalesPurchaseOrderBinding;
+import com.sangsolutions.sang.databinding.FragmentAdvanceInvoiceBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,9 +76,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class S_P_OrderFragment extends Fragment {
+public class AdvanceInvoiceFragment extends Fragment {
 
-    FragmentSalesPurchaseOrderBinding binding;
+    FragmentAdvanceInvoiceBinding binding;
     int iDocType,iTransId;
     boolean EditMode;
     String docNo;
@@ -110,8 +105,7 @@ public class S_P_OrderFragment extends Fragment {
     HashMap<Integer, Integer> hashMapHeader;
 
     List<BodyPart>bodyPartList;
-    OrderBodyAdapter orderBodyAdapter;
-
+    BodyPartAdapter bodyPartAdapter;
     NavController navController;
 
     int numberOfLinesH;
@@ -140,24 +134,24 @@ public class S_P_OrderFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding=FragmentSalesPurchaseOrderBinding.inflate(getLayoutInflater());
-        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+       binding=FragmentAdvanceInvoiceBinding.inflate(getLayoutInflater());
         try {
             ((Home)getActivity()).setDrawerEnabled(false);
         }catch (Exception e){
             e.printStackTrace();
         }
-        assert getArguments() != null;
-        iDocType = S_P_OrderFragmentArgs.fromBundle(getArguments()).getIDocType();
-        iTransId = S_P_OrderFragmentArgs.fromBundle(getArguments()).getITransId();
-        EditMode = S_P_OrderFragmentArgs.fromBundle(getArguments()).getEditMode();
-        Log.d("llllll","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +"");
-
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
         hashMapBody=new HashMap<>();
         hashMapHeader=new HashMap<>();
 
         headerListTags =new ArrayList<>();
         bodyListTags =new ArrayList<>();
+
+        assert getArguments() != null;
+        iDocType=16;
+        iTransId = AdvanceInvoiceFragmentArgs.fromBundle(getArguments()).getITransId();
+        EditMode = AdvanceInvoiceFragmentArgs.fromBundle(getArguments()).getEditMode();
+        Log.d("llllll","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +"");
         df = new SimpleDateFormat("dd-MM-yyyy");
         helper=new DatabaseHelper(requireActivity());
 
@@ -191,39 +185,11 @@ public class S_P_OrderFragment extends Fragment {
         if(cursorTagNumber!=null) {
             tagTotalNumber = cursorTagNumber.getCount();
         }
+
         bodyPartList=new ArrayList<>();
-        orderBodyAdapter=new OrderBodyAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
+        bodyPartAdapter=new BodyPartAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-
-
-        binding.date.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dateSetting(binding.date);
-
-            }
-        });
-
-        binding.delDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dateSetting(binding.delDate);
-            }
-        });
-
-        binding.addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(binding.cardViewBody.getVisibility()==View.GONE){
-                    binding.cardViewBody.setVisibility(View.VISIBLE);
-                }
-                else {
-                    binding.cardViewBody.setVisibility(View.GONE);
-                }
-
-            }
-        });
 
         for (int tagId=1;tagId<=tagTotalNumber;tagId++){
             Cursor cursor=helper.getTransSettings(iDocType,tagId);
@@ -311,7 +277,43 @@ public class S_P_OrderFragment extends Fragment {
 
         initialValueSettingHeader();
 
+        binding.date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
+
+                        StringDate = Tools.checkDigit(dayOfMonth)+
+                                "-" +
+                                Tools.checkDigit(month + 1) +
+                                "-"+
+                                year;
+                        binding.date.setText(StringDate);
+                    }
+                };
+                Calendar now = Calendar.getInstance();
+                int year = now.get(Calendar.YEAR);
+                int month = now.get(Calendar.MONTH);
+                int day = now.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), onDateSetListener, year, month, day);
+                datePickerDialog.show();
+            }
+        });
+
+        binding.addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(binding.cardViewBody.getVisibility()==View.GONE){
+                    binding.cardViewBody.setVisibility(View.VISIBLE);
+                }
+                else {
+                    binding.cardViewBody.setVisibility(View.GONE);
+                }
+
+            }
+        });
         binding.barcodeI.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -319,7 +321,6 @@ public class S_P_OrderFragment extends Fragment {
                 barcodeScanningChecking();
             }
         });
-
         binding.productName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -342,8 +343,6 @@ public class S_P_OrderFragment extends Fragment {
         if (binding.surfaceView.getVisibility() == View.VISIBLE) {
             binding.productName.dismissDropDown();
         }
-
-
 
         binding.customer.addTextChangedListener(new TextWatcher() {
             @Override
@@ -393,6 +392,8 @@ public class S_P_OrderFragment extends Fragment {
                 }
             }
         });
+
+
         binding.saveMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -415,12 +416,6 @@ public class S_P_OrderFragment extends Fragment {
                                             if (!mandatoryList_H.get(i).getText().toString().equals("")
                                                     && helper.isTagValid(mandatoryList_H.get(i).getText().toString().trim())) {
                                                 if (i + 1 == mandatoryList_H.size() && flag) {
-
-                                                    for(int j=0;j<headerListTags.size();j++){
-                                                        if(autoText_H_list.get(j).getText().toString().equals("")){
-                                                            hashMapHeader.remove(headerListTags.get(j));
-                                                        }
-                                                    }
 //                                                                if(mandatoryList_H.size()==hashMapHeader.size()){
                                                     saveMain();
 //                                                                }
@@ -456,8 +451,10 @@ public class S_P_OrderFragment extends Fragment {
                             }
                         }).create().show();
 
+
             }
         });
+
 
         binding.deleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -472,7 +469,7 @@ public class S_P_OrderFragment extends Fragment {
                                     if(Tools.isConnected(requireContext())) {
                                         deleteAllFromAPI();
                                     }else {
-                                        deleteAllFromDB();
+//                                        deleteAllFromDB();
                                     }
 
                                 }
@@ -490,24 +487,12 @@ public class S_P_OrderFragment extends Fragment {
 
             }
         });
-
         return binding.getRoot();
     }
 
-    private void deleteAllFromDB() {
-        if(helper.deleteSP_Order_Header(iTransId,iDocType,docNo)){
-            if(helper.delete_S_P_Order_Body(iDocType,iTransId)){
-                Log.d("responsePost ", "successfully");
-                NavDirections actions =S_P_OrderFragmentDirections
-                        .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
-                navController.navigate(actions);
-                Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     private void deleteAllFromAPI() {
-        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransOrder)
+
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransAdvInvoice)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -515,11 +500,9 @@ public class S_P_OrderFragment extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         Log.d("response_delete",response);
-                        NavDirections actions =S_P_OrderFragmentDirections
-                                .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
+                        NavDirections actions = AdvanceInvoiceFragmentDirections.actionAdvanceInvoiceFragmentToAdvanceInvoiceHistoryFragment();
                         navController.navigate(actions);
                         Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
-
                     }
 
                     @Override
@@ -528,9 +511,12 @@ public class S_P_OrderFragment extends Fragment {
 
                     }
                 });
+
     }
 
     private void saveMain() {
+
+
         if (Tools.isConnected(requireContext())) {
             JSONObject jsonObjectMain = new JSONObject();
             try {
@@ -540,7 +526,6 @@ public class S_P_OrderFragment extends Fragment {
                 jsonObjectMain.put("iTransId", iTransId);
                 jsonObjectMain.put("sDocNo", docNo);
                 jsonObjectMain.put("sDate", Tools.dateFormat(binding.date.getText().toString()));
-                jsonObjectMain.put("sDeliveryDate", Tools.dateFormat(binding.delDate.getText().toString()));
                 jsonObjectMain.put("iDocType", iDocType);
                 jsonObjectMain.put("iAccount1", iCustomer);
                 jsonObjectMain.put("iAccount2", 0);
@@ -561,7 +546,6 @@ public class S_P_OrderFragment extends Fragment {
                 for (int i = 0; i < bodyPartList.size(); i++) {
                     JSONObject jsonObject = new JSONObject();
 
-
                     Log.d("bodyPartList size", bodyPartList.size() + "" + i);
 
                     for (int j = 1; j <= tagTotalNumber; j++) {
@@ -578,16 +562,27 @@ public class S_P_OrderFragment extends Fragment {
 
                     jsonObject.put("iProduct", bodyPartList.get(i).getiProduct());
                     jsonObject.put("fQty", bodyPartList.get(i).getQty());
+                    jsonObject.put("fRate", bodyPartList.get(i).getRate());
+                    jsonObject.put("fDiscount", bodyPartList.get(i).getDiscount());
+                    jsonObject.put("fAddCharges", bodyPartList.get(i).getAddCharges());
+                    jsonObject.put("fVatPer", bodyPartList.get(i).getVatPer());
+                    jsonObject.put("fVAT", bodyPartList.get(i).getVat());
                     if (bodyPartList.get(i).getRemarks().equals("")) {
                         jsonObject.put("sRemarks", "");
                     } else {
                         jsonObject.put("sRemarks", bodyPartList.get(i).getRemarks());
                     }
                     jsonObject.put("sUnits", bodyPartList.get(i).getUnit());
+                    jsonObject.put("fNet", bodyPartList.get(i).getNet());
 
 
                     Log.d("jsonObjecttIproduct", jsonObject.get("iProduct") + "");
                     Log.d("jsonObjecttQty", jsonObject.get("fQty") + "");
+                    Log.d("jsonObjecttrate", jsonObject.get("fRate") + "");
+                    Log.d("jsonObjecttdis", jsonObject.get("fDiscount") + "");
+                    Log.d("jsonObjecttaddcha", jsonObject.get("fAddCharges") + "");
+                    Log.d("jsonObjecttvarper", jsonObject.get("fVatPer") + "");
+                    Log.d("jsonObjecttvat", jsonObject.get("fVAT") + "");
                     Log.d("jsonObjecttrema", jsonObject.get("sRemarks") + "");
 
 
@@ -603,138 +598,35 @@ public class S_P_OrderFragment extends Fragment {
                 e.printStackTrace();
             }
         }else {
-            saveLocally();
-        }
-    }
-
-    private void saveLocally() {
-        Sales_purchase_order_class sp_class=new Sales_purchase_order_class();
-        Cursor cursor1=helper.getDataFromS_P_Order_Header();
-        if(!EditMode) {
-            if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
-                iTransId = Tools.getNewDocNoLocally(cursor1);
-            }
-        }
-
-        sp_class.setiTransId(iTransId);
-        sp_class.setsDocNo(docNo);
-        sp_class.setsDate(binding.date.getText().toString());
-        sp_class.setsDelDate(binding.delDate.getText().toString());
-        sp_class.setiDocType(iDocType);
-        sp_class.setiAccount1(iCustomer);
-        sp_class.setiAccount2(0);
-        sp_class.setsNarration(binding.description.getText().toString());
-        sp_class.setProcessTime(DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"");
-        sp_class.setStatus(0);
-        Log.d("responsePost", sp_class.getStatus()+"");
-        if(helper.deleteSP_Order_Header(iTransId,iDocType,docNo)) {
-            if (helper.insert_S_P_Order_Header(sp_class)) {
-                InsertBodyPart_DB();
-            }
-
-        }
-    }
-
-    private void InsertBodyPart_DB() {
-        if(helper.delete_S_P_Order_Body(iDocType,iTransId)) {
-
-            for (int i = 0; i < bodyPartList.size(); i++) {
-                Sales_purchase_order_class sp_classBody = new Sales_purchase_order_class();
-
-                for (int j = 1; j <= tagTotalNumber; j++) {
-                    if (hashMapHeader.containsKey(j)) {
-                        loadDataTags(sp_classBody, j, hashMapHeader.get(j));
-                    } else if (bodyPartList.get(i).hashMapBody.containsKey(j)) {
-                        loadDataTags(sp_classBody, j, bodyPartList.get(i).hashMapBody.get(j));
-                    } else {
-                        loadDataTags(sp_classBody, j, 0);
-                    }
-                }
-                sp_classBody.setiProduct(bodyPartList.get(i).getiProduct());
-                sp_classBody.setFqty(bodyPartList.get(i).getQty());
-                sp_classBody.setsRemarks(bodyPartList.get(i).getRemarks());
-                sp_classBody.setUnit(bodyPartList.get(i).getUnit());
-                sp_classBody.setsDocNo(docNo);
-                sp_classBody.setiDocType(iDocType);
-                sp_classBody.setiTransId(iTransId);
-                Log.d("DataBodyInsert", "deleted");
-                if (helper.insert_S_P_Order_Body(sp_classBody)) {
-                    Log.d("DataBodyInsert", "SUCCESS");
-
-                    if (i + 1 == bodyPartList.size()) {
-                        Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
-                        NavDirections actions =S_P_OrderFragmentDirections
-                                .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
-                        navController.navigate(actions);
-                    }
-                }
-
-
-            }
-        }
-    }
-
-    private void loadDataTags(Sales_purchase_order_class sp_class, int j, Integer iTag) {
-        switch (j){
-            case 1:{
-                sp_class.setiTag1(iTag);
-                break;
-            }
-            case 2:{
-                sp_class.setiTag2(iTag);
-                break;
-            }
-            case 3:{
-                sp_class.setiTag3(iTag);
-                break;
-            }
-            case 4:{
-                sp_class.setiTag4(iTag);
-                break;
-            }
-            case 5:{
-                sp_class.setiTag5(iTag);
-                break;
-            }
-            case 6:{
-                sp_class.setiTag6(iTag);
-                break;
-            } case 7:{
-                sp_class.setiTag7(iTag);
-                break;
-            }
-            case 8:{
-                sp_class.setiTag8(iTag);
-                break;
-            }
-
+//            saveLocallyally();
         }
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain) {
-
         Log.d("uploadjSONoBJECT",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
-            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity())+ URLs.PostTransOrder)
+            AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity()) + URLs.PostTransAdvInvoice)
                     .addJSONObjectBody(jsonObjectMain)
                     .setPriority(Priority.MEDIUM)
                     .build()
                     .getAsString(new StringRequestListener() {
                         @Override
                         public void onResponse(String response) {
+                            Log.d("responsePostt", response);
                             if (response.contains(docNo)) {
                                 alertDialog.dismiss();
-                                if(helper.deleteSP_Header_Order(iTransId,iDocType,docNo)) {
-                                    if (helper.delete_S_P_Body_Order(iDocType, iTransId)) {
+//                                if(helper.deleteSP_Header(iTransId,iDocType,docNo)){
+//                                    if(helper.delete_S_P_Body(iDocType,iTransId)){
                                         Log.d("responsePost ", "successfully");
                                         Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
                                         bodyPartList.clear();
-                                        NavDirections actions = S_P_OrderFragmentDirections
-                                                .actionSPOrderFragmentToSPOrderHistoryFragment(iDocType, toolTitle);
+                                        NavDirections actions = AdvanceInvoiceFragmentDirections.actionAdvanceInvoiceFragmentToAdvanceInvoiceHistoryFragment();
                                         navController.navigate(actions);
-                                    }
-                                }
+//                                    }
+//                                }
+
+
                             }
                         }
 
@@ -745,74 +637,86 @@ public class S_P_OrderFragment extends Fragment {
                         }
                     });
         }
-        else {
-            Snackbar snackbar=Snackbar.make(binding.getRoot(),"No Internet",Snackbar.LENGTH_LONG);
-            snackbar.setBackgroundTint(Color.RED);
-            snackbar.setTextColor(Color.WHITE);
-            snackbar.show();
-        }
-    }
-
-    private void dateSetting(EditText date) {
-        DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
-
-                StringDate = Tools.checkDigit(dayOfMonth)+
-                        "-" +
-                        Tools.checkDigit(month + 1) +
-                        "-"+
-                        year;
-                date.setText(StringDate);
-            }
-        };
-        Calendar now = Calendar.getInstance();
-        int year = now.get(Calendar.YEAR);
-        int month = now.get(Calendar.MONTH);
-        int day = now.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), onDateSetListener, year, month, day);
-        datePickerDialog.show();
 
     }
+
 
     private void saveBodyPartProduct() {
+        float rate,gross,net,vatPer = 0,vat=0,discount = 0,addCharges = 0;
         int qty;
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
-            if(!binding.qtyProduct.getText().toString().equals("")){
-                BodyPart bodyPart=new BodyPart();
+            if(!binding.qtyProduct.getText().toString().equals("") ){
+                if(!binding.rateProduct.getText().toString().equals("") && ! binding.rateProduct.getText().toString().equals(".")){
 
-                qty=Integer.parseInt(binding.qtyProduct.getText().toString());
+                    BodyPart bodyPart=new BodyPart();
 
-                bodyPart.setProductName(binding.productName.getText().toString());
-                bodyPart.setQty(qty);
-                bodyPart.setiProduct(iProduct);
-                bodyPart.setHashMapBody(hashMapBody);
-                bodyPart.setUnit(binding.spinnerUnit.getSelectedItem().toString());
-                bodyPart.setRemarks(binding.remarksProduct.getText().toString());
-                if(editModeProduct) {
-                    bodyPartList.set(position_body_Edit,bodyPart);
+                    qty=Integer.parseInt(binding.qtyProduct.getText().toString());
 
-                }else {
-                    bodyPartList.add(bodyPart);
+                    rate=Float.parseFloat(binding.rateProduct.getText().toString());
 
-                }
-                orderBodyAdapter.notifyDataSetChanged();
+                    gross=qty*rate;
 
-                binding.boyPartRV.setAdapter(orderBodyAdapter);
 
-                initialValueSettingBody();
-                binding.cardViewBody.setVisibility(View.GONE);
-
-                orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
-                    @Override
-                    public void onItemClick(BodyPart bodyPart, int position) {
-                        editingProductField(bodyPart,position);
+                    if(!binding.disProduct.getText().toString().equals("") && !binding.disProduct.getText().toString().equals(".")){
+                        discount=Float.parseFloat(binding.disProduct.getText().toString());
                     }
-                });
-            }else {binding.qtyProduct.setError("No Quantity");}
-        }else {binding.productName.setError("Enter proper Name");}
+
+
+                    if(!binding.addChargesProduct.getText().toString().equals("") && !binding.addChargesProduct.getText().toString().equals(".")){
+                        addCharges=Float.parseFloat(binding.addChargesProduct.getText().toString());
+                    }
+                    if(!binding.vatPerProduct.getText().toString().equals("") && !binding.vatPerProduct.getText().toString().equals(".")){
+                        vatPer=Float.parseFloat(binding.vatPerProduct.getText().toString());
+
+                    }
+                    net=gross-discount+addCharges+vat;
+                    vat=net-(net/(1+vatPer/100));
+                    bodyPart.setGross(gross);
+                    bodyPart.setNet(Float.parseFloat(df.format(net)));
+                    bodyPart.setVat(Float.parseFloat(df.format(vat)));
+                    bodyPart.setVatPer(vatPer);
+                    bodyPart.setDiscount(discount);
+                    bodyPart.setAddCharges(addCharges);
+                    bodyPart.setProductName(binding.productName.getText().toString());
+                    bodyPart.setQty(qty);
+                    bodyPart.setRate(rate);
+                    bodyPart.setiProduct(iProduct);
+                    bodyPart.setHashMapBody(hashMapBody);
+                    bodyPart.setUnit(binding.spinnerUnit.getSelectedItem().toString());
+
+                    bodyPart.setRemarks(binding.remarksProduct.getText().toString());
+
+                    if(editModeProduct) {
+                        bodyPartList.set(position_body_Edit,bodyPart);
+
+                    }else {
+                        bodyPartList.add(bodyPart);
+
+                    }
+                    bodyPartAdapter.notifyDataSetChanged();
+
+                    binding.boyPartRV.setAdapter(bodyPartAdapter);
+
+                    initialValueSettingBody();
+                    binding.cardViewBody.setVisibility(View.GONE);
+
+                    /////////////////////////////////////////editProduct
+
+                    bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(BodyPart bodyPart, int position) {
+                            editingProductField(bodyPart,position);
+
+
+                        }
+                    });
+
+                    ////////////////////////////////////////editProduct
+
+                }else {binding.rateProduct.setError("Enter Rate");}
+            }else {binding.qtyProduct.setError("Enter qty");}
+        }else {binding.productName.setError("enter valid product");}
     }
 
     private void editingProductField(BodyPart bodyPart, int position) {
@@ -825,6 +729,10 @@ public class S_P_OrderFragment extends Fragment {
         binding.productName.setText(bodyPart.getProductName());
         iProduct=bodyPart.getiProduct();
         binding.qtyProduct.setText(String.valueOf(bodyPart.getQty()));
+        binding.rateProduct.setText(String.valueOf(bodyPart.getRate()));
+        binding.vatPerProduct.setText(String.valueOf(bodyPart.getVatPer()));
+        binding.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
+        binding.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
         binding.remarksProduct.setText(bodyPart.getRemarks());
         setUnit(helper.getProductUnitById(iProduct),position);
 
@@ -837,6 +745,7 @@ public class S_P_OrderFragment extends Fragment {
                     autoText_B_list.get(i).setText(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
                 }else {
                     autoText_B_list.get(i).setText("");
+
                 }
                 hashMapBody.put(tagId, tagDetails);
             }
@@ -850,6 +759,10 @@ public class S_P_OrderFragment extends Fragment {
         hashMapBody=new HashMap<>();
         binding.productName.setText("");
         binding.qtyProduct.setText("");
+        binding.rateProduct.setText("");
+        binding.vatPerProduct.setText("");
+        binding.disProduct.setText("");
+        binding.addChargesProduct.setText("");
         binding.cardViewBody.setVisibility(View.GONE);
         setUnit("",-1);
 
@@ -857,11 +770,9 @@ public class S_P_OrderFragment extends Fragment {
             autoText_B_list.get(i).setText("");
         }
         binding.remarksProduct.setText("");
-
     }
 
     private void GetCustomer(String customerKeyword) {
-
         customerList.clear();
         Cursor cursor=helper.getCustomerbyKeyword(customerKeyword);
         if(cursor!=null && !customerKeyword.equals("")) {
@@ -927,6 +838,7 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void barcodeScanningChecking() {
+
         if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(requireActivity(),new String[]{Manifest.permission.CAMERA},101);
         }
@@ -945,6 +857,7 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void barcodeScanning() {
+
         barcodeDetector=new BarcodeDetector.Builder(requireActivity()).setBarcodeFormats(Barcode.ALL_FORMATS).build();
         cameraSource=new CameraSource.Builder(requireActivity(),barcodeDetector).setAutoFocusEnabled(true)
                 .setRequestedPreviewSize(1080,1920).build();
@@ -1010,6 +923,7 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void setUnit(String units, int position) {
+
         List<String> list;
         list = Arrays.asList(units.split("\\s*,\\s*"));
         UnitAdapter unitAdapter = new UnitAdapter(list, requireActivity());
@@ -1023,6 +937,66 @@ public class S_P_OrderFragment extends Fragment {
                 }
         }
     }
+
+
+    private void initialValueSettingHeader() {
+
+        alertDialog.show();
+        numberOfLinesH =0;
+        numberOfLinesB =0;
+        StringDate=df.format(new Date());
+        binding.date.setText(StringDate);
+        if (iDocType == 10) {
+            binding.customer.setHint("Select Vendor");
+            toolTitle = "Purchase Summary";
+        } else {
+            toolTitle = "Sale Summary";
+        }
+        Cursor cursor = helper.getUserCode(userIdS);
+        if (cursor!=null) {
+            userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
+        }
+        if(Tools.isConnected(requireActivity())) {
+            if (EditMode) {
+//                EditValueFromAPI();
+            } else {
+                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetNextDocNo)
+                        .addQueryParameter("iDocType", String.valueOf(iDocType))
+                        .addQueryParameter("iUser", userIdS)
+                        .setPriority(Priority.MEDIUM)
+                        .build()
+                        .getAsJSONArray(new JSONArrayRequestListener() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+
+                                Log.d("responseDocNo", response.toString());
+                                try {
+                                    JSONArray jsonArray = new JSONArray(response.toString());
+                                    if (jsonArray.length() > 0) {
+                                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                                        docNo = jsonObject.getString("Column1");
+                                    }
+                                    binding.docNo.setText(docNo);
+                                    alertDialog.dismiss();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onError(ANError anError) {
+                                Log.d("responseTotalNumber", anError.toString());
+                                alertDialog.dismiss();
+                                NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                                navController.navigate(actions);
+                            }
+                        });
+            }
+        }
+
+
+
+        }
 
     private TextWatcher getTextWatcher(AutoCompleteTextView autocompleteView, int iTag, String iTagPosition) {
 
@@ -1048,7 +1022,6 @@ public class S_P_OrderFragment extends Fragment {
     }
 
     private void GetTagDetails(String s, int iTag, AutoCompleteTextView autocompleteView, String iTagPosition) {
-
         tagList.clear();
         Cursor cursor=helper.getTagbyKeyword(s,iTag);
         if(cursor!=null && !s.equals("")) {
@@ -1088,261 +1061,7 @@ public class S_P_OrderFragment extends Fragment {
 
             tagList.clear();
         }
-    }
-
-    private void initialValueSettingHeader() {
-
-        alertDialog.show();
-        numberOfLinesH = 0;
-        numberOfLinesB = 0;
-        StringDate = df.format(new Date());
-        binding.date.setText(StringDate);
-        binding.delDate.setText(StringDate);
-        if (iDocType == 12) {
-            binding.customer.setHint("Select Vendor");
-            toolTitle = "Purchase Order Summary";
-        } else {
-            toolTitle = "Sale Order Summary";
-        }
-        Cursor cursor = helper.getUserCode(userIdS);
-        if (cursor != null) {
-            userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
-        }
-
-        if (Tools.isConnected(requireActivity())) {
-            if (EditMode) {
-                EditValueFromAPI();
-            } else {
-                ///////
-
-                AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetNextDocNo)
-                        .addQueryParameter("iDocType", String.valueOf(iDocType))
-                        .addQueryParameter("iUser", userIdS)
-                        .setPriority(Priority.MEDIUM)
-                        .build()
-                        .getAsJSONArray(new JSONArrayRequestListener() {
-                            @Override
-                            public void onResponse(JSONArray response) {
-
-                                Log.d("responseDocNo", response.toString());
-                                try {
-                                    JSONArray jsonArray = new JSONArray(response.toString());
-                                    if(jsonArray.length()>0) {
-                                        JSONObject jsonObject=jsonArray.getJSONObject(0);
-                                        docNo=jsonObject.getString("Column1");
-                                    }
-                                    binding.docNo.setText(docNo);
-                                    alertDialog.dismiss();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            @Override
-                            public void onError(ANError anError) {
-                                Log.d("responseTotalNumber", anError.toString());
-                                alertDialog.dismiss();
-                                NavDirections actions = S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType, toolTitle);
-                                navController.navigate(actions);
-                            }
-                        });
-            }
-        } else {
-            alertDialog.dismiss();
-            Toast.makeText(requireActivity(), "No Internet", Toast.LENGTH_SHORT).show();
-            if (EditMode) {
-                editfromlocaldb();
-            } else {
-                Cursor cursor1 = helper.getDataFromS_P_Order_Header();
-                if (cursor1.getCount() > 0) {
-                    int count = Tools.getNewDocNoLocally(cursor1);
-                    Log.d("status", count + "");
-                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-"  + count;
-                }else {
-                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-"  + 1;
-
-                }
-            }
-
-            binding.docNo.setText(docNo);
-        }
-
-        ///////
-
-    }
-
-    private void editfromlocaldb() {
-
-        Cursor cursorEdit_H=helper.getEditValuesHeaderS_P_Order(iTransId,iDocType);
-
-        if(cursorEdit_H.moveToFirst()&& cursorEdit_H.getCount()>0){
-            iTransId=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.I_TRANS_ID));
-            docNo=cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_DOC_NO));
-            binding.docNo.setText(docNo);
-            binding.date.setText( cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_DATE)));
-            binding.delDate.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_DEL_DATE)));
-            binding.description.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.S_NARRATION)));
-            iCustomer=cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(Sales_purchase_order_class.I_ACCOUNT_1));
-            binding.customer.setText(helper.getCustomerUsingId(iCustomer));
-            changeStatus(iTransId,docNo,1);
-        }
-
-        Cursor cursorEdit_B=helper.getEditValuesBodyS_P_Order(iTransId,iDocType);
-
-        if(cursorEdit_B.moveToFirst() && cursorEdit_B.getCount()>0) {
-            for (int i = 0; i < cursorEdit_B.getCount(); i++) {
-                for (int k = 0; k < headerListTags.size(); k++) {
-                    int tagDetails = cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + headerListTags.get(k)));
-                    hashMapHeader.put(headerListTags.get(k), tagDetails);
-                    Cursor tagNameCursor = helper.getTagName(headerListTags.get(k), tagDetails);
-                    if (tagDetails != 0) {
-                        autoText_H_list.get(k).setText(tagNameCursor.getString(tagNameCursor.getColumnIndex(TagDetails.S_NAME)));
-
-                    } else {
-                        autoText_H_list.get(k).setText("");
-                    }
-                }
-                for (int k = 0; k < bodyListTags.size(); k++) {
-                    hashMapBody.put(bodyListTags.get(k),cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ bodyListTags.get(k))));
-                }
-
-                BodyPart bodyPart=new BodyPart();
-                bodyPart.setiProduct( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.I_PRODUCT)));
-
-                String productName=helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.I_PRODUCT)));
-
-                bodyPart.setProductName(productName);
-                bodyPart.setQty( cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.F_QTY)));
-                bodyPart.setRemarks(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.S_REMARKS)));
-                bodyPart.setUnit(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(Sales_purchase_order_class.S_UNITS)));
-                bodyPart.setHashMapBody(hashMapBody);
-
-                bodyPartList.add(bodyPart);
-                orderBodyAdapter.notifyDataSetChanged();
-                hashMapBody=new HashMap<>();
-
-                if(cursorEdit_B.getCount()==i+1){
-                    binding.boyPartRV.setAdapter(orderBodyAdapter);
-                    alertDialog.dismiss();
-                    orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
-                        @Override
-                        public void onItemClick(BodyPart bodyPart, int position) {
-                            editingProductField(bodyPart,position);
-                        }
-                    });
-
-                }
-                cursorEdit_B.moveToNext();
-
-            }
-        }
-    }
-
-    private void changeStatus(int transId, String docNo, int iStatus) {
-        if(helper.changeStatus_S_P_Order(transId,docNo,iStatus)){
-            Log.d("statusChange","successfully");
-        }
-    }
 
 
-    private void EditValueFromAPI() {
-
-        if(Tools.isConnected(requireContext())){
-            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransOrderDetails)
-                    .addQueryParameter("iTransId",String.valueOf(iTransId))
-                    .setPriority(Priority.MEDIUM)
-                    .build()
-                    .getAsJSONObject(new JSONObjectRequestListener() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d("Response_loadEditValue",response.toString());
-                            loadAPIValue_for_Edit(response);
-
-                        }
-
-                        @Override
-                        public void onError(ANError anError) {
-                            Log.d("Response_loadEditValue",anError.toString());
-                            alertDialog.dismiss();
-                            Toast.makeText(requireActivity(), anError.getMessage(), Toast.LENGTH_SHORT).show();
-                            NavDirections actions =S_P_OrderFragmentDirections.actionSPOrderFragmentToSPOrderHistoryFragment(iDocType,toolTitle);
-                            navController.navigate(actions);
-                        }
-                    });
-        }else {
-            Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
-            alertDialog.dismiss();
-        }
-    }
-
-    private void loadAPIValue_for_Edit(JSONObject response) {
-
-
-        try {
-           JSONArray jsonArray = new JSONArray(response.getString("Table"));
-            Log.d("HeadArray",jsonArray.length()+"");
-            JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
-            Log.d("BodyArray1",jsonArray1.length()+"");
-
-            for (int i=0;i<jsonArray.length();i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-                binding.docNo.setText(jsonObject.getString("sDocNo"));
-                docNo=jsonObject.getString("sDocNo");
-                binding.date.setText(jsonObject.getString("sDate"));
-                binding.delDate.setText(jsonObject.getString("sDelivaryDate"));
-                iCustomer = jsonObject.getInt("iAccount1");
-                binding.customer.setText(jsonObject.getString("sAccount1"));
-                binding.description.setText(jsonObject.getString("sNarration"));
-                Log.d("BodyPartt",jsonObject.getString("sDelivaryDate"));
-            }
-
-
-            for (int j=0;j<jsonArray1.length();j++){
-                JSONObject jsonObjectInner = jsonArray1.getJSONObject(j);
-                for (int k = 0; k< headerListTags.size(); k++){
-                    hashMapHeader.put(headerListTags.get(k),jsonObjectInner.getInt("iTag"+ headerListTags.get(k)));
-                    autoText_H_list.get(k).setText(jsonObjectInner.getString("sTag"+ headerListTags.get(k)));
-                }
-                for(int k=0;k<bodyListTags.size();k++){
-                    hashMapBody.put(bodyListTags.get(k),jsonObjectInner.getInt("iTag"+ bodyListTags.get(k)));
-
-                }
-
-                BodyPart bodyPart=new BodyPart();
-                bodyPart.setiProduct(jsonObjectInner.getInt("iProduct"));
-                bodyPart.setProductName(jsonObjectInner.getString("sProduct"));
-                bodyPart.setQty(jsonObjectInner.getInt("fQty"));
-                bodyPart.setRemarks(jsonObjectInner.getString("sRemarks"));
-                bodyPart.setUnit(jsonObjectInner.getString("sUnits"));
-                bodyPart.setHashMapBody(hashMapBody);
-
-
-                bodyPartList.add(bodyPart);
-                orderBodyAdapter.notifyDataSetChanged();
-                hashMapBody=new HashMap<>();
-
-
-                if(jsonArray1.length()==j+1){
-                    Log.d("Bodypartlistsize",bodyPartList.size()+" ");
-                    binding.boyPartRV.setAdapter(orderBodyAdapter);
-                    alertDialog.dismiss();
-                    Log.d("Bodypartlistsize",bodyPartList.size()+" "+jsonObjectInner.getString("sProduct"));
-                    orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
-                        @Override
-                        public void onItemClick(BodyPart bodyPart, int position) {
-                            editingProductField(bodyPart,position);
-                        }
-                    });
-                }
-            }
-
-
-
-
-        } catch (JSONException e) {
-            Log.d("exception",e.getMessage());
-            e.printStackTrace();
-        }
     }
 }

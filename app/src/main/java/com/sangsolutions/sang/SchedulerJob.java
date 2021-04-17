@@ -66,6 +66,7 @@ public class SchedulerJob {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void SyncTransSalePurchase(Context context) {
+        Log.d("TransSalePurchase","TransSalePurchase");
             JobScheduler js =
                     (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobInfo job = new JobInfo.Builder(

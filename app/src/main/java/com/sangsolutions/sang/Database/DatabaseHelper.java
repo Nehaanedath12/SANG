@@ -380,7 +380,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_CUSTOMER_MASTER =" create table if not exists " + TABLE_CUSTOMER_MASTER + " (" +
 
+            "" + CustomerMasterClass.LOCAL+ " TEXT(50) DEFAULT null ," +
             "" + CustomerMasterClass.ID+ " INTEGER DEFAULT 0, " +
+
             "" + CustomerMasterClass.NAME+" TEXT(50) DEFAULT null ,"  +
             "" + CustomerMasterClass.CODE+" TEXT(50) DEFAULT null ,"  +
             "" + CustomerMasterClass.ALT_NAME+" TEXT(50) DEFAULT null ,"  +
@@ -1921,6 +1923,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean insertMasterCustomer(CustomerMasterClass masterClass) {
         this.db=getReadableDatabase();
         ContentValues cv=new ContentValues();
+        cv.put(CustomerMasterClass.LOCAL,masterClass.isLocal());
 
         cv.put(CustomerMasterClass.ID,masterClass.getiId());
         cv.put(CustomerMasterClass.NAME,masterClass.getName());
@@ -2172,9 +2175,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean deleteTranSetting(int iDocType, int tagId) {
         this.db=getReadableDatabase();
-        float status = db.delete(TABLE_TRANSACTION_SETTING,
-                TransSetting.I_DOC_TYPE+"=? and "+TransSetting.I_TAG_ID+"=? ",
-                new String[]{String.valueOf(iDocType),String.valueOf(tagId)});
-        return status != -1;
+        Cursor cursor=db.rawQuery("select * from "+TABLE_TRANSACTION_SETTING,null);
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_TRANSACTION_SETTING,
+                    TransSetting.I_DOC_TYPE + "=? and " + TransSetting.I_TAG_ID + "=? ",
+                    new String[]{String.valueOf(iDocType), String.valueOf(tagId)});
+            return status != -1;
+        }else return true;
     }
 }

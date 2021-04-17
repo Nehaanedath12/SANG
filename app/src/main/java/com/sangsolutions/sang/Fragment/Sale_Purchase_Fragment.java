@@ -526,14 +526,17 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.date.setText(StringDate);
         if (iDocType == 10) {
             binding.customer.setHint("Select Vendor");
-            toolTitle = "Purchase Summary";
-        } else {
-            toolTitle = "Sale Summary";
+            toolTitle = "Purchase History";
+        } else if (iDocType == 20){
+            toolTitle = "Sale History";
+        }else if (iDocType == 16){
+            toolTitle = "Advance Invoice History";
         }
         Cursor cursor = helper.getUserCode(userIdS);
         if (cursor!=null) {
             userCode = cursor.getString(cursor.getColumnIndex(User.USER_CODE));
         }
+        Log.d("doctypeee",iDocType+"");
 
         if(Tools.isConnected(requireActivity())) {
             if (EditMode) {
@@ -581,9 +584,9 @@ public class Sale_Purchase_Fragment extends Fragment {
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("status",count+"");
-                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-"  + count;
                 }else {
-                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-"  + 1;
 
                 }
             }
@@ -963,7 +966,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                 if (helper.insert_S_P_Header(sp_class)) {
                     InsertBodyPart_DB();
                 }
-
         }
 
     }
@@ -1076,10 +1078,10 @@ public class Sale_Purchase_Fragment extends Fragment {
                     }
                     if(!binding.vatPerProduct.getText().toString().equals("") && !binding.vatPerProduct.getText().toString().equals(".")){
                             vatPer=Float.parseFloat(binding.vatPerProduct.getText().toString());
-                        vat=((vatPer/100)*(gross-discount+addCharges));
+
                         }
                         net=gross-discount+addCharges+vat;
-
+                    vat=((vatPer/100)*(gross-discount+addCharges));
                         bodyPart.setGross(gross);
                         bodyPart.setNet(Float.parseFloat(df.format(net)));
                         bodyPart.setVat(Float.parseFloat(df.format(vat)));

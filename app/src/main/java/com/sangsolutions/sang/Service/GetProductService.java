@@ -72,7 +72,7 @@ public class GetProductService extends JobService {
             protected Void doInBackground(Void... voids) {
 
                 try {
-                    JSONArray jsonArray = new JSONArray(response.toString());
+                    JSONArray jsonArray = new JSONArray(response.getString("Table"));
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         int iStatus=jsonObject.getInt("iStatus");

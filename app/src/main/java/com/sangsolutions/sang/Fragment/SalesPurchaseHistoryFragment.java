@@ -85,8 +85,10 @@ public class SalesPurchaseHistoryFragment extends Fragment {
         iDocType = SalesPurchaseHistoryFragmentArgs.fromBundle(getArguments()).getIDocType();
         if (iDocType == 10) {
             toolTitle = "Purchase";
-        } else {
+        } else if(iDocType==20) {
             toolTitle = "Sales";
+        } else if(iDocType==16) {
+            toolTitle = "Advance Invoice";
         }
 
         Cursor cursor_userId=helper.getUserId();

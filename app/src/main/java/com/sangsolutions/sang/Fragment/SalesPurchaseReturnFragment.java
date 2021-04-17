@@ -1439,9 +1439,9 @@ public class SalesPurchaseReturnFragment extends Fragment {
                 if(cursor1.getCount()>0) {
                     int count= Tools.getNewDocNoLocally(cursor1);
                     Log.d("status",count+"");
-                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-" + "000" + count;
+                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-"  + count;
                 }else {
-                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-" + "000" + 1;
+                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-"  + 1;
 
                 }
             }
@@ -1563,9 +1563,9 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
     private void loadAPIValue_for_Edit(JSONObject response) {
 
-        JSONArray jsonArray= null;
+
         try {
-            jsonArray = new JSONArray(response.getString("Table"));
+            JSONArray jsonArray = new JSONArray(response.getString("Table"));
             Log.d("HeadArray",jsonArray.length()+"");
             JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
             Log.d("BodyArray1",jsonArray1.length()+"");

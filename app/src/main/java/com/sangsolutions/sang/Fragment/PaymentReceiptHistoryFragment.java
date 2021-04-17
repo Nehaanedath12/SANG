@@ -91,8 +91,11 @@ public class PaymentReceiptHistoryFragment extends Fragment {
         if(iDocType==15){
             toolTitle="Payment";
         }
-        else {
+        else if(iDocType==25) {
             toolTitle="Receipt";
+        }
+        else if(iDocType==17) {
+            toolTitle="Receipt Advance-Inv";
         }
         Cursor cursor_userId=helper.getUserId();
         if(cursor_userId!=null &&cursor_userId.moveToFirst()) {
