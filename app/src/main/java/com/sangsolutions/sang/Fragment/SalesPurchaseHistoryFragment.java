@@ -401,6 +401,7 @@ public class SalesPurchaseHistoryFragment extends Fragment {
     }
 
     private void deleteFromAPI(int iTransId) {
+        Log.d("response_delete",iTransId+"");
         AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTrans)
                 .addQueryParameter("iTransId", String.valueOf(iTransId))
                 .setPriority(Priority.MEDIUM)

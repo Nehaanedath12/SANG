@@ -181,6 +181,10 @@ public class Home extends AppCompatActivity {
         else if(navController.getCurrentDestination().getId()==R.id.masterFragment){
             backAlert();
         }
+        else if(navController.getCurrentDestination().getId()==R.id.masterHistoryFragment){
+            NavDirections action= MasterHistoryFragmentDirections.actionMasterHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
 
 
     }
@@ -509,7 +513,7 @@ public class Home extends AppCompatActivity {
                 R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment,
                 R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment,
                 R.id.s_P_OrderHistoryFragment,R.id.requestHistoryFragment,R.id.quotationHistoryFragment,
-                R.id.stockCountHistoryFragment,R.id.masterHistoryFragment,R.id.advanceInvoiceHistoryFragment)
+                R.id.stockCountHistoryFragment,R.id.masterHistoryFragment)
                 .setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -704,12 +708,13 @@ public class Home extends AppCompatActivity {
         Log.d("ipppp","new Tools().getIP(Login.this)");
 
 //        schedulerJob.SyncToken(this);
+        schedulerJob.syncMasterTagDetails(Home.this);
         schedulerJob.SyncMasterSettings(Home.this);
         schedulerJob.SyncAccounts(Home.this);
         schedulerJob.SyncProduct(Home.this);
         schedulerJob.SyncTransSalePurchase(Home.this);
         schedulerJob.SyncBank(Home.this);
-        schedulerJob.syncMasterTagDetails(Home.this);
+
         schedulerJob.SyncUser(Home.this);
         }
 

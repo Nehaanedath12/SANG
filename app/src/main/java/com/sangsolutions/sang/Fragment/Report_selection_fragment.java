@@ -42,6 +42,15 @@ public class Report_selection_fragment extends Fragment {
                 navController.navigate(actions);
             }
         });
+
+        binding.advanceInvoiceReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("16","Advance Inv Report");
+                navController.navigate(actions);
+            }
+        });
+
         binding.PaymentReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,6 +62,13 @@ public class Report_selection_fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("25","Receipt Report");
+                navController.navigate(action);
+            }
+        });
+        binding.receiptAdvanceInvoiceReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections.actionReportSelectionFragmentToPRReportFragment("17","Receipt AdvanceInv Report");
                 navController.navigate(action);
             }
         });

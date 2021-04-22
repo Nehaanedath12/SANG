@@ -154,12 +154,16 @@ public class PostSalePurchaseService extends JobService {
                     public void onResponse(String response) {
 
                         Log.d("responsePost ", response);
-                        if (response.contains("-")) {
+                        Log.d("responsePostSP", response);
+                        try {
+                            int tId = Integer.parseInt(response);
                             if(helper.deleteSP_Header(iTransId,iDocType,docNo)){
                                 if(helper.delete_S_P_Body(iDocType,iTransId)){
                                     Log.d("responsePost ", "successfully");
                                 }
                             }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
 

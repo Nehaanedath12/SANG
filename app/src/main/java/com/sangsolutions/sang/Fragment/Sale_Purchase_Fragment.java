@@ -906,7 +906,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     }
 
     private void uploadToAPI(JSONObject jsonObjectMain) {
-        Log.d("uploadjSONoBJECT",jsonObjectMain.toString());
+        Log.d("uploadJSONoBJECT",jsonObjectMain.toString());
         if(Tools.isConnected(requireActivity())) {
             alertDialog.show();
             AndroidNetworking.post("http://"+ new Tools().getIP(requireActivity()) + URLs.PostProductStock)
@@ -916,20 +916,29 @@ public class Sale_Purchase_Fragment extends Fragment {
                     .getAsString(new StringRequestListener() {
                             @Override
                             public void onResponse(String response) {
-                                Log.d("responsePostt", response);
-                            if (response.contains(docNo)) {
+                                Log.d("responsePostSP", response);
+                                try {
+                                    iTransId=Integer.parseInt(response);
                                     alertDialog.dismiss();
-                                if(helper.deleteSP_Header(iTransId,iDocType,docNo)){
-                                    if(helper.delete_S_P_Body(iDocType,iTransId)){
-                                        Log.d("responsePost ", "successfully");
-                                        Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
-                                        bodyPartList.clear();
-                                        NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                                    if(helper.deleteSP_Header(iTransId,iDocType,docNo)){
+                                        if(helper.delete_S_P_Body(iDocType,iTransId)){
+                                            Log.d("responsePostSP ", "successfully "+iDocType);
+                                            Toast.makeText(requireActivity(), "Posted successfully", Toast.LENGTH_SHORT).show();
+                                            bodyPartList.clear();
+                                            NavDirections actions;
+                                            if(iDocType==16){
+                                                actions = Sale_Purchase_FragmentDirections.
+                                                        actionSalePurchaseFragmentToPaymentReceiptFragment("Receipt Advance-Inv", 17)
+                                                        .setEditMode(EditMode).setITransId(iTransId).setFromInvoice(true);
+                                                //iTransId is refid
+                                            }else {
+                                                actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                                            }
                                         navController.navigate(actions);
+                                        }
                                     }
-                                }
-
-
+                                }catch (Exception e){
+                                    alertDialog.dismiss();
                                 }
                                 }
 

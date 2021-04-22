@@ -89,8 +89,8 @@ import io.fotoapparat.result.WhenDoneListener;
 public class PaymentReceiptFragment extends Fragment {
     FragmentPaymentReceiptBinding binding;
     NavController navController;
-    int iDocType,iTransId;
-    boolean EditMode;
+    int iDocType,iTransId,iTransID;
+    boolean EditMode,FromInvoice;
     String StringDate;
     SimpleDateFormat df;
     DatabaseHelper helper;
@@ -164,7 +164,8 @@ public class PaymentReceiptFragment extends Fragment {
         iDocType = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getIDocType();
         iTransId = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getITransId();
         EditMode = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getEditMode();
-        Log.d("PaymentReceipt","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +"");
+        FromInvoice = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getFromInvoice();
+        Log.d("lllllp","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +""+FromInvoice);
 
 
         AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
@@ -344,7 +345,9 @@ public class PaymentReceiptFragment extends Fragment {
             public void onClick(View v) {
 
                 if(Tools.isConnected(requireActivity())){
-                invoiceDialogue();
+                    if(!FromInvoice) {
+                        invoiceDialogue();
+                    }
                 }else {
                     Toast.makeText(requireActivity(), "You are offline!!", Toast.LENGTH_SHORT).show();
                 }
@@ -516,7 +519,7 @@ public class PaymentReceiptFragment extends Fragment {
                 for(int i=0;i<invoiceSelectedList.size();i++){
                     amount+=invoiceSelectedList.get(i).getAmount();
                 }
-                if(Double.parseDouble(binding.amount.getText().toString().trim())!=amount){
+                if(binding.amount.getText().equals("") || Double.parseDouble(binding.amount.getText().toString().trim())!=amount){
                     binding.amount.setError("amount incorrect");
                 }
                 else {
@@ -653,7 +656,7 @@ public class PaymentReceiptFragment extends Fragment {
 
                     JSONArray jsonArray=new JSONArray();
 
-                    if(invoiceSelectedList.size()>0) {
+                    if(invoiceSelectedList.size()>0 ) {
                     for (int i = 0; i < invoiceSelectedList.size(); i++) {
                     JSONObject jsonObject = new JSONObject();
 
@@ -1238,38 +1241,18 @@ public class PaymentReceiptFragment extends Fragment {
 
         if(Tools.isConnected(requireActivity())) {
                 if (EditMode) {
-                EditValueFromAPI();
+                    if(iDocType==17  && FromInvoice){
+                        loadingReceiptFromInvoice();
+                    }
+                    else {
+                        EditValueFromAPI();
+                    }
                 }
                 else {
-                                    AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) +URLs.GetNextDocNo)
-                                    .addQueryParameter("iDocType", String.valueOf(iDocType))
-                                    .addQueryParameter("iUser", userIdS)
-                                    .setPriority(Priority.MEDIUM)
-                                    .build()
-                                    .getAsJSONArray(new JSONArrayRequestListener() {
-                                    @Override
-                                    public void onResponse(JSONArray response) {
-                                    Log.d("responseHistory", response.toString());
-                                    try {
-                                    JSONArray jsonArray = new JSONArray(response.toString());
-                                    if(jsonArray.length()>0) {
-                                        JSONObject jsonObject=jsonArray.getJSONObject(0);
-                                        docNo=jsonObject.getString("Column1");
-                                    }
-                                    binding.docNo.setText(docNo);
-                                    alertDialog.dismiss();
-                                    } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    }
-                            }
+                    createNewDocument();
 
-                            @Override
-                            public void onError(ANError anError) {
-                                Log.d("responseTotalNumber", anError.toString());
-                                alertDialog.dismiss();
-                            }
-                        });
             }
+
         }
         else {
             Toast.makeText(requireActivity(), "NO Internet", Toast.LENGTH_SHORT).show();
@@ -1293,6 +1276,186 @@ public class PaymentReceiptFragment extends Fragment {
             binding.docNo.setText(docNo);
 
         }
+    }
+
+    private void createNewDocument() {
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) +URLs.GetNextDocNo)
+                .addQueryParameter("iDocType", String.valueOf(iDocType))
+                .addQueryParameter("iUser", userIdS)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONArray(new JSONArrayRequestListener() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("responseHistory", response.toString());
+                        try {
+                            JSONArray jsonArray = new JSONArray(response.toString());
+                            if(jsonArray.length()>0) {
+                                JSONObject jsonObject=jsonArray.getJSONObject(0);
+                                docNo=jsonObject.getString("Column1");
+                            }
+                            binding.docNo.setText(docNo);
+
+                            if(iDocType==17 && FromInvoice){
+                                loadingNewReceiptFromInvoice();
+
+
+                            }else {
+                                alertDialog.dismiss();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseTotalNumber", anError.toString());
+                        alertDialog.dismiss();
+                    }
+                });
+    }
+
+
+
+
+
+    private void loadingNewReceiptFromInvoice() {
+
+        AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetTransDetails)
+                .addQueryParameter("iTransId",String.valueOf(iTransId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("Response_loadEditValue",response.toString());
+                        loadAPIValue_for_Edit_from_Invoice(response,iTransId);
+                        alertDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("Response_loadEditValue",anError.toString());
+                        alertDialog.dismiss();
+                        Toast.makeText(requireActivity(), anError.getMessage(), Toast.LENGTH_SHORT).show();
+                        NavDirections actions = Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToSalesPurchaseHistoryFragment(toolTitle).setIDocType(iDocType);
+                        navController.navigate(actions);
+                    }
+                });
+    }
+
+    private void loadAPIValue_for_Edit_from_Invoice(JSONObject response, int iRefId) {
+        try {
+            JSONArray jsonArray = new JSONArray(response.getString("Table"));
+            Log.d("HeadArray",jsonArray.length()+"");
+            JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
+            Log.d("BodyArray1",jsonArray1.length()+"");
+
+            for (int i=0;i<jsonArray.length();i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+//                binding.docNo.setText(jsonObject.getString("sDocNo"));
+//                docNo=jsonObject.getString("sDocNo");
+                binding.date.setText(jsonObject.getString("sDate"));
+                iCustomer = jsonObject.getInt("iAccount1");
+                binding.customer.setText(jsonObject.getString("sAccount1"));
+//                binding.description.setText(jsonObject.getString("sNarration"));
+
+                if(EditMode){
+                    iTransId=iTransID;
+                }
+                else {
+                    iTransId =0;
+                }
+
+                binding.date.setEnabled(false);
+                binding.customer.setEnabled(false);
+            }
+            for (int j=0;j<jsonArray1.length();j++) {
+                JSONObject jsonObjectInner = jsonArray1.getJSONObject(j);
+                binding.amount.setText(jsonObjectInner.getString("fNet"));
+                binding.amount.setEnabled(false);
+
+                Log.d("headertags", headerListTags.size() + "");
+                for (int k = 0; k < headerListTags.size(); k++) {
+                    Log.d("headertags", headerListTags.size() + " " +
+                            k + " " + headerListTags.get(k) + " " + jsonObjectInner.getInt("iTag" + headerListTags.get(k))
+                            + " ");
+                    hashMapHeader.put(headerListTags.get(k), jsonObjectInner.getInt("iTag" + headerListTags.get(k)));
+                    autoText_H_list.get(k).setText(jsonObjectInner.getString("sTag" + headerListTags.get(k)));
+                    autoText_H_list.get(k).setEnabled(false);
+                }
+                Invoice invoice=new Invoice();
+                invoice.setiTransId(iRefId);
+                invoice.setAmount(jsonObjectInner.getDouble("fNet"));
+                invoiceSelectedList.add(invoice);
+            }
+        }catch (Exception e){
+        e.printStackTrace();
+        }
+    }
+
+    private void loadingReceiptFromInvoice() {
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity()) +URLs.GetTransReceipt_PaymentDetails_RefId)
+                .addQueryParameter("iRefId", String.valueOf(iTransId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("responseHistoryRefId", response.toString());
+                        try {
+                            JSONArray jsonArray = new JSONArray(response.getString("Table"));
+                            JSONArray jsonArray1=new JSONArray(response.getString("Table1"));
+                            JSONArray jsonArray2=new JSONArray(response.getString("Table2"));
+                            if(jsonArray.length()==0){
+                                createNewDocument();
+                            }else {
+//                                iRefId=iTransId;
+                                String sAttachment=null;
+                                for (int i=0;i<jsonArray.length();i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    binding.docNo.setText(jsonObject.getString("sDocNo"));
+                                    docNo=jsonObject.getString("sDocNo");
+                                    binding.description.setText(jsonObject.getString("sNarration"));
+                                    iPaymentMethod = jsonObject.getInt("iPaymentMethod");
+                                    if(iPaymentMethod==2) {
+                                        binding.paymentSpinner.setSelection(1);
+                                        iBank = jsonObject.getInt("iBank");
+                                        binding.bankName.setText(jsonObject.getString("sBank"));
+                                        binding.checkNo.setText(jsonObject.getString("iChequeNo"));
+                                        binding.checkDate.setText(jsonObject.getString("sChequeDate"));
+                                        sAttachment=jsonObject.getString("sAttachment");
+                                        Log.d("sAttachments",sAttachment);
+                                    }
+                                    iTransID=jsonObject.getInt("iTransId");
+                                }
+                                if(iPaymentMethod==2 && !sAttachment.equals("")){
+                                    Log.d("resultArray2",jsonArray2.length()+" "+iPaymentMethod);
+                                    for(int k=0;k<jsonArray2.length();k++){
+                                        JSONObject jsonObject2 = jsonArray2.getJSONObject(k);
+                                        String sAttachment2=jsonObject2.getString("sAttachment");
+                                        Log.d("sAttachments",sAttachment2);
+                                        imageList.add(sAttachment2);
+                                        imageAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                                loadingNewReceiptFromInvoice();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseHistoryRefId", anError.toString()+anError.getErrorDetail()+anError.getErrorBody());
+
+                    }
+                });
+
     }
 
     private void editfromlocaldb() {
