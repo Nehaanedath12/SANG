@@ -37,7 +37,7 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        syncData();
+        schedulerJob.SyncUser(Login.this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

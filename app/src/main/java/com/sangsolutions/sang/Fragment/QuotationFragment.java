@@ -797,7 +797,11 @@ public class QuotationFragment extends Fragment {
                     bodyPart.setUnit(binding.spinnerUnit.getSelectedItem().toString());
 
                     bodyPart.setRemarks(binding.remarksProduct.getText().toString());
-
+                    try {
+                        Log.d("Positionn",  bodyPartList.get(position_body_Edit).getiProduct()+" kj ");
+                    }catch (Exception e){
+                        editModeProduct=false;
+                    }
                     if(editModeProduct) {
                         bodyPartList.set(position_body_Edit,bodyPart);
 
