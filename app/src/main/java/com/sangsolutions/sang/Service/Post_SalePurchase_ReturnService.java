@@ -20,7 +20,6 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.Sales_purchase_Class;
-import com.sangsolutions.sang.Fragment.SalesPurchaseReturnFragmentDirections;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
@@ -38,7 +37,7 @@ public class Post_SalePurchase_ReturnService extends JobService {
         helper=new DatabaseHelper(this);
         this.params=params;
         AndroidNetworking.initialize(this);
-        Log.d("SalePurchaseReturn","iTransId"+"");
+        Log.d("Post_SalePurchaseReturn","iTransId"+"");
         GetDataSalePurchaseReturn();
         return true;
     }

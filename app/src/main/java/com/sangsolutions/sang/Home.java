@@ -1,6 +1,5 @@
 package com.sangsolutions.sang;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,10 +12,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,56 +19,46 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.common.Priority;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.ExpandableListAdapter;
 import com.sangsolutions.sang.Adapter.ExpandedMenuModel;
-import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
-import com.sangsolutions.sang.Fragment.MasterFragment;
-import com.sangsolutions.sang.Fragment.MasterFragmentDirections;
-import com.sangsolutions.sang.Fragment.MasterHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.P_R_ReportFragmentDirections;
-import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
-import com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.QuotationHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
-import com.sangsolutions.sang.Fragment.RequestFragmentDirections;
-import com.sangsolutions.sang.Fragment.RequestHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.S_P_OrderFragmentDirections;
-import com.sangsolutions.sang.Fragment.S_P_OrderHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.S_P_ReportFragmentDirections;
-import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
-import com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.SalesPurchaseReturnFragmentDirections;
-import com.sangsolutions.sang.Fragment.SalesPurchaseReturnHistoryFragmentDirections;
-import com.sangsolutions.sang.Fragment.StockCountFragmentDirections;
-import com.sangsolutions.sang.Fragment.StockCountHistoryFragmentDirections;
-import com.sangsolutions.sang.Service.PostSalePurchaseService;
-import com.sangsolutions.sang.databinding.ActivityMainBinding;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sangsolutions.sang.Fragment.MasterAccountFragment.MasterFragmentDirections;
+import com.sangsolutions.sang.Fragment.MasterAccountFragment.MasterHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.PaymentReceiptFragment.PaymentReceiptFragmentDirections;
+import com.sangsolutions.sang.Fragment.PaymentReceiptFragment.PaymentReceiptHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.PurchaseWithBatch.PurchaseBatchFragmentDirections;
+import com.sangsolutions.sang.Fragment.PurchaseWithBatch.PurchaseBatchHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.QuotationFragment.QuotationHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.Report_selection_fragmentDirections;
+
+import com.sangsolutions.sang.Fragment.Reports.P_R_ReportFragmentDirections;
+import com.sangsolutions.sang.Fragment.Reports.S_P_ReportFragmentDirections;
+import com.sangsolutions.sang.Fragment.RequestEnquiryFragment.RequestFragmentDirections;
+import com.sangsolutions.sang.Fragment.RequestEnquiryFragment.RequestHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.S_P_OrderFragment.S_P_OrderFragmentDirections;
+import com.sangsolutions.sang.Fragment.S_P_OrderFragment.S_P_OrderHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.S_P_ReturnFragment.SalesPurchaseReturnFragmentDirections;
+import com.sangsolutions.sang.Fragment.S_P_ReturnFragment.SalesPurchaseReturnHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.SalesPurchaseFragment.Sale_Purchase_FragmentDirections;
+import com.sangsolutions.sang.Fragment.SalesPurchaseFragment.SalesPurchaseHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.SalesWithBatch.SalesBatchHistoryFragmentDirections;
+import com.sangsolutions.sang.Fragment.StockCountFragment.StockCountFragmentDirections;
+import com.sangsolutions.sang.Fragment.StockCountFragment.StockCountHistoryFragmentDirections;
+import com.sangsolutions.sang.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 
 public class Home extends AppCompatActivity {
@@ -117,7 +102,7 @@ public class Home extends AppCompatActivity {
             backAlert();
         }
         else if(navController.getCurrentDestination().getId()==R.id.salesPurchaseHistoryFragment){
-           NavDirections action=SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
+           NavDirections action= SalesPurchaseHistoryFragmentDirections.actionSalesPurchaseHistoryFragmentToHomeFragment();
            navController.navigate(action);
         }
         else if(navController.getCurrentDestination().getId()==R.id.homeFragment){
@@ -154,7 +139,7 @@ public class Home extends AppCompatActivity {
             backAlert();
         }
         else if(navController.getCurrentDestination().getId()==R.id.s_P_OrderHistoryFragment){
-            NavDirections action=S_P_OrderHistoryFragmentDirections.actionSPOrderHistoryFragmentToHomeFragment();
+            NavDirections action= S_P_OrderHistoryFragmentDirections.actionSPOrderHistoryFragmentToHomeFragment();
             navController.navigate(action);
         }
         else if(navController.getCurrentDestination().getId()==R.id.requestHistoryFragment){
@@ -165,7 +150,7 @@ public class Home extends AppCompatActivity {
             backAlert();
         }
         else if(navController.getCurrentDestination().getId()==R.id.quotationHistoryFragment){
-            NavDirections action=QuotationHistoryFragmentDirections.actionQuotationHistoryFragmentToHomeFragment();
+            NavDirections action= QuotationHistoryFragmentDirections.actionQuotationHistoryFragmentToHomeFragment();
             navController.navigate(action);
         }
         else if(navController.getCurrentDestination().getId()==R.id.quotationFragment){
@@ -183,6 +168,20 @@ public class Home extends AppCompatActivity {
         }
         else if(navController.getCurrentDestination().getId()==R.id.masterHistoryFragment){
             NavDirections action= MasterHistoryFragmentDirections.actionMasterHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.purchaseBatchFragment){
+            backAlert();
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.purchaseBatchHistoryFragment){
+            NavDirections action= PurchaseBatchHistoryFragmentDirections.actionPurchaseBatchHistoryFragmentToHomeFragment();
+            navController.navigate(action);
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.salesBatchFragment){
+            backAlert();
+        }
+        else if(navController.getCurrentDestination().getId()==R.id.salesBatchHistoryFragment){
+            NavDirections action= SalesBatchHistoryFragmentDirections.actionSalesBatchHistoryFragmentToHomeFragment();
             navController.navigate(action);
         }
 
@@ -332,7 +331,20 @@ public class Home extends AppCompatActivity {
                             }
                         }
                         break;
+                        case 8:{
+                            tagCursor = helper.getTagDetails();
+                            if (tagCursor.getCount() > 0) {
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesBatchHistoryFragment(19);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+                            } else {
+                                Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        break;
                     }
+
+
                     drawer.closeDrawer(GravityCompat.START);
                     return true;
                 }
@@ -410,6 +422,19 @@ public class Home extends AppCompatActivity {
                             }
 
                         }break;
+                        case  6:{
+                            tagCursor = helper.getTagDetails();
+                            if (tagCursor.getCount() > 0) {
+                                NavDirections action = HomeFragmentDirections
+                                        .actionHomeFragmentToPurchaseBatchHistoryFragment(18);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
+                            }
+                            else {
+                                Toast.makeText(Home.this, "please sync Data's", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }break;
 
 
                     }
@@ -433,7 +458,22 @@ public class Home extends AppCompatActivity {
                     }break;
                     case 3:{
                         if(Tools.isConnected(Home.this)) {
-                            syncTag();
+                            AlertDialog.Builder builder=new AlertDialog.Builder(Home.this);
+                            builder.setTitle("Sync!")
+                                    .setMessage("Do you want to Sync?")
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            syncTag();
+                                        }
+                                    })
+                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).create().show();
+
                             drawer.closeDrawer(GravityCompat.START);
                             return true;
                         }
@@ -484,26 +524,54 @@ public class Home extends AppCompatActivity {
         });
 
         final Handler handler = new Handler();
-        final int delay = 1000*30; // 1000 milliseconds == 1 second
+        final int delay = 1000*20; // 1000 milliseconds == 1 second
         handler.postDelayed(new Runnable() {
             public void run() {
                 Log.d("kkk","kk");
                 if(Tools.isConnected(Home.this)){
-                    Log.d("kkk","connected");
-                    schedulepost.Post_CustomerMaster(Home.this);
+                    Log.d("kkkk","connected");
+
                     schedulepost.Post_SalePurchase(Home.this);
                     schedulepost.Post_PaymentReceipt(Home.this);
                     schedulepost.Post_SalePurchase_Return(Home.this);
                     schedulepost.Post_SalePurchase_Order(Home.this);
+
+
                     schedulepost.Post_EnquiryRequest(Home.this);
                     schedulepost.Post_Quotation(Home.this);
-
                     schedulepost.Post_StockCount(Home.this);
+                    schedulepost.Post_CustomerMaster(Home.this);
+                    schedulepost.Post_PurchaseBatch(Home.this);
+
+
 
                 }
                 handler.postDelayed(this, delay);
             }
         }, delay);
+
+
+
+
+        final Handler handler1 = new Handler();
+        final int delay1 = 1000*30; // 1000 milliseconds == 1 second
+        handler1.postDelayed(new Runnable() {
+            public void run() {
+                Log.d("kkk","kk");
+                if(Tools.isConnected(Home.this)){
+                    Log.d("kkkk","connected");
+
+//                    schedulepost.Post_SalePurchase_Order(Home.this);
+//                    schedulepost.Post_EnquiryRequest(Home.this);
+//                    schedulepost.Post_Quotation(Home.this);
+//                    schedulepost.Post_StockCount(Home.this);
+//                    schedulepost.Post_PurchaseBatch(Home.this);
+
+                }
+                handler1.postDelayed(this, delay1);
+            }
+        }, delay1);
+
 
 
 
@@ -513,7 +581,8 @@ public class Home extends AppCompatActivity {
                 R.id.paymentReceiptHistoryFragment,R.id.ReceiptHistoryFragment,
                 R.id.salesPurchaseReturnHistoryFragment,R.id.PurchaseReturnHistoryFragment,
                 R.id.s_P_OrderHistoryFragment,R.id.requestHistoryFragment,R.id.quotationHistoryFragment,
-                R.id.stockCountHistoryFragment,R.id.masterHistoryFragment)
+                R.id.stockCountHistoryFragment,R.id.masterHistoryFragment,R.id.purchaseBatchHistoryFragment,
+                R.id.salesBatchHistoryFragment)
                 .setDrawerLayout(drawer).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
@@ -531,7 +600,7 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (navController.getCurrentDestination().getId() == R.id.sale_Purchase_Fragment) {
-                   NavDirections action=Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToHomeFragment();
+                   NavDirections action= Sale_Purchase_FragmentDirections.actionSalePurchaseFragmentToHomeFragment();
                     navController.navigate(action);
                 }
                 else if(navController.getCurrentDestination().getId() == R.id.salesPurchaseHistoryFragment){
@@ -604,6 +673,18 @@ public class Home extends AppCompatActivity {
                 }
                 else if(navController.getCurrentDestination().getId()==R.id.masterHistoryFragment){
                     NavDirections action=  MasterHistoryFragmentDirections.actionMasterHistoryFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.purchaseBatchHistoryFragment){
+                    NavDirections action=  PurchaseBatchHistoryFragmentDirections.actionPurchaseBatchHistoryFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.purchaseBatchFragment){
+                    NavDirections action=  PurchaseBatchFragmentDirections.actionPurchaseBatchFragmentToHomeFragment();
+                    navController.navigate(action);
+                }
+                else if(navController.getCurrentDestination().getId()==R.id.salesBatchHistoryFragment){
+                    NavDirections action=  SalesBatchHistoryFragmentDirections.actionSalesBatchHistoryFragmentToHomeFragment();
                     navController.navigate(action);
                 }
 
@@ -685,6 +766,7 @@ public class Home extends AppCompatActivity {
         heading1.add("Sales Quotation");
         heading1.add("Advance Invoice");
         heading1.add("Receipt Advance Invoice");
+        heading1.add("Sales with Batch");
 
         List<String> heading2 = new ArrayList<String>();
         heading2.add("Purchase");
@@ -693,6 +775,7 @@ public class Home extends AppCompatActivity {
         heading2.add("Purchase Order");
         heading2.add("Request");
         heading2.add("Purchase Quotation");
+        heading2.add("Purchase with Batch");
 
         listDataChild.put(listDataHeader.get(1), heading1);// Header, Child data
         listDataChild.put(listDataHeader.get(2), heading2);
@@ -708,13 +791,12 @@ public class Home extends AppCompatActivity {
         Log.d("ipppp","new Tools().getIP(Login.this)");
 
 //        schedulerJob.SyncToken(this);
+        schedulerJob.SyncTransSalePurchase(Home.this);
         schedulerJob.syncMasterTagDetails(Home.this);
         schedulerJob.SyncMasterSettings(Home.this);
-        schedulerJob.SyncAccounts(Home.this);
-        schedulerJob.SyncProduct(Home.this);
-        schedulerJob.SyncTransSalePurchase(Home.this);
         schedulerJob.SyncBank(Home.this);
-
+        schedulerJob.SyncProduct(Home.this);
+        schedulerJob.SyncAccounts(Home.this);
         schedulerJob.SyncUser(Home.this);
         }
 
@@ -771,6 +853,14 @@ public class Home extends AppCompatActivity {
                 return true;
             }
             else if(navController.getCurrentDestination().getId()==R.id.masterFragment){
+                backAlert();
+                return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.purchaseBatchFragment){
+                backAlert();
+                return true;
+            }
+            else if(navController.getCurrentDestination().getId()==R.id.salesBatchFragment){
                 backAlert();
                 return true;
             }

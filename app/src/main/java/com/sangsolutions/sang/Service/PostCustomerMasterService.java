@@ -21,7 +21,6 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Database.CustomerMasterClass;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.StockCountDBClass;
-import com.sangsolutions.sang.Fragment.MasterFragmentDirections;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
@@ -37,7 +36,7 @@ public class PostCustomerMasterService extends JobService {
         helper=new DatabaseHelper(this);
         this.params=params;
         AndroidNetworking.initialize(this);
-        Log.d("PostCustomerMaster","iTransId"+"");
+        Log.d("Post_CustomerMaster","iTransId"+"");
         GetDataPostCustomerMasterService();
         return true;
     }

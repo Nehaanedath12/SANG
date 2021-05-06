@@ -43,12 +43,21 @@
         <action
             android:id="@+id/action_homeFragment_to_masterHistoryFragment"
             app:destination="@id/masterHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_purchaseBatchHistoryFragment"
+            app:destination="@id/purchaseBatchHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_purchaseBatchHistoryFragment2"
+            app:destination="@id/purchaseBatchHistoryFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_salesBatchHistoryFragment"
+            app:destination="@id/salesBatchHistoryFragment" />
 
 
     </fragment>
     <fragment
         android:id="@+id/salesPurchaseHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseFragment.SalesPurchaseHistoryFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_sales_purchase_history">
         <action
@@ -67,7 +76,7 @@
     </fragment>
     <fragment
         android:id="@+id/sale_Purchase_Fragment"
-        android:name="com.sangsolutions.sang.Fragment.Sale_Purchase_Fragment"
+        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseFragment.Sale_Purchase_Fragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_sale_purchase">
 
@@ -129,7 +138,7 @@
     </fragment>
     <fragment
         android:id="@+id/reportFragment"
-        android:name="com.sangsolutions.sang.Fragment.S_P_ReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.Reports.S_P_ReportFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_report">
         <action
@@ -147,7 +156,7 @@
     </fragment>
     <fragment
         android:id="@+id/paymentReceiptFragment"
-        android:name="com.sangsolutions.sang.Fragment.PaymentReceiptFragment"
+        android:name="com.sangsolutions.sang.Fragment.PaymentReceiptFragment.PaymentReceiptFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_payment_receipt">
         <action
@@ -180,7 +189,7 @@
     </fragment>
     <fragment
         android:id="@+id/paymentReceiptHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.PaymentReceiptHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.PaymentReceiptFragment.PaymentReceiptHistoryFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_payment_receipt_history">
         <action
@@ -201,7 +210,7 @@
     </fragment>
     <fragment
         android:id="@+id/p_R_ReportFragment"
-        android:name="com.sangsolutions.sang.Fragment.P_R_ReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.Reports.P_R_ReportFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_report_receipt_payment">
         <argument
@@ -219,7 +228,7 @@
     </fragment>
     <fragment
         android:id="@+id/salesPurchaseReturnFragment"
-        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseReturnFragment"
+        android:name="com.sangsolutions.sang.Fragment.S_P_ReturnFragment.SalesPurchaseReturnFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_sales_purchase_return">
         <argument
@@ -245,7 +254,7 @@
     </fragment>
     <fragment
         android:id="@+id/salesPurchaseReturnHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.SalesPurchaseReturnHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.S_P_ReturnFragment.SalesPurchaseReturnHistoryFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_history_sales_purchase_return">
         <argument
@@ -267,7 +276,7 @@
     </fragment>
     <fragment
         android:id="@+id/s_P_Return_ReportFragment2"
-        android:name="com.sangsolutions.sang.Fragment.S_P_Return_ReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.Reports.S_P_Return_ReportFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_report_sales_purchase_return">
         <argument
@@ -285,7 +294,7 @@
     </fragment>
     <fragment
         android:id="@+id/s_P_OrderFragment"
-        android:name="com.sangsolutions.sang.Fragment.S_P_OrderFragment"
+        android:name="com.sangsolutions.sang.Fragment.S_P_OrderFragment.S_P_OrderFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_sales_purchase_order">
         <argument
@@ -311,7 +320,7 @@
     </fragment>
     <fragment
         android:id="@+id/s_P_OrderHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.S_P_OrderHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.S_P_OrderFragment.S_P_OrderHistoryFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_sales_purchase_order_history">
         <argument
@@ -330,7 +339,7 @@
     </fragment>
     <fragment
         android:id="@+id/s_P_Order_ReportFragment"
-        android:name="com.sangsolutions.sang.Fragment.S_P_Order_ReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.Reports.S_P_Order_ReportFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_report_sales_purchase_order">
         <argument
@@ -345,7 +354,7 @@
     </fragment>
     <fragment
         android:id="@+id/requestFragment"
-        android:name="com.sangsolutions.sang.Fragment.RequestFragment"
+        android:name="com.sangsolutions.sang.Fragment.RequestEnquiryFragment.RequestFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_request">
         <argument
@@ -372,7 +381,7 @@
     </fragment>
     <fragment
         android:id="@+id/requestHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.RequestHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.RequestEnquiryFragment.RequestHistoryFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragmnet_request_history">
         <argument
@@ -391,7 +400,7 @@
     </fragment>
     <fragment
         android:id="@+id/quotationFragment"
-        android:name="com.sangsolutions.sang.Fragment.QuotationFragment"
+        android:name="com.sangsolutions.sang.Fragment.QuotationFragment.QuotationFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_quotation">
         <argument
@@ -418,7 +427,7 @@
     </fragment>
     <fragment
         android:id="@+id/quotationHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.QuotationHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.QuotationFragment.QuotationHistoryFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_quatation_history">
         <argument
@@ -436,7 +445,7 @@
     </fragment>
     <fragment
         android:id="@+id/requestEnquiryReportFragment"
-        android:name="com.sangsolutions.sang.Fragment.RequestEnquiryReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.Reports.RequestEnquiryReportFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_request_enquiry_report">
         <argument
@@ -454,7 +463,7 @@
     </fragment>
     <fragment
         android:id="@+id/stockCountFragment"
-        android:name="com.sangsolutions.sang.Fragment.StockCountFragment"
+        android:name="com.sangsolutions.sang.Fragment.StockCountFragment.StockCountFragment"
         android:label="StockCount"
         tools:layout="@layout/fragment_stock_count">
         <argument
@@ -479,7 +488,7 @@
     </fragment>
     <fragment
         android:id="@+id/stockCountHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.StockCountHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.StockCountFragment.StockCountHistoryFragment"
         android:label="StockCount History"
         tools:layout="@layout/fragment_history_stock_count">
         <argument
@@ -495,7 +504,7 @@
     </fragment>
     <fragment
         android:id="@+id/quotationReportFragment"
-        android:name="com.sangsolutions.sang.Fragment.QuotationReportFragment"
+        android:name="com.sangsolutions.sang.Fragment.Reports.QuotationReportFragment"
         android:label="{tool_title}"
         tools:layout="@layout/fragment_quotation_report">
 
@@ -511,7 +520,7 @@
     </fragment>
     <fragment
         android:id="@+id/stockCountReport"
-        android:name="com.sangsolutions.sang.Fragment.StockCountReport"
+        android:name="com.sangsolutions.sang.Fragment.Reports.StockCountReport"
         android:label="StockCount Report"
         tools:layout="@layout/fragment_stockcount_report">
         <argument
@@ -529,7 +538,7 @@
     </fragment>
     <fragment
         android:id="@+id/masterFragment"
-        android:name="com.sangsolutions.sang.Fragment.MasterFragment"
+        android:name="com.sangsolutions.sang.Fragment.MasterAccountFragment.MasterFragment"
         android:label="Master Setting"
         tools:layout="@layout/fragment_master">
         <argument
@@ -552,7 +561,7 @@
 
     <fragment
         android:id="@+id/masterHistoryFragment"
-        android:name="com.sangsolutions.sang.Fragment.MasterHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.MasterAccountFragment.MasterHistoryFragment"
         android:label="Master History"
         tools:layout="@layout/fragment_master_history">
 
@@ -562,6 +571,82 @@
         <action
             android:id="@+id/action_masterHistoryFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/purchaseBatchFragment"
+        android:name="com.sangsolutions.sang.Fragment.PurchaseWithBatch.PurchaseBatchFragment"
+        android:label="Purchase Batch" >
+        <argument
+            android:name="iDocType"
+            app:argType="integer"
+            android:defaultValue="0"/>
+        <argument
+            android:name="iTransId"
+            app:argType="integer"
+            android:defaultValue="0" />
+
+        <argument
+            android:name="EditMode"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_purchaseBatchFragment_to_purchaseBatchHistoryFragment"
+            app:destination="@id/purchaseBatchHistoryFragment" />
+        <action
+            android:id="@+id/action_purchaseBatchFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/purchaseBatchHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.PurchaseWithBatch.PurchaseBatchHistoryFragment"
+        android:label="Purchase Batch History" >
+        <argument
+            android:name="iDocType"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_purchaseBatchHistoryFragment_to_purchaseBatchFragment"
+            app:destination="@id/purchaseBatchFragment" />
+        <action
+            android:id="@+id/action_purchaseBatchHistoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salesBatchHistoryFragment"
+        android:name="com.sangsolutions.sang.Fragment.SalesWithBatch.SalesBatchHistoryFragment"
+        android:label="Sales Batch History"
+        tools:layout="@layout/fragment_sales_batch_history">
+        <argument
+            android:name="iDocType"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_salesBatchHistoryFragment_to_salesBatchFragment"
+            app:destination="@id/salesBatchFragment" />
+        <action
+            android:id="@+id/action_salesBatchHistoryFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salesBatchFragment"
+        android:name="com.sangsolutions.sang.Fragment.SalesWithBatch.SalesBatchFragment"
+        android:label="Sales Batch"
+        tools:layout="@layout/fragment_sales_batch">
+        <argument
+            android:name="iDocType"
+            app:argType="integer"
+            android:defaultValue="0"/>
+        <argument
+            android:name="iTransId"
+            app:argType="integer"
+            android:defaultValue="0" />
+
+        <argument
+            android:name="EditMode"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
+        <action
+            android:id="@+id/action_salesBatchFragment_to_salesBatchHistoryFragment"
+            app:destination="@id/salesBatchHistoryFragment" />
     </fragment>
 
 

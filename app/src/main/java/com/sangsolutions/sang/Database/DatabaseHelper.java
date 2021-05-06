@@ -1,6 +1,5 @@
 package com.sangsolutions.sang.Database;
 
-import android.accounts.Account;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -28,7 +27,7 @@ import java.io.InputStreamReader;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     Context context;
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "Sang.db";
     private static final String TABLE_MASTER_SETTINGS = "t1_masterSettings";
     private static final String TABLE_ACCOUNTS = "t1_accounts";
@@ -59,6 +58,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static  final String TABLE_STOCK_COUNT_BODY = "t1_stock_count_body";
 
     private static  final String TABLE_CUSTOMER_MASTER= "t1_customer_master";
+
+    //batchPurchase
+
+    private static  final String TABLE_BATCH_PURCHASE_HEADER = "t1_batch_purchase";
+    private static  final String TABLE_BATCH_PURCHASE_BODY= "t1_batch_purchase_body";
+    private static  final String TABLE_BATCH_PURCHASE_BATCH_BODY= "t1_batch_purchase_batch_body";
+
 
     private static  final String IID = "iId";
     private static  final String USER_ID = "user_Id";
@@ -408,6 +414,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ");";
 
 
+    private static final String CREATE_TABLE_BATCH_PURCHASE =" create table if not exists " + TABLE_BATCH_PURCHASE_HEADER + " (" +
+            "" + BatchPurchaseClass.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_ACCOUNT_1 +  " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_ACCOUNT_2 +  " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.S_DATE +  " TEXT(50) DEFAULT null , "  +
+            "" + BatchPurchaseClass.S_NARRATION + " TEXT(50) DEFAULT null , " +
+            "" + BatchPurchaseClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + BatchPurchaseClass.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+            "" + BatchPurchaseClass.STATUS +  " INTEGER DEFAULT 0 " +
+
+            ");";
+
+    private static final String CREATE_TABLE_BATCH_PURCHASE_BODY =" create table if not exists " + TABLE_BATCH_PURCHASE_BODY + " (" +
+            "" + BatchPurchaseClass.I_TAG_1 + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_TAG_2 + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_TAG_3 + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_TAG_4 + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_TAG_5 + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_TAG_6 + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_TAG_7 + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_TAG_8 + " INTEGER DEFAULT 0, " +
+
+
+            "" + BatchPurchaseClass.SL_NO +  " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.F_QTY+  " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.F_RATE + "  TEXT(50) DEFAULT null , " +
+            "" + BatchPurchaseClass.F_DISCOUNT +  " TEXT(50) DEFAULT null , "  +
+            "" + BatchPurchaseClass.F_ADD_CHARGES + " TEXT(50) DEFAULT null , " +
+            "" + BatchPurchaseClass.F_VAT_PER + " TEXT(50) DEFAULT null ,"  +
+            "" + BatchPurchaseClass.F_VAT + " TEXT(50) DEFAULT null ,"  +
+            "" + BatchPurchaseClass.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+            "" + BatchPurchaseClass.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+            "" + BatchPurchaseClass.F_NET + " TEXT(50) DEFAULT null ,"  +
+            "" + BatchPurchaseClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + BatchPurchaseClass.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
+
+
+    private static final String CREATE_TABLE_BATCH_PURCHASE_BATCH_BODY=" create table if not exists " + TABLE_BATCH_PURCHASE_BATCH_BODY + " (" +
+            "" + BatchPurchaseClass.BATCH_NAME + " TEXT(50) DEFAULT null, " +
+            "" + BatchPurchaseClass.MF_DATE + " TEXT(50) DEFAULT null, " +
+            "" + BatchPurchaseClass.EXP_DATE + " TEXT(50) DEFAULT null, " +
+            "" + BatchPurchaseClass.BATCH_QTY + " INTEGER DEFAULT 0, " +
+
+            "" + BatchPurchaseClass.SL_NO +  " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_PRODUCT + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+            "" + BatchPurchaseClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + BatchPurchaseClass.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+
+            ");";
+
     private SQLiteDatabase db;
 
     public DatabaseHelper(@Nullable Context context) {
@@ -446,6 +508,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_STOCK_COUNT_BODY);
 
         db.execSQL(CREATE_TABLE_CUSTOMER_MASTER);
+
+        db.execSQL(CREATE_TABLE_BATCH_PURCHASE);
+        db.execSQL(CREATE_TABLE_BATCH_PURCHASE_BODY);
+        db.execSQL(CREATE_TABLE_BATCH_PURCHASE_BATCH_BODY);
 
     }
 
@@ -2182,5 +2248,180 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     new String[]{String.valueOf(iDocType), String.valueOf(tagId)});
             return status != -1;
         }else return true;
+    }
+
+    public Cursor getDataFrom_Batch_P_Header() {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+ TABLE_BATCH_PURCHASE_HEADER,null);
+        cursor.moveToFirst();
+        return cursor;
+
+    }
+
+    public boolean insert_Batch_P_Header(BatchPurchaseClass b_class) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(BatchPurchaseClass.I_TRANS_ID,b_class.getiTransId());
+        cv.put(BatchPurchaseClass.S_DOC_NO,b_class.getsDocNo());
+        cv.put(BatchPurchaseClass.I_DOC_TYPE,b_class.getiDocType());
+        cv.put(BatchPurchaseClass.I_ACCOUNT_1,b_class.getiAccount1());
+        cv.put(BatchPurchaseClass.I_ACCOUNT_2,b_class.getiAccount2());
+        cv.put(BatchPurchaseClass.S_NARRATION,b_class.getsNarration());
+        cv.put(BatchPurchaseClass.S_DATE,b_class.getsDate());
+        cv.put(BatchPurchaseClass.PROCESS_TIME,b_class.getProcessTime());
+        cv.put(BatchPurchaseClass.STATUS,b_class.getStatus());
+
+
+        float status = db.insert(TABLE_BATCH_PURCHASE_HEADER, null, cv);
+        return status != -1;
+
+    }
+
+    public boolean delete_Batch_P_Header(int iTransId, int iDocType, String sDocNo) {
+
+        String sDocType=String.valueOf(iDocType);
+        this.db = getWritableDatabase();
+
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_HEADER,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_BATCH_PURCHASE_HEADER, BatchPurchaseClass.S_DOC_NO + " =  ? and "
+                    + BatchPurchaseClass.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+            return status != -1;
+        }else {
+            return true;
+        }
+    }
+
+    public boolean delete_Batch_P_Body(int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_BODY,null);
+
+        if(cursor.getCount()>0) {
+            float status = db.delete(TABLE_BATCH_PURCHASE_BODY, BatchPurchaseClass.I_DOC_TYPE + " =  ? and "
+                    + BatchPurchaseClass.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+            return status != -1;
+        }else
+            return true;
+    }
+
+    public boolean insert_Batch_P_Body(BatchPurchaseClass batchP) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(BatchPurchaseClass.I_TAG_1,batchP.getiTag1());
+        cv.put(BatchPurchaseClass.I_TAG_2,batchP.getiTag2());
+        cv.put(BatchPurchaseClass.I_TAG_3,batchP.getiTag3());
+        cv.put(BatchPurchaseClass.I_TAG_4,batchP.getiTag4());
+        cv.put(BatchPurchaseClass.I_TAG_5,batchP.getiTag5());
+        cv.put(BatchPurchaseClass.I_TAG_6,batchP.getiTag6());
+        cv.put(BatchPurchaseClass.I_TAG_7,batchP.getiTag7());
+        cv.put(BatchPurchaseClass.I_TAG_8,batchP.getiTag8());
+
+        cv.put(BatchPurchaseClass.I_PRODUCT,batchP.getiProduct());
+        cv.put(BatchPurchaseClass.F_QTY,batchP.getTotalQty());
+        cv.put(BatchPurchaseClass.F_RATE,batchP.getfRate());
+        cv.put(BatchPurchaseClass.F_DISCOUNT,batchP.getfDiscount());
+        cv.put(BatchPurchaseClass.F_ADD_CHARGES,batchP.getfAddCharges());
+        cv.put(BatchPurchaseClass.F_VAT_PER,batchP.getFvatPer());
+        cv.put(BatchPurchaseClass.F_VAT,batchP.getfVat());
+        cv.put(BatchPurchaseClass.S_REMARKS,batchP.getsRemarks());
+        cv.put(BatchPurchaseClass.S_UNITS,batchP.getUnit());
+        cv.put(BatchPurchaseClass.F_NET,batchP.getNet());
+
+        cv.put(BatchPurchaseClass.S_DOC_NO,batchP.getsDocNo());
+        cv.put(BatchPurchaseClass.I_DOC_TYPE,batchP.getiDocType());
+        cv.put(BatchPurchaseClass.I_TRANS_ID,batchP.getiTransId());
+        cv.put(BatchPurchaseClass.SL_NO,0);
+
+        float status = db.insert(TABLE_BATCH_PURCHASE_BODY, null, cv);
+        return status != -1;
+    }
+
+    public boolean delete_Batch_P_Body_batch( int iDocType, int iTransId) {
+        this.db=getReadableDatabase();
+//        String sProduct=String.valueOf(iProduct);
+        String sDocType=String.valueOf(iDocType);
+        String sTransId=String.valueOf(iTransId);
+        this.db = getWritableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_BATCH_BODY,null);
+
+        if(cursor.getCount()>0) {
+//            float status = db.delete(TABLE_BATCH_PURCHASE_BATCH_BODY, BatchPurchaseClass.I_DOC_TYPE + " =  ? and "
+//                    + BatchPurchaseClass.I_TRANS_ID + " = ? and "   + BatchPurchaseClass.I_PRODUCT + " = ?", new String[]{sDocType, sTransId,sProduct});
+            float status = db.delete(TABLE_BATCH_PURCHASE_BATCH_BODY, BatchPurchaseClass.I_DOC_TYPE + " =  ? and "
+                    + BatchPurchaseClass.I_TRANS_ID + " = ? ", new String[]{sDocType, sTransId});
+
+            return status != -1;
+
+        }else
+            return true;
+
+    }
+
+    public boolean insert_Batch_P_Body_batch(BatchPurchaseClass batchP) {
+        this.db=getReadableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(BatchPurchaseClass.S_DOC_NO,batchP.getsDocNo());
+        cv.put(BatchPurchaseClass.I_DOC_TYPE,batchP.getiDocType());
+        cv.put(BatchPurchaseClass.I_TRANS_ID,batchP.getiTransId());
+        cv.put(BatchPurchaseClass.I_PRODUCT,batchP.getiProduct());
+        cv.put(BatchPurchaseClass.SL_NO,0);
+
+        cv.put(BatchPurchaseClass.BATCH_NAME,batchP.getBatchName());
+        cv.put(BatchPurchaseClass.BATCH_QTY,batchP.getBatchQty());
+        cv.put(BatchPurchaseClass.EXP_DATE,batchP.getExpDate());
+        cv.put(BatchPurchaseClass.MF_DATE,batchP.getMfDate());
+
+        float status = db.insert(TABLE_BATCH_PURCHASE_BATCH_BODY, null, cv);
+        return status != -1;
+
+    }
+
+    public Cursor getDataFromBatch_P_by_Itype(int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_HEADER+" where "
+                +BatchPurchaseClass.I_DOC_TYPE+"='"+iDocType+"' order by "+BatchPurchaseClass.I_TRANS_ID,null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getEditValuesHeaderBatchP(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_HEADER+" where "
+                +BatchPurchaseClass.I_DOC_TYPE+"='"+iDocType+"' and "+BatchPurchaseClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public boolean changeStatus_Batch_P(int transId, String docNo, int iStatus) {
+
+        String sTransId=String.valueOf(transId);
+        this.db=getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(BatchPurchaseClass.STATUS,iStatus);
+        float status=db.update(TABLE_BATCH_PURCHASE_HEADER,cv,  BatchPurchaseClass.I_TRANS_ID + " = ? and " + BatchPurchaseClass.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        return  status != -1;
+    }
+
+    public Cursor getEditValuesBody_BatchP(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_BODY+" where "
+                +BatchPurchaseClass.I_DOC_TYPE+"='"+iDocType+"' and "+BatchPurchaseClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getDataFrom_Batch_P_Batch(int iTransId, int iDocType) {
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_BATCH_BODY+" where "
+                +BatchPurchaseClass.I_DOC_TYPE+"='"+iDocType+"' and "+BatchPurchaseClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+        cursor.moveToFirst();
+        return cursor;
+
     }
 }

@@ -20,8 +20,7 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.SP_QuotationClass;
-import com.sangsolutions.sang.Database.Sales_purchase_Class;
-import com.sangsolutions.sang.Fragment.QuotationFragmentDirections;
+
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 

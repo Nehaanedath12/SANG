@@ -22,7 +22,6 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.Payment_Receipt_class;
 import com.sangsolutions.sang.Database.Sales_purchase_Class;
-import com.sangsolutions.sang.Fragment.PaymentReceiptFragmentDirections;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
@@ -44,7 +43,7 @@ public class PostPaymentReceiptService extends JobService {
         helper=new DatabaseHelper(this);
         this.params=params;
         AndroidNetworking.initialize(this);
-        Log.d("Payment_Receipt_class","iTransId"+"");
+        Log.d("Post_Payment_Receipt","iTransId"+"");
         GetDataPaymentReceipt();
         return true;
     }

@@ -22,7 +22,6 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.Sales_purchase_Class;
-import com.sangsolutions.sang.Fragment.Sale_Purchase_FragmentDirections;
 import com.sangsolutions.sang.SchedulePost;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -177,7 +176,6 @@ public class PostSalePurchaseService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        Log.d("Post_SalePurchasestop","iTransId"+"");
 //        new SchedulePost().Post_PaymentReceipt(this);
 //            Log.d("Post_PaymentReceipt","Post_PaymentReceipt");
 //            JobScheduler js =

@@ -37,6 +37,7 @@ public class GetMasterSettingsService extends JobService {
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
+        Log.d("SyncMasterSettings1","SyncMasterSettings");
         schedulerJob = new SchedulerJob();
         AndroidNetworking.initialize(this);
         GetMaster();

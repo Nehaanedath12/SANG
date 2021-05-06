@@ -82,4 +82,11 @@ public class URLs {
     public static final String  GetTransReceipt_PaymentDetails_RefId =domain+"GetTransReceipt_PaymentDetails_RefId";
 
 
+//    PostTransWithBatch
+    public static final String  PostTransWithBatch =domain+"PostTransWithBatch";
+    public static final String  GetTransWithBatchSummary =domain+"GetTransWithBatchSummary";
+    public static final String  DeleteTransWithBatch =domain+"DeleteTransWithBatch";
+    public static final String  GetTransWithBatchDetails =domain+"GetTransWithBatchDetails";
+
+
 }

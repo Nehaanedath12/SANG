@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi;
 
 import com.sangsolutions.sang.Service.PostCustomerMasterService;
 import com.sangsolutions.sang.Service.PostPaymentReceiptService;
+import com.sangsolutions.sang.Service.PostPurchaseBatchService;
 import com.sangsolutions.sang.Service.PostSalePurchaseService;
 import com.sangsolutions.sang.Service.Post_EnquiryRequestService;
 import com.sangsolutions.sang.Service.Post_QuotationService;
@@ -138,6 +139,21 @@ public class SchedulePost {
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .build();
         Log.d("Post_CustomerMaster","Post_CustomerMaster");
+        assert js != null;
+        js.schedule(job);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void Post_PurchaseBatch(Context context) {
+        Log.d("PostPurchaseBatch","PostPurchaseBatch");
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                9,
+                new ComponentName(context, PostPurchaseBatchService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        Log.d("PostPurchaseBatch","PostPurchaseBatch");
         assert js != null;
         js.schedule(job);
     }

@@ -21,7 +21,6 @@ import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.Sales_purchase_Class;
 import com.sangsolutions.sang.Database.Sales_purchase_order_class;
-import com.sangsolutions.sang.Fragment.S_P_OrderFragmentDirections;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
 
@@ -54,7 +53,7 @@ public class Post_SalePurchase_OrderService extends JobService {
 
                 Cursor cursorHeader=helper.getDataFromS_P_Order_HeaderPost();
 
-                Log.d("responsePost1", cursorHeader.getCount()+"mmmm");
+                Log.d("responsePostOrder", cursorHeader.getCount()+"mmmm");
                 if(cursorHeader.moveToFirst() && cursorHeader.getCount()>0) {
                     for (int i = 0; i < cursorHeader.getCount(); i++) {
 

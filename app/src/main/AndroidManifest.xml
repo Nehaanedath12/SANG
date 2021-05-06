@@ -77,6 +77,9 @@
         <service android:name=".Service.PostCustomerMasterService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Service.PostPurchaseBatchService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

@@ -17,7 +17,6 @@ import com.sangsolutions.sang.Service.GetProductService;
 import com.sangsolutions.sang.Service.GetTokenService;
 import com.sangsolutions.sang.Service.GetTransactionSettingService;
 import com.sangsolutions.sang.Service.GetUserService;
-import com.sangsolutions.sang.Service.PostSalePurchaseService;
 
 public class SchedulerJob {
 
