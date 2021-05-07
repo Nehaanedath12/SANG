@@ -21,6 +21,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="5dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:layout_marginBottom="5dp">
                 <ImageView
                     android:id="@+id/delete"
@@ -29,6 +31,13 @@
                     android:layout_gravity="center"
                     android:src="@drawable/ic_delete_black"/>
 
+                <LinearLayout
+                    android:id="@+id/linear_tags"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="horizontal"/>
                 <TextView
                     android:id="@+id/product_name"
                     android:layout_width="150dp"
@@ -62,13 +71,6 @@
                     android:layout_height="wrap_content"
                     android:text="Rate"/>
 
-                <LinearLayout
-                    android:id="@+id/linear_tags"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:orientation="horizontal"/>
 
 
                 <TextView

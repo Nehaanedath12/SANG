@@ -29,6 +29,14 @@
             android:layout_gravity="center"
             android:src="@drawable/ic_delete_black"/>
 
+        <LinearLayout
+            android:id="@+id/linear_tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal"/>
+
         <TextView
             android:id="@+id/product_name"
             android:layout_width="150dp"
@@ -94,13 +102,7 @@
             android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:text="ADD CHARGES"/>
-        <LinearLayout
-            android:id="@+id/linear_tags"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="horizontal"/>
+
 
 
         <TextView

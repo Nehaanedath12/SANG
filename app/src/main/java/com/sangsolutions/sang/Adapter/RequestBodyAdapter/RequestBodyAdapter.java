@@ -40,6 +40,7 @@ public class RequestBodyAdapter extends RecyclerView.Adapter<RequestBodyAdapter.
     public interface OnClickListener {
         void onItemClick(RequestClass requestClass, int position);
 
+        void onDeleteClick(List<RequestClass> list, int position);
     }
 
 
@@ -131,25 +132,7 @@ public class RequestBodyAdapter extends RecyclerView.Adapter<RequestBodyAdapter.
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder builder=new AlertDialog.Builder(context);
-                builder.setTitle("delete!")
-                        .setMessage("Do you want to delete this item ?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                list.remove(position);
-                                notifyDataSetChanged();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
-
-
-
+                onClickListener.onDeleteClick(list,position);
 
             }
         });

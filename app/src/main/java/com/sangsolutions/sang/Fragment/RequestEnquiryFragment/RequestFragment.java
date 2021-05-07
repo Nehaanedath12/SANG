@@ -750,6 +750,11 @@ public class RequestFragment extends Fragment {
 
                         editingProductField(requestClass,position);
                     }
+
+                    @Override
+                    public void onDeleteClick(List<RequestClass> list, int position) {
+                        deleteProductField(list,position);
+                    }
                 });
 
 
@@ -757,6 +762,32 @@ public class RequestFragment extends Fragment {
 
             }else {binding.qtyProduct.setError("no qty");}
         }else {binding.productName.setError("enter valid product");}
+    }
+
+    private void deleteProductField(List<RequestClass> list, int position) {
+
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
+        builder.setTitle("delete!")
+                .setMessage("Do you want to delete this item ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list.remove(position);
+                        bodyPartAdapter.notifyDataSetChanged();
+                        binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
+
+
+
+
     }
 
     private void editingProductField(RequestClass bodyPart, int position) {
@@ -1140,6 +1171,11 @@ public class RequestFragment extends Fragment {
                         public void onItemClick(RequestClass requestClass, int position) {
                             editingProductField(bodyPart,position);
                         }
+
+                        @Override
+                        public void onDeleteClick(List<RequestClass> list, int position) {
+                            deleteProductField(list,position);
+                        }
                     });
                 }
                 cursorEdit_B.moveToNext();
@@ -1237,6 +1273,11 @@ public class RequestFragment extends Fragment {
                         @Override
                         public void onItemClick(RequestClass requestClass, int position) {
                             editingProductField(requestClass,position);
+                        }
+
+                        @Override
+                        public void onDeleteClick(List<RequestClass> list, int position) {
+                            deleteProductField(list,position);
                         }
                     });
                 }

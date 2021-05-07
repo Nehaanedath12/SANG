@@ -122,7 +122,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="40dp">
+                android:layout_marginBottom="150dp">
 
                 <HorizontalScrollView
                     android:layout_width="match_parent"
@@ -147,6 +147,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:src="@drawable/ic_delete"/>
+
+                            <LinearLayout
+                                android:id="@+id/linear_tags"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:orientation="horizontal"/>
+
                             <TextView
                                 android:layout_width="150dp"
                                 android:layout_weight="1"
@@ -162,22 +171,6 @@
                                 android:layout_height="wrap_content"
                                 android:text="Unit"/>
 
-
-                            <LinearLayout
-                                android:id="@+id/linear_tags"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:gravity="center"
-                                android:orientation="horizontal"/>
-
-<!--                            <TextView-->
-<!--                                android:layout_width="50dp"-->
-<!--                                android:layout_weight="1"-->
-<!--                                android:gravity="center"-->
-<!--                                android:textColor="@color/white"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:text="Batch"/>-->
                             <TextView
                                 android:layout_width="50dp"
                                 android:layout_weight="1"
@@ -186,21 +179,6 @@
                                 android:layout_height="wrap_content"
                                 android:text="Qty"/>
 
-<!--                            <TextView-->
-<!--                                android:layout_width="100dp"-->
-<!--                                android:layout_weight="1"-->
-<!--                                android:gravity="center"-->
-<!--                                android:textColor="@color/white"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:text="Mf.Date"/>-->
-
-<!--                            <TextView-->
-<!--                                android:layout_width="100dp"-->
-<!--                                android:layout_weight="1"-->
-<!--                                android:gravity="center"-->
-<!--                                android:textColor="@color/white"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:text="Exp.Date"/>-->
                             <TextView
                                 android:layout_width="50dp"
                                 android:layout_weight="1"
@@ -253,8 +231,6 @@
                                 android:text="Add Charges"/>
 
 
-
-
                             <TextView
                                 android:layout_width="70dp"
                                 android:layout_weight="1"
@@ -263,19 +239,6 @@
                                 android:layout_height="wrap_content"
                                 android:text="Remarks"/>
                         </LinearLayout>
-                        <!--                        <FrameLayout-->
-                        <!--                            android:id="@+id/frameEmpty"-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="match_parent">-->
-                        <!--                            <TextView-->
-                        <!--                                android:layout_width="match_parent"-->
-                        <!--                                android:layout_height="match_parent"-->
-                        <!--                                android:gravity="center"-->
-                        <!--                                android:text="Empty.."-->
-                        <!--                                android:textSize="15dp"-->
-                        <!--                                android:textStyle="bold"-->
-                        <!--                                android:textColor="@color/purple_500"/>-->
-                        <!--                        </FrameLayout>-->
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/boyPart_RV"
                             android:layout_width="match_parent"
@@ -286,4 +249,115 @@
 
         </RelativeLayout>
     </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/bottom_moreDetails"
+        android:background="@color/purple_500"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_bar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/TotalQty_Bar"
+                android:text="TotalQty_Bar"
+                android:textStyle="italic"
+                android:textColor="@color/white"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/TotalGross_Bar"
+                android:text="TotalGross_Bar"
+                android:textStyle="italic"
+                android:textColor="@color/white"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/TotalVat_Bar"
+                android:text="TotalVat_Bar"
+                android:textStyle="italic"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+      <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_alignParentEnd="true"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:paddingEnd="20dp"
+          >
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/TotalRate_Bar"
+              android:text="TotalRate_Bar"
+              android:textStyle="italic"
+              android:textColor="@color/white"/>
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/TotalDis_Bar"
+              android:text="TotalDis_Bar"
+              android:textStyle="italic"
+              android:textColor="@color/white"/>
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/TotalAdd_Bar"
+              android:text="TotalAdd_Bar"
+              android:textStyle="italic"
+              android:textColor="@color/white"/>
+
+      </LinearLayout>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/bottom_bar"
+        android:background="@color/purple_500"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:layout_alignParentBottom="true">
+
+
+        <ImageView
+            android:id="@+id/bottom_arrow_up"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_arrow_up"
+            android:paddingLeft="20dp"/>
+        <ImageView
+            android:id="@+id/bottom_arrow_down"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_arrow_down"
+            android:visibility="gone"
+            android:paddingLeft="20dp"/>
+
+        <TextView
+            android:id="@+id/totalNet"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:paddingEnd="20dp"
+            android:textSize="18dp"
+            android:gravity="center"
+            android:text="Total Net: "
+            android:textColor="@color/white"
+            android:textStyle="italic" />
+
+    </RelativeLayout>
 </RelativeLayout>

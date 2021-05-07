@@ -816,9 +816,35 @@ public class S_P_OrderFragment extends Fragment {
                     public void onItemClick(BodyPart bodyPart, int position) {
                         editingProductField(bodyPart,position);
                     }
+
+                    @Override
+                    public void onDeleteClick(List<BodyPart> list, int position) {
+                        deleteProductField(list,position);
+                    }
                 });
             }else {binding.qtyProduct.setError("No Quantity");}
         }else {binding.productName.setError("Enter proper Name");}
+    }
+
+    private void deleteProductField(List<BodyPart> list, int position) {
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
+        builder.setTitle("delete!")
+                .setMessage("Do you want to delete this item ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list.remove(position);
+                        orderBodyAdapter.notifyDataSetChanged();
+                        binding.boyPartRV.setAdapter(orderBodyAdapter);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
+
     }
 
     private void editingProductField(BodyPart bodyPart, int position) {
@@ -1106,9 +1132,9 @@ public class S_P_OrderFragment extends Fragment {
         binding.delDate.setText(StringDate);
         if (iDocType == 12) {
             binding.customer.setHint("Select Vendor");
-            toolTitle = "Purchase Order Summary";
+            toolTitle = "Purchase Order History";
         } else {
-            toolTitle = "Sale Order Summary";
+            toolTitle = "Sale Order History";
         }
         Cursor cursor = helper.getUserCode(userIdS);
         if (cursor != null) {
@@ -1235,6 +1261,11 @@ public class S_P_OrderFragment extends Fragment {
                         public void onItemClick(BodyPart bodyPart, int position) {
                             editingProductField(bodyPart,position);
                         }
+
+                        @Override
+                        public void onDeleteClick(List<BodyPart> list, int position) {
+                            deleteProductField(list,position);
+                        }
                     });
 
                 }
@@ -1338,6 +1369,11 @@ public class S_P_OrderFragment extends Fragment {
                         @Override
                         public void onItemClick(BodyPart bodyPart, int position) {
                             editingProductField(bodyPart,position);
+                        }
+
+                        @Override
+                        public void onDeleteClick(List<BodyPart> list, int position) {
+                            deleteProductField(list,position);
                         }
                     });
                 }

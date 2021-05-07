@@ -825,6 +825,11 @@ public class QuotationFragment extends Fragment {
                         public void onItemClick(QuotationClass quotationClass, int position) {
                             editingProductField(bodyPart,position);
                         }
+
+                        @Override
+                        public void onDeleteClick(List<QuotationClass> list, int position) {
+                            deleteProductField(list,position);
+                        }
                     });
 
                     ////////////////////////////////////////editProduct
@@ -832,6 +837,30 @@ public class QuotationFragment extends Fragment {
                 }else {binding.rateProduct.setError("no Rate");}
             }else {binding.qtyProduct.setError("no qty");}
         }else {binding.productName.setError("enter valid product");}
+
+    }
+
+    private void deleteProductField(List<QuotationClass> list, int position) {
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
+        builder.setTitle("delete!")
+                .setMessage("Do you want to delete this item ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list.remove(position);
+                        bodyPartAdapter.notifyDataSetChanged();
+                        binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
+
+
+
 
     }
 
@@ -1122,9 +1151,9 @@ public class QuotationFragment extends Fragment {
         binding.date.setText(StringDate);
         if (iDocType == 14) {
             binding.customer.setHint("Select Vendor");
-            toolTitle = "Purchase Quotation Summary";
+            toolTitle = "Purchase Quotation History";
         } else {
-            toolTitle = "Sale Quotation Summary";
+            toolTitle = "Sale Quotation History";
         }
         Cursor cursor = helper.getUserCode(userIdS);
         if (cursor!=null) {
@@ -1251,6 +1280,11 @@ public class QuotationFragment extends Fragment {
                         public void onItemClick(QuotationClass quotationClass, int position) {
                             editingProductField(bodyPart,position);
                         }
+
+                        @Override
+                        public void onDeleteClick(List<QuotationClass> list, int position) {
+                            deleteProductField(list,position);
+                        }
                     });
                 }
                 cursorEdit_B.moveToNext();
@@ -1354,6 +1388,11 @@ public class QuotationFragment extends Fragment {
                         @Override
                         public void onItemClick(QuotationClass quotationClass, int position) {
                             editingProductField(quotationClass,position);
+                        }
+
+                        @Override
+                        public void onDeleteClick(List<QuotationClass> list, int position) {
+                            deleteProductField(list,position);
                         }
                     });
                 }

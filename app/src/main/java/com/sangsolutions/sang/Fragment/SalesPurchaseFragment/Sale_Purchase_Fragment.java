@@ -698,6 +698,11 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                             editingProductField(bodyPart,position);
                         }
+
+                        @Override
+                        public void onDeleteClick(List<BodyPart> list, int position) {
+                            deleteProductField(list,position);
+                        }
                     });
                 }
             }
@@ -709,6 +714,26 @@ public class Sale_Purchase_Fragment extends Fragment {
             Log.d("exception",e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void deleteProductField(List<BodyPart> list, int position) {
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
+        builder.setTitle("delete!")
+                .setMessage("Do you want to delete this item ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list.remove(position);
+                        bodyPartAdapter.notifyDataSetChanged();
+                        binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
     }
 
     private void editfromlocaldb() {
@@ -778,6 +803,11 @@ public class Sale_Purchase_Fragment extends Fragment {
 //                            productDialogue();
 
                             editingProductField(bodyPart,position);
+                        }
+
+                        @Override
+                        public void onDeleteClick(List<BodyPart> list, int position) {
+                            deleteProductField(list,position);
                         }
                     });
                 }
@@ -1136,6 +1166,11 @@ public class Sale_Purchase_Fragment extends Fragment {
                                 editingProductField(bodyPart,position);
 
 
+                            }
+
+                            @Override
+                            public void onDeleteClick(List<BodyPart> list, int position) {
+                                deleteProductField(list,position);
                             }
                         });
 

@@ -42,6 +42,7 @@ public class QuotationAdapter extends RecyclerView.Adapter<QuotationAdapter.View
     public interface OnClickListener {
         void onItemClick(QuotationClass quotationClass, int position);
 
+        void onDeleteClick(List<QuotationClass> list, int position);
     }
 
     public QuotationAdapter(Context context, List<QuotationClass> list, int tagTotalNumber, int iDocType) {
@@ -129,25 +130,7 @@ public class QuotationAdapter extends RecyclerView.Adapter<QuotationAdapter.View
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                AlertDialog.Builder builder=new AlertDialog.Builder(context);
-                builder.setTitle("delete!")
-                        .setMessage("Do you want to delete this item ?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                list.remove(position);
-                                notifyDataSetChanged();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
-
-
+                onClickListener.onDeleteClick(list,position);
 
 
             }

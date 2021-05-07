@@ -1060,6 +1060,11 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
 
                         }
+
+                        @Override
+                        public void onDeleteClick(List<BodyPart> list, int position) {
+                            deleteProductField(list,position);
+                        }
                     });
 
                     ////////////////////////////////////////editProduct
@@ -1068,6 +1073,27 @@ public class SalesPurchaseReturnFragment extends Fragment {
             }else {binding.qtyProduct.setError("Enter qty");}
         }else {binding.productName.setError("enter valid product");}
 
+
+    }
+
+    private void deleteProductField(List<BodyPart> list, int position) {
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
+        builder.setTitle("delete!")
+                .setMessage("Do you want to delete this item ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list.remove(position);
+                        bodyPartAdapter.notifyDataSetChanged();
+                        binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
 
     }
 
@@ -1523,6 +1549,11 @@ public class SalesPurchaseReturnFragment extends Fragment {
 
                             editingProductField(bodyPart,position);
                         }
+
+                        @Override
+                        public void onDeleteClick(List<BodyPart> list, int position) {
+                            deleteProductField(list,position);
+                        }
                     });
                 }
                 cursorEdit_B.moveToNext();
@@ -1633,6 +1664,11 @@ public class SalesPurchaseReturnFragment extends Fragment {
 //                            productDialogue();
 
                             editingProductField(bodyPart,position);
+                        }
+
+                        @Override
+                        public void onDeleteClick(List<BodyPart> list, int position) {
+                            deleteProductField(list,position);
                         }
                     });
                 }

@@ -155,7 +155,7 @@
             android:layout_marginStart="10dp"
             android:textStyle="bold" />
         <Button
-            android:id="@+id/add_button"
+            android:id="@+id/saveBatch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ADD"
@@ -164,7 +164,6 @@
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
-        android:visibility="gone"
         android:id="@+id/cardView_batch"
         android:layout_below="@+id/linear_add_Batch_details"
         android:tag="cardTag"
@@ -222,11 +221,11 @@
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/ic_date"
              />
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="save batch"
-                android:id="@+id/saveBatch"/>
+<!--            <Button-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="save batch"-->
+<!--                android:id="@+id/saveBatch"/>-->
         </LinearLayout>
     </androidx.cardview.widget.CardView>
     <androidx.cardview.widget.CardView

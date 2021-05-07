@@ -73,6 +73,7 @@ public class Home extends AppCompatActivity {
     Cursor tagCursor;
     SchedulePost schedulepost;
     SchedulerJob schedulerJob;
+    SchedulePost1 schedulepost1;
     List<Integer>tagList;
     int lockmode;
     ExpandableListAdapter mMenuAdapter;
@@ -199,6 +200,7 @@ public class Home extends AppCompatActivity {
 
         schedulepost =new SchedulePost();
         schedulerJob = new SchedulerJob();
+        schedulepost1 =new SchedulePost1();
 
         toolbar=binding.toolbar;
         drawer=binding.drawerLayout;
@@ -537,11 +539,11 @@ public class Home extends AppCompatActivity {
                     schedulepost.Post_SalePurchase_Order(Home.this);
 
 
-                    schedulepost.Post_EnquiryRequest(Home.this);
-                    schedulepost.Post_Quotation(Home.this);
-                    schedulepost.Post_StockCount(Home.this);
-                    schedulepost.Post_CustomerMaster(Home.this);
-                    schedulepost.Post_PurchaseBatch(Home.this);
+                    schedulepost1.Post_EnquiryRequest(Home.this);
+                    schedulepost1.Post_Quotation(Home.this);
+                    schedulepost1.Post_StockCount(Home.this);
+                    schedulepost1.Post_CustomerMaster(Home.this);
+                    schedulepost1.Post_PurchaseBatch(Home.this);
 
 
 

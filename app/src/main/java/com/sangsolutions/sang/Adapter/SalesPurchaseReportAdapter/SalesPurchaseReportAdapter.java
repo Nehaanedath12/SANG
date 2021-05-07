@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
-import com.sangsolutions.sang.Database.DatabaseHelper;
+
 import com.sangsolutions.sang.R;
 
 import java.util.List;

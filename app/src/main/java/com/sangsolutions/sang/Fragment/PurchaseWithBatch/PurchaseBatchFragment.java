@@ -13,6 +13,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -39,8 +41,6 @@ import com.sangsolutions.sang.Adapter.BatchPurchaseAdapter.BatchPurchase;
 import com.sangsolutions.sang.Adapter.BatchPurchaseAdapter.BatchPurchaseAdapter;
 import com.sangsolutions.sang.Adapter.BatchPurchaseBodyAdapter.BatchPurchaseBody;
 import com.sangsolutions.sang.Adapter.BatchPurchaseBodyAdapter.BatchPurchaseBodyAdapter;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
@@ -124,9 +124,10 @@ public class PurchaseBatchFragment extends Fragment {
     List<BatchPurchase>batchList1;
     BatchPurchaseAdapter batchPurchaseAdapter;
 
-    boolean editModeProduct =false;
+    boolean EditModeProduct =false;
     int position_body_Edit;
 
+    Animation slideUp, slideDown;
 
     @Nullable
     @Override
@@ -138,6 +139,8 @@ public class PurchaseBatchFragment extends Fragment {
             e.printStackTrace();
         }
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+
+
 
         assert getArguments() != null;
         iDocType = PurchaseBatchFragmentArgs.fromBundle(getArguments()).getIDocType();
@@ -168,6 +171,10 @@ public class PurchaseBatchFragment extends Fragment {
         productsList=new ArrayList<>();
         productsAdapter=new ProductsAdapter(requireActivity(),productsList);
 
+        slideDown = AnimationUtils.loadAnimation(getContext(), R.anim.move_down);
+        slideUp = AnimationUtils.loadAnimation(getContext(), R.anim.move_up);
+        binding.bottomBar.setVisibility(View.GONE);
+        binding.bottomMoreDetails.setVisibility(View.GONE);
 
 
         AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
@@ -247,6 +254,8 @@ public class PurchaseBatchFragment extends Fragment {
         }
 
         initialValueSettingHeader();
+
+
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -320,7 +329,67 @@ public class PurchaseBatchFragment extends Fragment {
             }
         });
 
+
+        binding.bottomArrowUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("arroww",bodyList.size()+"");
+
+                if(bodyList.size()>0){
+                    binding.bottomMoreDetails.startAnimation(slideUp);
+                    binding.bottomMoreDetails.setVisibility(View.VISIBLE);
+                    binding.bottomArrowUp.setVisibility(View.GONE);
+                    binding.bottomArrowDown.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        binding.bottomArrowDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.bottomMoreDetails.startAnimation(slideDown);
+                binding.bottomMoreDetails.setVisibility(View.GONE);
+                binding.bottomArrowUp.setVisibility(View.VISIBLE);
+                binding.bottomArrowDown.setVisibility(View.GONE);
+            }
+        });
+
         return binding.getRoot();
+    }
+
+    private void settingBottomBar() {
+        if(bodyList.size()>0){
+            binding.bottomBar.setVisibility(View.VISIBLE);
+            float totalNet=0.0f;
+
+            int tQty=0;
+            float gross=0.0f;
+            float vat=0.0f;
+            float discount=0.0f;
+            float addCharges=0.0f;
+            float rate=0.0f;
+            for (int i=0;i<bodyList.size();i++) {
+                totalNet=totalNet+bodyList.get(i).getNet();
+
+                tQty=tQty+bodyList.get(i).getTotalQty();
+                gross=gross+bodyList.get(i).getGross();
+                vat=vat+bodyList.get(i).getVat();
+                discount=discount+bodyList.get(i).getDiscount();
+                addCharges=addCharges+bodyList.get(i).getAddCharges();
+                rate=rate+bodyList.get(i).getRate();
+            }
+            binding.totalNet.setText("Total Net: "+totalNet);
+
+            binding.TotalQtyBar.setText("Total Qty: "+tQty);
+            binding.TotalGrossBar.setText("Total Gross: "+gross);
+            binding.TotalVatBar.setText("Total Vat: "+vat);
+            binding.TotalDisBar.setText("Total Discount: "+discount);
+            binding.TotalAddBar.setText("Total AddCharges: "+addCharges);
+            binding.TotalRateBar.setText("Total Rate: "+rate);
+            Log.d("totalNet",totalNet+"");
+        }else {
+            binding.bottomBar.setVisibility(View.GONE);
+        }
     }
 
     private void SaveMainTest() {
@@ -612,6 +681,25 @@ public class PurchaseBatchFragment extends Fragment {
         batchBinding.batchRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
 
+        batchBinding.qtyProduct.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                if(batchList.size()==0 && !EditModeProduct){
+                    batchBinding.batchQty.setText(s.toString());
+                }
+            }
+        });
 
 
 
@@ -623,17 +711,17 @@ public class PurchaseBatchFragment extends Fragment {
             }
         });
 
-        batchBinding.addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(batchBinding.cardViewBatch.getVisibility()==View.GONE){
-                    batchBinding.cardViewBatch.setVisibility(View.VISIBLE);
-                }
-                else {
-                    batchBinding.cardViewBatch.setVisibility(View.GONE);
-                }
-            }
-        });
+//        batchBinding.addButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(batchBinding.cardViewBatch.getVisibility()==View.GONE){
+//                    batchBinding.cardViewBatch.setVisibility(View.VISIBLE);
+//                }
+//                else {
+//                    batchBinding.cardViewBatch.setVisibility(View.GONE);
+//                }
+//            }
+//        });
 
         batchBinding.productName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -888,7 +976,7 @@ public class PurchaseBatchFragment extends Fragment {
                             try {
                                 Log.d("Positionn",  bodyList.get(position_body_Edit).getiProduct()+" kj ");
                             }catch (Exception e){
-                                editModeProduct=false;
+                                EditModeProduct =false;
                             }
                                 BatchPurchaseBody batchPurchaseBody = new BatchPurchaseBody(
                                         batchBinding.productName.getText().toString(),
@@ -905,12 +993,13 @@ public class PurchaseBatchFragment extends Fragment {
                                         iProduct,
                                         hashMapBody,
                                         batchList1);
-                                if(!editModeProduct) {
+                                if(!EditModeProduct) {
                                     bodyList.add(batchPurchaseBody);
                                 }else {
                                     bodyList.set(position_body_Edit,batchPurchaseBody);
                                 }
                                 binding.boyPartRV.setAdapter(bodyAdapter);
+                                settingBottomBar();
                                 bodyAdapter.notifyDataSetChanged();
 
                             initialValueSettingBody();
@@ -922,8 +1011,12 @@ public class PurchaseBatchFragment extends Fragment {
                                     bodyAdapterOnItemClick(purchaseBody,position);
 
                                 }
+
+                                @Override
+                                public void onDeleteClick(List<BatchPurchaseBody> list, int position) {
+                                    bodyAdapterDelete(list,position);
+                                }
                             });
-//                            }
 
 
 
@@ -944,8 +1037,30 @@ public class PurchaseBatchFragment extends Fragment {
         }
     }
 
+    private void bodyAdapterDelete(List<BatchPurchaseBody> list, int position) {
+        Log.d("clickedd","deleted") ;
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
+        builder.setTitle("delete!")
+                .setMessage("Do you want to delete this product ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        list.remove(position);
+                        bodyAdapter.notifyDataSetChanged();
+                        binding.boyPartRV.setAdapter(bodyAdapter);
+                        settingBottomBar();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
+    }
+
     private void bodyAdapterOnItemClick(BatchPurchaseBody purchaseBody, int position) {
-        editModeProduct =true;
+        EditModeProduct =true;
         position_body_Edit=position;
         Toast.makeText(requireContext(), "click", Toast.LENGTH_SHORT).show();
         mainAlert();
@@ -987,7 +1102,7 @@ public class PurchaseBatchFragment extends Fragment {
     }
 
     private void initialValueSettingBody() {
-        editModeProduct=false;
+        EditModeProduct =false;
         batchList.clear();
 //        batchList=new ArrayList<>();
         batchList1=new ArrayList<>();
@@ -1016,7 +1131,7 @@ public class PurchaseBatchFragment extends Fragment {
         batchBinding.batch.setText("");
         batchBinding.expDate.setText(df.format(new Date()));
         batchBinding.mfDate.setText(df.format(new Date()));
-        batchBinding.cardViewBatch.setVisibility(View.GONE);
+//        batchBinding.cardViewBatch.setVisibility(View.GONE);
     }
 
 
@@ -1189,6 +1304,7 @@ public class PurchaseBatchFragment extends Fragment {
 
             binding.docNo.setText(docNo);
         }
+
     }
 
     private void editfromlocaldb() {
@@ -1276,11 +1392,17 @@ public class PurchaseBatchFragment extends Fragment {
 
                 if (cursorEdit_B.getCount() == i + 1) {
                     binding.boyPartRV.setAdapter(bodyAdapter);
+                    settingBottomBar();
                     alertDialog.dismiss();
                     bodyAdapter.setOnClickListener(new BatchPurchaseBodyAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(BatchPurchaseBody purchaseBody, int position) {
                             bodyAdapterOnItemClick(purchaseBody,position);
+                        }
+
+                        @Override
+                        public void onDeleteClick(List<BatchPurchaseBody> list, int position) {
+                            bodyAdapterDelete(list,position);
                         }
                     });
                 }
@@ -1404,12 +1526,19 @@ public class PurchaseBatchFragment extends Fragment {
             batchList1=new ArrayList<>();
 
                 if(productBodyArray.length()==j+1){
+                    Log.d("bodyListsize",bodyList.size()+"");
+                    settingBottomBar();
                     binding.boyPartRV.setAdapter(bodyAdapter);
                     alertDialog.dismiss();
                     bodyAdapter.setOnClickListener(new BatchPurchaseBodyAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(BatchPurchaseBody purchaseBody, int position) {
                             bodyAdapterOnItemClick(purchaseBody,position);
+                        }
+
+                        @Override
+                        public void onDeleteClick(List<BatchPurchaseBody> list, int position) {
+                            bodyAdapterDelete(list,position);
                         }
                     });
                 }

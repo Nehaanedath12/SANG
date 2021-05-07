@@ -18,8 +18,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPart;
-import com.sangsolutions.sang.Adapter.BodyAdapter.BodyPartAdapter;
 import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetails;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Database.DatabaseHelper;
@@ -43,6 +41,7 @@ public class BatchPurchaseBodyAdapter extends RecyclerView.Adapter<BatchPurchase
     public interface OnClickListener {
         void onItemClick(BatchPurchaseBody purchaseBody, int position);
 
+        void onDeleteClick(List<BatchPurchaseBody> list, int position);
     }
     public BatchPurchaseBodyAdapter(Context context, List<BatchPurchaseBody> list, int tagTotalNumber, int iDocType) {
         this.context=context;
@@ -122,7 +121,7 @@ public class BatchPurchaseBodyAdapter extends RecyclerView.Adapter<BatchPurchase
         holder.discount.setText(String.valueOf(list.get(position).discount));
         holder.add_charges.setText(String.valueOf(list.get(position).addCharges));
 
-        Log.d("batchList",list.get(position).batchList.size()+"");
+        Log.d("batchList",list.get(position).batchList.size()+" gross"+String.valueOf(list.get(position).gross) );
 
 //        holder.batch.setText(list.get(position).batch);
 //        holder.expDate.setText(list.get(position).expDate);
@@ -145,23 +144,8 @@ public class BatchPurchaseBodyAdapter extends RecyclerView.Adapter<BatchPurchase
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("clickedd","deleted") ;
-                AlertDialog.Builder builder=new AlertDialog.Builder(context);
-                builder.setTitle("delete!")
-                        .setMessage("Do you want to delete this product ?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                list.remove(position);
-                                notifyDataSetChanged();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
+                onClickListener.onDeleteClick(list,position);
+
             }
         });
 
