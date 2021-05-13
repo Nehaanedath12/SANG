@@ -62,9 +62,12 @@ public class PostPurchaseBatchService extends JobService {
                         JSONObject jsonObjectMain = new JSONObject();
                         try {
                             if (docNo.contains("L")) {
-                                iTransId = 0;
+
+                                jsonObjectMain.put("iTransId", 0);
+                            }else {
+                                jsonObjectMain.put("iTransId", iTransId);
                             }
-                            jsonObjectMain.put("iTransId", iTransId);
+
                             jsonObjectMain.put("sDocNo", docNo);
                             jsonObjectMain.put("sDate", Tools.dateFormat(cursorHeader.getString(cursorHeader.getColumnIndex(BatchPurchaseClass.S_DATE))));
                             jsonObjectMain.put("iDocType", iDocType);
@@ -81,6 +84,7 @@ public class PostPurchaseBatchService extends JobService {
                             if(cursorBody.moveToFirst() && cursorBody.getCount()>0){
                             for (int j = 0; j < cursorBody.getCount(); j++) {
 
+                                Log.d("bodyyy",cursorBody.getInt(cursorBody.getColumnIndex(BatchPurchaseClass.I_PRODUCT))+"");
                                 JSONObject jsonObject=new JSONObject();
                                 for (int i1=1;i1<=8;i1++){
                                     jsonObject.put("iTag"+i1, cursorBody.getInt(cursorBody.getColumnIndex("iTag"+i1)));
@@ -100,9 +104,10 @@ public class PostPurchaseBatchService extends JobService {
                                 jsonObject.put("sUnits",cursorBody.getString(cursorBody.getColumnIndex(BatchPurchaseClass.S_UNITS)));
                                 jsonObject.put("fNet",cursorBody.getFloat(cursorBody.getColumnIndex(BatchPurchaseClass.F_NET)));
 
+                                int irawId=cursorBody.getInt(cursorBody.getColumnIndex(BatchPurchaseClass.I_ROW_ID));
 
                                 JSONArray jsonArrayBatch = new JSONArray();
-                                Cursor cursorBodyBatch = helper.getDataFrom_Batch_P_Batch(iTransId, iDocType);
+                                Cursor cursorBodyBatch = helper.getDataFrom_Batch_P_Batch(iTransId, iDocType,irawId);
                                 if(cursorBodyBatch.moveToFirst() && cursorBodyBatch.getCount()>0) {
                                     for (int k = 0; k < cursorBodyBatch.getCount(); k++) {
                                         JSONObject jsonObjectBatch = new JSONObject();
@@ -112,12 +117,16 @@ public class PostPurchaseBatchService extends JobService {
                                         jsonObjectBatch.put("ExpDate", Tools.dateFormat(cursorBodyBatch.getString(cursorBodyBatch.getColumnIndex(BatchPurchaseClass.EXP_DATE))));
 
                                         jsonArrayBatch.put(jsonObjectBatch);
+                                        cursorBodyBatch.moveToNext();
                                     }
+
                                 }
                                 jsonObject.put("Batch", jsonArrayBatch);
 
                                 jsonArray.put(jsonObject);
+                                cursorBody.moveToNext();
                             }
+
                         }
 
                             jsonObjectMain.put("Body", jsonArray);
@@ -129,6 +138,7 @@ public class PostPurchaseBatchService extends JobService {
                         }
 
 
+                        cursorHeader.moveToNext();
                     }
                 }
 
@@ -152,7 +162,7 @@ public class PostPurchaseBatchService extends JobService {
                     public void onResponse(String response) {
 
                         Log.d("responsePost ", response);
-                        Log.d("responsePostSP", response);
+                        Log.d("responsePostBatchP", response);
                         try {
                             int tId = Integer.parseInt(response);
                             if(helper.delete_Batch_P_Header(iTransId,iDocType,docNo)){

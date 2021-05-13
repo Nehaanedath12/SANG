@@ -27,7 +27,7 @@ import java.io.InputStreamReader;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     Context context;
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
     private static final String DATABASE_NAME = "Sang.db";
     private static final String TABLE_MASTER_SETTINGS = "t1_masterSettings";
     private static final String TABLE_ACCOUNTS = "t1_accounts";
@@ -428,6 +428,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ");";
 
     private static final String CREATE_TABLE_BATCH_PURCHASE_BODY =" create table if not exists " + TABLE_BATCH_PURCHASE_BODY + " (" +
+            "" + BatchPurchaseClass.I_ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "  +
+
             "" + BatchPurchaseClass.I_TAG_1 + " INTEGER DEFAULT 0, " +
             "" + BatchPurchaseClass.I_TAG_2 + " INTEGER DEFAULT 0, " +
             "" + BatchPurchaseClass.I_TAG_3 + " INTEGER DEFAULT 0, " +
@@ -466,6 +468,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + BatchPurchaseClass.I_PRODUCT + " INTEGER DEFAULT 0, " +
             "" + BatchPurchaseClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
             "" + BatchPurchaseClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+            "" + BatchPurchaseClass.I_ROW_ID + "  INTEGER DEFAULT 0 , "  +
             "" + BatchPurchaseClass.I_TRANS_ID + " INTEGER DEFAULT 0 " +
 
             ");";
@@ -2309,7 +2312,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
-    public boolean insert_Batch_P_Body(BatchPurchaseClass batchP) {
+    public long insert_Batch_P_Body(BatchPurchaseClass batchP) {
         this.db=getReadableDatabase();
         ContentValues cv=new ContentValues();
 
@@ -2338,8 +2341,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(BatchPurchaseClass.I_TRANS_ID,batchP.getiTransId());
         cv.put(BatchPurchaseClass.SL_NO,0);
 
-        float status = db.insert(TABLE_BATCH_PURCHASE_BODY, null, cv);
-        return status != -1;
+//        float status = db.insert(TABLE_BATCH_PURCHASE_BODY, null, cv);
+        long id = db.insert(TABLE_BATCH_PURCHASE_BODY, null, cv);
+        Log.d("iddd",id+"");
+
+            return id;
+
+
+
     }
 
     public boolean delete_Batch_P_Body_batch( int iDocType, int iTransId) {
@@ -2376,6 +2385,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(BatchPurchaseClass.BATCH_QTY,batchP.getBatchQty());
         cv.put(BatchPurchaseClass.EXP_DATE,batchP.getExpDate());
         cv.put(BatchPurchaseClass.MF_DATE,batchP.getMfDate());
+        cv.put(BatchPurchaseClass.I_ROW_ID,batchP.getRawId());
 
         float status = db.insert(TABLE_BATCH_PURCHASE_BATCH_BODY, null, cv);
         return status != -1;
@@ -2416,12 +2426,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getDataFrom_Batch_P_Batch(int iTransId, int iDocType) {
+    public Cursor getDataFrom_Batch_P_Batch(int iTransId, int iDocType,int irawId) {
         this.db=getReadableDatabase();
         Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_BATCH_BODY+" where "
-                +BatchPurchaseClass.I_DOC_TYPE+"='"+iDocType+"' and "+BatchPurchaseClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
+                +BatchPurchaseClass.I_ROW_ID+"='"+irawId+"' and "+BatchPurchaseClass.I_TRANS_ID+"="+"'"+iTransId+"'",null);
         cursor.moveToFirst();
         return cursor;
 
     }
+
 }

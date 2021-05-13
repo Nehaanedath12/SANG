@@ -5,6 +5,7 @@ public class BatchPurchaseClass {
     String sDocNo,sDate,sNarration,processTime;
     int iTransId,iDocType,iAccount1,iAccount2,iUser,status;
 
+    int rawId;
 
     //body
     Float fRate,fVat,fvatPer,fDiscount,fAddCharges,net;
@@ -16,6 +17,14 @@ public class BatchPurchaseClass {
     String sRemarks,unit;
 
     public BatchPurchaseClass() {
+    }
+
+    public int getRawId() {
+        return rawId;
+    }
+
+    public void setRawId(int rawId) {
+        this.rawId = rawId;
     }
 
     public int getSlNo() {
@@ -326,5 +335,5 @@ public class BatchPurchaseClass {
     public static  String EXP_DATE="expDate";
 
     public static  String SL_NO="slNo";
-
+    public static  String I_ROW_ID="iRowId";
 }

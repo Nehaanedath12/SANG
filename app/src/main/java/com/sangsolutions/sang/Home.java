@@ -336,7 +336,7 @@ public class Home extends AppCompatActivity {
                         case 8:{
                             tagCursor = helper.getTagDetails();
                             if (tagCursor.getCount() > 0) {
-                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesBatchHistoryFragment(19);
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesBatchHistoryFragment(28);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
                             } else {
@@ -466,7 +466,7 @@ public class Home extends AppCompatActivity {
                                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            syncTag();
+                                            syncData();
                                         }
                                     })
                                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -538,12 +538,12 @@ public class Home extends AppCompatActivity {
                     schedulepost.Post_SalePurchase_Return(Home.this);
                     schedulepost.Post_SalePurchase_Order(Home.this);
 
+//                    schedulepost1.Post_PurchaseBatch(Home.this);
+//                    schedulepost1.Post_EnquiryRequest(Home.this);
+//                    schedulepost1.Post_Quotation(Home.this);
+//                    schedulepost1.Post_StockCount(Home.this);
+//                    schedulepost1.Post_CustomerMaster(Home.this);
 
-                    schedulepost1.Post_EnquiryRequest(Home.this);
-                    schedulepost1.Post_Quotation(Home.this);
-                    schedulepost1.Post_StockCount(Home.this);
-                    schedulepost1.Post_CustomerMaster(Home.this);
-                    schedulepost1.Post_PurchaseBatch(Home.this);
 
 
 
@@ -559,16 +559,15 @@ public class Home extends AppCompatActivity {
         final int delay1 = 1000*30; // 1000 milliseconds == 1 second
         handler1.postDelayed(new Runnable() {
             public void run() {
-                Log.d("kkk","kk");
+                Log.d("kkk2","kk");
                 if(Tools.isConnected(Home.this)){
-                    Log.d("kkkk","connected");
+                    Log.d("kkkk2","connected");
 
-//                    schedulepost.Post_SalePurchase_Order(Home.this);
-//                    schedulepost.Post_EnquiryRequest(Home.this);
-//                    schedulepost.Post_Quotation(Home.this);
-//                    schedulepost.Post_StockCount(Home.this);
-//                    schedulepost.Post_PurchaseBatch(Home.this);
-
+                    schedulepost1.Post_PurchaseBatch(Home.this);
+                    schedulepost1.Post_EnquiryRequest(Home.this);
+                    schedulepost1.Post_Quotation(Home.this);
+                    schedulepost1.Post_StockCount(Home.this);
+                    schedulepost1.Post_CustomerMaster(Home.this);
                 }
                 handler1.postDelayed(this, delay1);
             }
@@ -788,17 +787,20 @@ public class Home extends AppCompatActivity {
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void syncTag() {
+    private void syncData() {
 
         Log.d("ipppp","new Tools().getIP(Login.this)");
 
 //        schedulerJob.SyncToken(this);
+        schedulerJob.SyncProduct(Home.this);
+        schedulerJob.SyncAccounts(Home.this);
         schedulerJob.SyncTransSalePurchase(Home.this);
         schedulerJob.syncMasterTagDetails(Home.this);
         schedulerJob.SyncMasterSettings(Home.this);
         schedulerJob.SyncBank(Home.this);
-        schedulerJob.SyncProduct(Home.this);
-        schedulerJob.SyncAccounts(Home.this);
+
+
+
         schedulerJob.SyncUser(Home.this);
         }
 

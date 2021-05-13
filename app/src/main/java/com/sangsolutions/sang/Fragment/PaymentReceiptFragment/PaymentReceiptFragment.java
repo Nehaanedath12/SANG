@@ -99,6 +99,7 @@ public class PaymentReceiptFragment extends Fragment {
     String toolTitle;
     String docNo;
     AlertDialog alertDialog;
+    AlertDialog alertDialogProgress;
 
     Cursor cursorTagNumber;
     int tagTotalNumber;
@@ -168,6 +169,14 @@ public class PaymentReceiptFragment extends Fragment {
         FromInvoice = PaymentReceiptFragmentArgs.fromBundle(getArguments()).getFromInvoice();
         Log.d("lllllp","iDocType "+iDocType+" "+"iTransId "+iTransId+" "+"editMode "+ EditMode +""+FromInvoice);
 
+
+
+
+        AlertDialog.Builder builderAlert=new AlertDialog.Builder(requireActivity());
+        View viewAlert=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
+        builderAlert.setView(viewAlert);
+        builderAlert.setCancelable(false);
+        alertDialogProgress = builderAlert.create();
 
         AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
         View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
@@ -918,9 +927,13 @@ public class PaymentReceiptFragment extends Fragment {
             alertDialog_invoice=builder.create();
 //            alertDialog_invoice.setCancelable(false);
             bindingInvoice.recyclerViewInvoice.setAdapter(invoiceAdapter);
+
             alertDialog_invoice.show();
 
+            alertDialogProgress.show();
+
             API_Invoice();
+
 
             invoiceAdapter.setOnClickListener(new InvoiceAdapter.OnClickListener() {
                         @Override
@@ -1070,11 +1083,12 @@ public class PaymentReceiptFragment extends Fragment {
                         public void onResponse(JSONArray response) {
                         Log.d("responseInvoice",response.toString());
                         load_API_Invoice(response);
+                            alertDialogProgress.dismiss();
                         }
                         @Override
                         public void onError(ANError anError) {
                         Log.d("responseInvoice",anError.toString());
-
+                            alertDialogProgress.dismiss();
                         }
                         });
                         }

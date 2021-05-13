@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -45,6 +46,7 @@ public class GetProductService extends JobService {
         }
         return true;
     }
+
 
     private void UpdateProducts() {
         int maxId=helper.getProductsMaxId();
@@ -157,7 +159,7 @@ public class GetProductService extends JobService {
                             Handler handler = new Handler(Looper.getMainLooper());
                             handler.post(new Runnable() {
                                 public void run() {
-//                                    Toast.makeText(GetProductService.this, "products Synced", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(GetProductService.this, "Synced", Toast.LENGTH_SHORT).show();
 
                                 }
                             });
@@ -176,6 +178,7 @@ public class GetProductService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
+
         return false;
     }
 }

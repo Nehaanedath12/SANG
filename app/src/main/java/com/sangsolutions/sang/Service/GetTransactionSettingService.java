@@ -60,6 +60,7 @@ public class GetTransactionSettingService extends JobService {
         GetTransSetting("23");
         GetTransSetting("24");
         GetTransSetting("25");
+        GetTransSetting("28");
 
         GetTransSetting("40");
         return true;
@@ -125,7 +126,7 @@ public class GetTransactionSettingService extends JobService {
                                         try {
                                         if( jsonObject.getInt(TransSetting.I_DOC_TYPE)==40){
                                             Log.d("transactionn","completed1");
-                                            Toast.makeText(GetTransactionSettingService.this, " Syncing completed", Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(GetTransactionSettingService.this, " Syncing completed", Toast.LENGTH_SHORT).show();
                                         }
                                         } catch (JSONException e) {
                                         e.printStackTrace();

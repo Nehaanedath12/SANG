@@ -1,7 +1,6 @@
-package com.sangsolutions.sang.Adapter.BatchPurchaseBodyAdapter;
+package com.sangsolutions.sang.Adapter.BatchSalesBodyAdapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,25 +23,26 @@ import com.sangsolutions.sang.R;
 
 import java.util.List;
 
+public class BatchSalesBodyAdapter extends RecyclerView.Adapter<BatchSalesBodyAdapter.ViewHolder> {
 
-public class BatchPurchaseBodyAdapter extends RecyclerView.Adapter<BatchPurchaseBodyAdapter.ViewHolder> {
-
-    List<BatchPurchaseBody>list;
-    Context context;
+    List<BatchSalesBody>list;
     DatabaseHelper helper;
     int tagTotalNumber;
     int iDocType;
+    Context context;
     private OnClickListener onClickListener;
 
     public void setOnClickListener(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
     public interface OnClickListener {
-        void onItemClick(BatchPurchaseBody purchaseBody, int position);
+        void onItemClick(BatchSalesBody batchSalesBody, int position);
 
-        void onDeleteClick(List<BatchPurchaseBody> list, int position);
+        void onDeleteClick( List<BatchSalesBody> list, int position);
+
     }
-    public BatchPurchaseBodyAdapter(Context context, List<BatchPurchaseBody> list, int tagTotalNumber, int iDocType) {
+
+    public BatchSalesBodyAdapter(Context context, List<BatchSalesBody> list, int tagTotalNumber, int iDocType) {
         this.context=context;
         this.list=list;
         this.tagTotalNumber=tagTotalNumber;
@@ -52,15 +51,14 @@ public class BatchPurchaseBodyAdapter extends RecyclerView.Adapter<BatchPurchase
 
     @NonNull
     @Override
-    public BatchPurchaseBodyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BatchSalesBodyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(context).inflate(R.layout.batch_purchase_body_adapter,parent,false);
         helper=new DatabaseHelper(context);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BatchPurchaseBodyAdapter.ViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull BatchSalesBodyAdapter.ViewHolder holder, int position) {
         holder.productName.setText(list.get(position).productName);
         holder.unit.setText(list.get(position).unit);
 
@@ -68,9 +66,10 @@ public class BatchPurchaseBodyAdapter extends RecyclerView.Adapter<BatchPurchase
         for (int tagId=1;tagId<=tagTotalNumber;tagId++){
             Log.d("iDocTypeBody",iDocType+" "+tagId);
             Cursor cursor=helper.getTransSettings(iDocType,tagId);
-            Log.d("iDocTypeBody",cursor.toString()+"");
+
 
             if(cursor!=null ) {
+                Log.d("iDocTypeBody",cursor.toString()+"");
                 cursor.moveToFirst();
                 String iTagPosition = cursor.getString(cursor.getColumnIndex(TransSetting.I_TAG_POSITION));
                 String mandatory = cursor.getString(cursor.getColumnIndex(TransSetting.B_MANDATORY));
@@ -134,24 +133,20 @@ public class BatchPurchaseBodyAdapter extends RecyclerView.Adapter<BatchPurchase
                 onClickListener.onItemClick(list.get(position),position);
             }
         });
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("clickedd","clickedd") ;
+                onClickListener.onDeleteClick(list,position);
+            }
+        });
         if (position % 2 == 0) {
             holder.parentCard.setBackgroundColor(Color.rgb(234, 234, 234));
         } else {
             holder.parentCard.setBackgroundColor(Color.rgb(255, 255, 255));
         }
-
-
-        holder.delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickListener.onDeleteClick(list,position);
-
-            }
-        });
-
-
-
     }
+
 
     @Override
     public int getItemCount() {

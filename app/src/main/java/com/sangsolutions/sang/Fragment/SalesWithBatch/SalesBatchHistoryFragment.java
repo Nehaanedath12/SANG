@@ -1,7 +1,10 @@
 package com.sangsolutions.sang.Fragment.SalesWithBatch;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,11 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Database.DatabaseHelper;
@@ -28,8 +36,13 @@ import com.sangsolutions.sang.Fragment.PurchaseWithBatch.PurchaseBatchHistoryFra
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
+import com.sangsolutions.sang.URLs;
 import com.sangsolutions.sang.databinding.FragmentBatchPurchaseHistoryBinding;
 import com.sangsolutions.sang.databinding.FragmentSalesBatchHistoryBinding;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +90,13 @@ public class SalesBatchHistoryFragment extends Fragment {
         if(cursor_userId!=null &&cursor_userId.moveToFirst()) {
             userIdS = cursor_userId.getString(cursor_userId.getColumnIndex("user_Id"));
         }
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+        View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
+        builder.setView(view);
+        builder.setCancelable(false);
+        alertDialog = builder.create();
+
+        getHistoryDatas();
 
 
 
@@ -88,7 +108,7 @@ public class SalesBatchHistoryFragment extends Fragment {
                     Toast.makeText(requireContext(), "No Internet!!", Toast.LENGTH_SHORT).show();
                 }
                 navController.navigate(R.id.homeFragment);
-                NavDirections action= HomeFragmentDirections.actionHomeFragmentToSalesBatchHistoryFragment(18);
+                NavDirections action= HomeFragmentDirections.actionHomeFragmentToSalesBatchHistoryFragment(28);
                 navController.navigate(action);
 
             }
@@ -97,12 +117,234 @@ public class SalesBatchHistoryFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavDirections action= SalesBatchHistoryFragmentDirections
-                        .actionSalesBatchHistoryFragmentToSalesBatchFragment().setIDocType(19).setEditMode(false).setITransId(0);
+                        .actionSalesBatchHistoryFragmentToSalesBatchFragment().setIDocType(28).setEditMode(false).setITransId(0);
                 navController.navigate(action);
             }
         });
-
+        binding.fabClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                closeSelection();
+            }
+        });
+        binding.fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteAlert();
+            }
+        });
 
         return binding.getRoot();
     }
+
+    private void deleteAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Delete?")
+                .setMessage("Do you want to Delete " + historyAdapter.getSelectedItemCount() + " items?")
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DeleteItems();
+
+                    }
+                })
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void DeleteItems() {
+        List<Integer> listSelectedItem = historyAdapter.getSelectedItems();
+        for (int i =0;i<listSelectedItem.size();i++) {
+            for (int j =0;j<historyList.size();j++) {
+                if (listSelectedItem.get(i) == j) {
+                    if(Tools.isConnected(requireContext())) {
+                        deleteFromAPI(historyList.get(j).getiTransId());
+                    }else {
+//                        deleteFromDB(historyList.get(j).getiTransId(),historyList.get(j).getsDocNo());
+                    }
+                }
+            }
+
+            if (i + 1 == listSelectedItem.size()) {
+                getHistoryDatas();
+                historyAdapter.notifyDataSetChanged();
+                closeSelection();
+            }
+        }
+    }
+
+    private void getHistoryDatas() {
+        alertDialog.show();
+        Log.d("doctypee",iDocType+"");
+        if(Tools.isConnected(requireContext())) {
+            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetTransWithBatchSummary)
+                    .addQueryParameter("iDocType", String.valueOf(iDocType))
+                    .addQueryParameter("iUser", userIdS)
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONArray(new JSONArrayRequestListener() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d("responseHistory", response.toString());
+                            loadDatas(response);
+
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            Log.d("responseHistory", anError.getMessage());
+
+                            alertDialog.dismiss();
+                        }
+                    });
+        }else {
+//            loadDatasFromDB();
+        }
+    }
+
+    private void loadDatas(JSONArray response) {
+        historyList.clear();
+        historyAdapter.notifyDataSetChanged();
+        try {
+            JSONArray jsonArray = new JSONArray(response.toString());
+            if(jsonArray.length()==0){
+                alertDialog.dismiss();
+            }
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                Log.d("I_TRANS_ID",jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1)+"");
+                SalesPurchaseHistory history=new SalesPurchaseHistory(
+                        jsonObject.getInt(SalesPurchaseHistory.I_TRANS_ID),
+                        jsonObject.getInt(SalesPurchaseHistory.I_ACCOUNT1),
+                        jsonObject.getInt(SalesPurchaseHistory.N_AMOUNT),
+                        jsonObject.getString(SalesPurchaseHistory.S_DOC_NO),
+                        jsonObject.getString(SalesPurchaseHistory.S_DATE),
+                        jsonObject.getString(SalesPurchaseHistory.S_ACCOUNT1),
+                        jsonObject.getString(SalesPurchaseHistory.S_ACCOUNT2)
+                );
+
+                historyList.add(history);
+                historyAdapter.notifyDataSetChanged();
+                if(i+1==jsonArray.length()){
+                    alertDialog.dismiss();
+
+
+                    historyAdapter.setOnClickListener(new SalesPurchaseHistoryAdapter.OnClickListener() {
+                        @Override
+                        public void onItemClick(int iTransId, int position) {
+
+                            if(Tools.isConnected(requireContext())) {
+                                adapterOnItemClick(iTransId, position);
+                            }else {
+                                Toast.makeText(requireContext(), "Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+                        @Override
+                        public void onDeleteClick(int iTransId, String sDocNo) {
+                            deleteFromAPI(iTransId);
+                        }
+
+                        @Override
+                        public void onItemLongClick(int position) {
+                            enableActionMode(position);
+                            selectionActive = true;
+                        }
+                    });
+
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteFromAPI(int iTransId) {
+        Log.d("response_delete",iTransId+"");
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransWithBatch)
+                .addQueryParameter("iTransId", String.valueOf(iTransId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("response_delete",response);
+//                        if(response.equals("-1")){
+//                            Toast.makeText(requireContext(), "Can't delete.Its invoice has used.", Toast.LENGTH_SHORT).show();
+//                        }
+                        getHistoryDatas();
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("response_delete",anError.toString()+ anError.getErrorDetail()+anError.getErrorBody());
+
+                    }
+                });
+    }
+
+    private void adapterOnItemClick(int iTransId, int position) {
+        if(!selectionActive) {
+            NavDirections action= SalesBatchHistoryFragmentDirections
+                    .actionSalesBatchHistoryFragmentToSalesBatchFragment().setIDocType(iDocType).setEditMode(true).setITransId(iTransId);
+            navController.navigate(action);
+        }
+        else {
+            enableActionMode(position);
+        }
+    }
+
+    private void enableActionMode(int position) {
+        toggleSelection(position);
+    }
+
+    private void toggleSelection(int position) {
+        historyAdapter.toggleSelection(position);
+        int count = historyAdapter.getSelectedItemCount();
+
+        if (count == 1 && binding.fabDelete.getVisibility() != View.VISIBLE) {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.fabAdd.startAnimation(slideDown);
+                    binding.fabAdd.setVisibility(View.GONE);
+
+                    binding.fabDelete.startAnimation(slideUp);
+                    binding.fabClose.startAnimation(slideUp);
+                    binding.fabDelete.setVisibility(View.VISIBLE);
+                    binding.fabClose.setVisibility(View.VISIBLE);
+                }
+            }, 300);
+        }
+
+        if (count == 0) {
+            closeSelection();
+        }
+    }
+
+    private void closeSelection() {
+        historyAdapter.clearSelections();
+        binding.fabAdd.setVisibility(View.VISIBLE);
+        binding.fabAdd.startAnimation(slideUp);
+        binding.fabDelete.startAnimation(slideDown);
+        binding.fabClose.startAnimation(slideDown);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                binding.fabDelete.setVisibility(View.GONE);
+                binding.fabClose.setVisibility(View.GONE);
+            }
+        }, 300);
+        selectionActive = false;
+    }
+
 }

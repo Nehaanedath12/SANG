@@ -88,5 +88,8 @@ public class URLs {
     public static final String  DeleteTransWithBatch =domain+"DeleteTransWithBatch";
     public static final String  GetTransWithBatchDetails =domain+"GetTransWithBatchDetails";
 
+    public static final String  GetBatchDetails =domain+"GetBatchDetails";
+
+
 
 }
