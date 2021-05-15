@@ -220,7 +220,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="40dp">
+                android:layout_marginBottom="100dp">
 
                 <HorizontalScrollView
                     android:layout_width="match_parent"
@@ -317,4 +317,41 @@
         </RelativeLayout>
     </ScrollView>
 
+    <RelativeLayout
+        android:id="@+id/bottom_bar"
+        android:background="@color/purple_500"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:clickable="true"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/TotalQty_Bar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:paddingEnd="20dp"
+            android:textSize="18dp"
+            android:gravity="center"
+            android:text="Total qty: "
+            android:textColor="@color/white"
+            android:textStyle="italic" />
+        <TextView
+            android:id="@+id/TotalRate_Bar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:paddingEnd="20dp"
+            android:textSize="18dp"
+            android:gravity="center"
+            android:text="Total rate: "
+            android:textColor="@color/white"
+            android:textStyle="italic" />
+
+    </RelativeLayout>
 </RelativeLayout>

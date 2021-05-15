@@ -3,6 +3,7 @@ package com.sangsolutions.sang.Service;
 import android.annotation.SuppressLint;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.BankAdapter.Bank;
+import com.sangsolutions.sang.Commons;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -32,11 +34,17 @@ public class GetBankService extends JobService {
     DatabaseHelper helper;
     JobParameters params;
     Bank bank;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         Log.d("bankk","banks");
         this.params=params;
+
+        preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
+        editor = preferences.edit();
+
         AndroidNetworking.initialize(this);
         if(helper.getBank()==0) {
             GetBanks();
@@ -71,6 +79,12 @@ public class GetBankService extends JobService {
     private void updateBankValues(JSONObject response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                editor.putString(Commons.BANK,"true").apply();
+            }
 
             @Override
             protected Void doInBackground(Void... voids) {
@@ -139,6 +153,14 @@ public class GetBankService extends JobService {
     private void loadBankData(JSONArray response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                editor.putString(Commons.BANK,"true").apply();
+
+            }
+
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
@@ -176,6 +198,8 @@ public class GetBankService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
+
+        Toast.makeText(this, "Bank Synced", Toast.LENGTH_SHORT).show();
         return false;
     }
 }

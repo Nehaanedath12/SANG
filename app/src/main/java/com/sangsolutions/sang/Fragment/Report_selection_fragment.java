@@ -31,7 +31,8 @@ public class Report_selection_fragment extends Fragment {
         binding.saleReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections actions=Report_selection_fragmentDirections.actionReportSelectionFragmentToReportFragment("20","Sales Report");
+                NavDirections actions=Report_selection_fragmentDirections.
+                        actionReportSelectionFragmentToReportFragment("20","Sales Report");
                 navController.navigate(actions);
             }
         });
@@ -147,6 +148,22 @@ public class Report_selection_fragment extends Fragment {
             public void onClick(View v) {
                 NavDirections action=Report_selection_fragmentDirections
                         .actionReportSelectionFragmentToStockCountReport("40","StockCount Report");
+                navController.navigate(action);
+            }
+        });
+        binding.purchaseBatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToReportFragment("18","Purchase-Batch Report");
+                navController.navigate(action);
+            }
+        });
+        binding.salesBatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavDirections action=Report_selection_fragmentDirections
+                        .actionReportSelectionFragmentToReportFragment("28","Sales-Batch Report");
                 navController.navigate(action);
             }
         });

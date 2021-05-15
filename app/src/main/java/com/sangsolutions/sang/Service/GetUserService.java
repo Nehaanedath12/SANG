@@ -65,6 +65,11 @@ public class GetUserService extends JobService {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
             @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+            }
+
+            @Override
             protected Void doInBackground(Void... voids) {
                 try {
                     JSONArray jsonArray = new JSONArray(response.toString());

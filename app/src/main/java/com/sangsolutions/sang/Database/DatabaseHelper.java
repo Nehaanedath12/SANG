@@ -65,6 +65,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static  final String TABLE_BATCH_PURCHASE_BODY= "t1_batch_purchase_body";
     private static  final String TABLE_BATCH_PURCHASE_BATCH_BODY= "t1_batch_purchase_batch_body";
 
+    //batchSales
+
+//    private static  final String TABLE_BATCH_SALES_HEADER = "t1_batch_sales";
+//    private static  final String TABLE_BATCH_SALES_BODY= "t1_batch_sales_body";
+//    private static  final String TABLE_BATCH_SALES_BATCH_BODY= "t1_batch_sales_batch_body";
+
 
     private static  final String IID = "iId";
     private static  final String USER_ID = "user_Id";
@@ -473,6 +479,70 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             ");";
 
+    //batchsales
+
+
+
+//    private static final String CREATE_TABLE_BATCH_SALES =" create table if not exists " + TABLE_BATCH_SALES_HEADER + " (" +
+//            "" + BatchPurchaseClass.I_TRANS_ID + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_ACCOUNT_1 +  " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_ACCOUNT_2 +  " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.S_DATE +  " TEXT(50) DEFAULT null , "  +
+//            "" + BatchPurchaseClass.S_NARRATION + " TEXT(50) DEFAULT null , " +
+//            "" + BatchPurchaseClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+//            "" + BatchPurchaseClass.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
+//            "" + BatchPurchaseClass.STATUS +  " INTEGER DEFAULT 0 " +
+//
+//            ");";
+//
+//    private static final String CREATE_TABLE_BATCH_SALES_BODY =" create table if not exists " + TABLE_BATCH_SALES_BODY + " (" +
+//            "" + BatchPurchaseClass.I_ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "  +
+//
+//            "" + BatchPurchaseClass.I_TAG_1 + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_TAG_2 + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_TAG_3 + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_TAG_4 + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_TAG_5 + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_TAG_6 + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_TAG_7 + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_TAG_8 + " INTEGER DEFAULT 0, " +
+//
+//
+//            "" + BatchPurchaseClass.SL_NO +  " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_PRODUCT +  " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.F_QTY+  " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.F_RATE + "  TEXT(50) DEFAULT null , " +
+//            "" + BatchPurchaseClass.F_DISCOUNT +  " TEXT(50) DEFAULT null , "  +
+//            "" + BatchPurchaseClass.F_ADD_CHARGES + " TEXT(50) DEFAULT null , " +
+//            "" + BatchPurchaseClass.F_VAT_PER + " TEXT(50) DEFAULT null ,"  +
+//            "" + BatchPurchaseClass.F_VAT + " TEXT(50) DEFAULT null ,"  +
+//            "" + BatchPurchaseClass.S_REMARKS + " TEXT(50) DEFAULT null ,"  +
+//            "" + BatchPurchaseClass.S_UNITS + " TEXT(50) DEFAULT null ,"  +
+//            "" + BatchPurchaseClass.F_NET + " TEXT(50) DEFAULT null ,"  +
+//            "" + BatchPurchaseClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+//            "" + BatchPurchaseClass.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+//
+//            ");";
+//
+//
+//    private static final String CREATE_TABLE_BATCH_SALES_BATCH_BODY=" create table if not exists " + TABLE_BATCH_SALES_BATCH_BODY + " (" +
+//            "" + BatchPurchaseClass.BATCH_NAME + " TEXT(50) DEFAULT null, " +
+//            "" + BatchPurchaseClass.MF_DATE + " TEXT(50) DEFAULT null, " +
+//            "" + BatchPurchaseClass.EXP_DATE + " TEXT(50) DEFAULT null, " +
+//            "" + BatchPurchaseClass.BATCH_QTY + " INTEGER DEFAULT 0, " +
+//
+//            "" + BatchPurchaseClass.SL_NO +  " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_PRODUCT + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.I_DOC_TYPE + " INTEGER DEFAULT 0, " +
+//            "" + BatchPurchaseClass.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
+//            "" + BatchPurchaseClass.I_ROW_ID + "  INTEGER DEFAULT 0 , "  +
+//            "" + BatchPurchaseClass.I_TRANS_ID + " INTEGER DEFAULT 0 " +
+//
+//            ");";
+
+
     private SQLiteDatabase db;
 
     public DatabaseHelper(@Nullable Context context) {
@@ -516,6 +586,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_BATCH_PURCHASE_BODY);
         db.execSQL(CREATE_TABLE_BATCH_PURCHASE_BATCH_BODY);
 
+
+//        db.execSQL(CREATE_TABLE_BATCH_SALES);
+//        db.execSQL(CREATE_TABLE_BATCH_SALES_BODY);
+//        db.execSQL(CREATE_TABLE_BATCH_SALES_BATCH_BODY);
+
     }
 
     @Override
@@ -530,7 +605,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.d("databasehelper", "Looking for migration file: " + migrationName);
             readAndExecuteSQLScript(db, context, migrationName);
         }
-        db.delete(TABLE_CURRENT_LOGIN,null,null);
+//        db.delete(TABLE_CURRENT_LOGIN,null,null);
         onCreate(db);
 
 }
@@ -902,7 +977,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor=db.rawQuery("select "+Products.S_UNIT+" from "+TABLE_PRODUCT+" where "+
                 Products.I_ID+"="+iProduct,null);
         cursor.moveToFirst();
-        return cursor.getString(cursor.getColumnIndex(Products.S_UNIT));
+        if(cursor!=null  && cursor.getCount()>0) {
+            return cursor.getString(cursor.getColumnIndex(Products.S_UNIT));
+        }else return null;
     }
 
     public Cursor getUserCode(String userIdS) {
@@ -2408,13 +2485,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public boolean changeStatus_Batch_P(int transId, String docNo, int iStatus) {
+    public boolean changeStatus_Batch_P(int transId, int iDocType, int iStatus) {
 
         String sTransId=String.valueOf(transId);
+        String sDocType=String.valueOf(iDocType);
         this.db=getReadableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(BatchPurchaseClass.STATUS,iStatus);
-        float status=db.update(TABLE_BATCH_PURCHASE_HEADER,cv,  BatchPurchaseClass.I_TRANS_ID + " = ? and " + BatchPurchaseClass.S_DOC_NO + " = ? ", new String[]{sTransId, docNo});
+        float status=db.update(TABLE_BATCH_PURCHASE_HEADER,cv,  BatchPurchaseClass.I_TRANS_ID + " = ? and " + BatchPurchaseClass.I_DOC_TYPE + " = ? ", new String[]{sTransId, sDocType});
         return  status != -1;
     }
 
@@ -2435,4 +2513,155 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+//    public Cursor getDataFrom_Batch_S_Header() {
+//        this.db=getReadableDatabase();
+//        Cursor cursor=db.rawQuery("select * from "+ TABLE_BATCH_SALES_HEADER,null);
+//        cursor.moveToFirst();
+//        return cursor;
+//
+//    }
+//
+//    public boolean delete_Batch_S_Header(int iTransId, int iDocType, String sDocNo) {
+//
+//        String sDocType=String.valueOf(iDocType);
+//        this.db = getWritableDatabase();
+//
+//        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_SALES_HEADER,null);
+//
+//        if(cursor.getCount()>0) {
+//            float status = db.delete(TABLE_BATCH_SALES_HEADER, BatchPurchaseClass.S_DOC_NO + " =  ? and "
+//                    + BatchPurchaseClass.I_DOC_TYPE + " = ?", new String[]{sDocNo, sDocType});
+//            return status != -1;
+//        }else {
+//            return true;
+//        }
+//    }
+//
+//    public boolean insert_Batch_S_Header(BatchPurchaseClass b_class) {
+//
+//        this.db=getReadableDatabase();
+//        ContentValues cv=new ContentValues();
+//
+//        cv.put(BatchPurchaseClass.I_TRANS_ID,b_class.getiTransId());
+//        cv.put(BatchPurchaseClass.S_DOC_NO,b_class.getsDocNo());
+//        cv.put(BatchPurchaseClass.I_DOC_TYPE,b_class.getiDocType());
+//        cv.put(BatchPurchaseClass.I_ACCOUNT_1,b_class.getiAccount1());
+//        cv.put(BatchPurchaseClass.I_ACCOUNT_2,b_class.getiAccount2());
+//        cv.put(BatchPurchaseClass.S_NARRATION,b_class.getsNarration());
+//        cv.put(BatchPurchaseClass.S_DATE,b_class.getsDate());
+//        cv.put(BatchPurchaseClass.PROCESS_TIME,b_class.getProcessTime());
+//        cv.put(BatchPurchaseClass.STATUS,b_class.getStatus());
+//
+//
+//        float status = db.insert(TABLE_BATCH_SALES_HEADER, null, cv);
+//        return status != -1;
+//
+//    }
+//
+//    public boolean delete_Batch_S_Body(int iDocType, int iTransId) {
+//
+//        this.db=getReadableDatabase();
+//        String sDocType=String.valueOf(iDocType);
+//        String sTransId=String.valueOf(iTransId);
+//        this.db = getWritableDatabase();
+//        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_SALES_BODY,null);
+//
+//        if(cursor.getCount()>0) {
+//            float status = db.delete(TABLE_BATCH_SALES_BODY, BatchPurchaseClass.I_DOC_TYPE + " =  ? and "
+//                    + BatchPurchaseClass.I_TRANS_ID + " = ?", new String[]{sDocType, sTransId});
+//            return status != -1;
+//        }else
+//            return true;
+//    }
+//
+//    public boolean delete_Batch_S_Body_batch(int iDocType, int iTransId) {
+//        this.db=getReadableDatabase();
+////        String sProduct=String.valueOf(iProduct);
+//        String sDocType=String.valueOf(iDocType);
+//        String sTransId=String.valueOf(iTransId);
+//        this.db = getWritableDatabase();
+//        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_SALES_BATCH_BODY,null);
+//
+//        if(cursor.getCount()>0) {
+//            float status = db.delete(TABLE_BATCH_SALES_BATCH_BODY, BatchPurchaseClass.I_DOC_TYPE + " =  ? and "
+//                    + BatchPurchaseClass.I_TRANS_ID + " = ? ", new String[]{sDocType, sTransId});
+//
+//            return status != -1;
+//
+//        }else
+//            return true;
+//    }
+//
+//    public long insert_Batch_S_Body(BatchPurchaseClass batchP) {
+//
+//        this.db=getReadableDatabase();
+//        ContentValues cv=new ContentValues();
+//
+//        cv.put(BatchPurchaseClass.I_TAG_1,batchP.getiTag1());
+//        cv.put(BatchPurchaseClass.I_TAG_2,batchP.getiTag2());
+//        cv.put(BatchPurchaseClass.I_TAG_3,batchP.getiTag3());
+//        cv.put(BatchPurchaseClass.I_TAG_4,batchP.getiTag4());
+//        cv.put(BatchPurchaseClass.I_TAG_5,batchP.getiTag5());
+//        cv.put(BatchPurchaseClass.I_TAG_6,batchP.getiTag6());
+//        cv.put(BatchPurchaseClass.I_TAG_7,batchP.getiTag7());
+//        cv.put(BatchPurchaseClass.I_TAG_8,batchP.getiTag8());
+//
+//        cv.put(BatchPurchaseClass.I_PRODUCT,batchP.getiProduct());
+//        cv.put(BatchPurchaseClass.F_QTY,batchP.getTotalQty());
+//        cv.put(BatchPurchaseClass.F_RATE,batchP.getfRate());
+//        cv.put(BatchPurchaseClass.F_DISCOUNT,batchP.getfDiscount());
+//        cv.put(BatchPurchaseClass.F_ADD_CHARGES,batchP.getfAddCharges());
+//        cv.put(BatchPurchaseClass.F_VAT_PER,batchP.getFvatPer());
+//        cv.put(BatchPurchaseClass.F_VAT,batchP.getfVat());
+//        cv.put(BatchPurchaseClass.S_REMARKS,batchP.getsRemarks());
+//        cv.put(BatchPurchaseClass.S_UNITS,batchP.getUnit());
+//        cv.put(BatchPurchaseClass.F_NET,batchP.getNet());
+//
+//        cv.put(BatchPurchaseClass.S_DOC_NO,batchP.getsDocNo());
+//        cv.put(BatchPurchaseClass.I_DOC_TYPE,batchP.getiDocType());
+//        cv.put(BatchPurchaseClass.I_TRANS_ID,batchP.getiTransId());
+//        cv.put(BatchPurchaseClass.SL_NO,0);
+//
+//        long id = db.insert(TABLE_BATCH_SALES_BODY, null, cv);
+//        Log.d("iddd",id+"");
+//
+//        return id;
+//
+//
+//    }
+//
+//    public boolean insert_Batch_S_Body_batch(BatchPurchaseClass batchP) {
+//        this.db=getReadableDatabase();
+//        this.db=getWritableDatabase();
+//        ContentValues cv=new ContentValues();
+//        cv.put(BatchPurchaseClass.S_DOC_NO,batchP.getsDocNo());
+//        cv.put(BatchPurchaseClass.I_DOC_TYPE,batchP.getiDocType());
+//        cv.put(BatchPurchaseClass.I_TRANS_ID,batchP.getiTransId());
+//        cv.put(BatchPurchaseClass.I_PRODUCT,batchP.getiProduct());
+//        cv.put(BatchPurchaseClass.SL_NO,0);
+//
+//        cv.put(BatchPurchaseClass.BATCH_NAME,batchP.getBatchName());
+//        cv.put(BatchPurchaseClass.BATCH_QTY,batchP.getBatchQty());
+//        cv.put(BatchPurchaseClass.EXP_DATE,batchP.getExpDate());
+//        cv.put(BatchPurchaseClass.MF_DATE,batchP.getMfDate());
+//        cv.put(BatchPurchaseClass.I_ROW_ID,batchP.getRawId());
+//
+//        float status = 0;
+//        Log.d("batchAddedd",batchP.getRawId()+" "+batchP+" "+batchP.iTransId+" "+batchP.iProduct+" "+
+//                batchP.getBatchQty()+" "+batchP.getBatchName());
+//             status = db.insert(TABLE_BATCH_SALES_BATCH_BODY, null, cv);
+//        Log.d("batchAddedd",status+"");
+//        return status != -1;
+//
+//    }
+
+    public Cursor getDataFrom_Batch_P_Header_Post() {
+
+        this.db=getReadableDatabase();
+        Cursor cursor=db.rawQuery("select * from "+TABLE_BATCH_PURCHASE_HEADER+
+                " where status=0 union select * from "+TABLE_BATCH_PURCHASE_HEADER+
+                " where status=1 and processTime <=( SELECT datetime('now','localtime','-1 hours'));",null);
+        cursor.moveToFirst();
+        return cursor;
+    }
 }

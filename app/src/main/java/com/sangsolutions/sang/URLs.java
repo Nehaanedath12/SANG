@@ -90,6 +90,7 @@ public class URLs {
 
     public static final String  GetBatchDetails =domain+"GetBatchDetails";
 
+    public static final String  GetTransWithBatchReport =domain+"GetTransWithBatchReport";
 
 
 }

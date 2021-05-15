@@ -3,6 +3,7 @@ package com.sangsolutions.sang.Service;
 import android.annotation.SuppressLint;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
+import com.sangsolutions.sang.Commons;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Tools;
 import com.sangsolutions.sang.URLs;
@@ -32,6 +34,8 @@ public class GetAccountsService extends JobService {
     DatabaseHelper helper;
     JobParameters params;
     Customer customer;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
     @Override
     public boolean onStartJob(JobParameters params) {
@@ -39,6 +43,9 @@ public class GetAccountsService extends JobService {
         this.params=params;
         Log.d("responseAccounts","response.toString()");
         AndroidNetworking.initialize(this);
+
+        preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
+        editor = preferences.edit();
 
         if(helper.getAccounts()==0) {
             GetAccounts();
@@ -70,6 +77,13 @@ public class GetAccountsService extends JobService {
 
     private void updateAccountsValues(JSONObject response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
+
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                editor.putString(Commons.ACCOUNTS,"true").apply();
+            }
 
             @Override
             protected Void doInBackground(Void... voids) {
@@ -141,6 +155,13 @@ public class GetAccountsService extends JobService {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> asyncTask=new AsyncTask<Void, Void, Void>() {
 
             @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                editor.putString(Commons.ACCOUNTS,"true").apply();
+
+            }
+
+            @Override
             protected Void doInBackground(Void... voids) {
                 try {
                     JSONArray jsonArray = new JSONArray(response.toString());
@@ -179,6 +200,8 @@ public class GetAccountsService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
+        Toast.makeText(this, "Accounts Synced", Toast.LENGTH_SHORT).show();
+
         return false;
     }
 }

@@ -86,7 +86,6 @@ public class BodyPartAdapter extends RecyclerView.Adapter<BodyPartAdapter.ViewHo
         for (int tagId=1;tagId<=tagTotalNumber;tagId++){
             Log.d("iDocTypeBody",iDocType+" "+tagId);
             Cursor cursor=helper.getTransSettings(iDocType,tagId);
-            Log.d("iDocTypeBody",cursor.toString()+"");
 
             if(cursor!=null ) {
                 cursor.moveToFirst();

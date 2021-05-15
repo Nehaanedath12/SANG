@@ -1,8 +1,13 @@
 package com.sangsolutions.sang.Service;
 
 import android.annotation.SuppressLint;
+import android.app.job.JobInfo;
 import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
 import android.app.job.JobService;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -17,6 +22,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
+import com.sangsolutions.sang.Commons;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.SchedulerJob;
 import com.sangsolutions.sang.Tools;
@@ -32,13 +38,18 @@ public class GetMasterSettingsService extends JobService {
     DatabaseHelper helper;
     JobParameters params;
     MasterSettings settings;
-    SchedulerJob schedulerJob;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
+
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
+
+        preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
+        editor = preferences.edit();
+
         Log.d("SyncMasterSettings1","SyncMasterSettings");
-        schedulerJob = new SchedulerJob();
         AndroidNetworking.initialize(this);
         GetMaster();
 
@@ -133,6 +144,14 @@ public class GetMasterSettingsService extends JobService {
     private void loadMasterData(JSONObject response) {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void>asyncTask=new AsyncTask<Void, Void, Void>() {
 
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                editor.putString(Commons.MASTER_SETTINGS,"true").apply();
+
+            }
+
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
@@ -170,7 +189,17 @@ public class GetMasterSettingsService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-//        schedulerJob.SyncProduct(GetMasterSettingsService.this);
+        Toast.makeText(this, "MasterSetting Synced", Toast.LENGTH_SHORT).show();
+
+        JobScheduler js =
+                (JobScheduler) getApplicationContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                0,
+                new ComponentName(getApplicationContext(), GetMasterSettingsService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        assert js != null;
+        js.schedule(job);
         return true;
     }
 }

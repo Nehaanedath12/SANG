@@ -120,11 +120,8 @@ public class BatchSalesBodyAdapter extends RecyclerView.Adapter<BatchSalesBodyAd
         holder.discount.setText(String.valueOf(list.get(position).discount));
         holder.add_charges.setText(String.valueOf(list.get(position).addCharges));
 
-        Log.d("batchList",list.get(position).batchList.size()+" gross"+String.valueOf(list.get(position).gross) );
 
-//        holder.batch.setText(list.get(position).batch);
-//        holder.expDate.setText(list.get(position).expDate);
-//        holder.mfDate.setText(list.get(position).mfDate);
+
 
         holder.parentLinear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,9 +172,7 @@ public class BatchSalesBodyAdapter extends RecyclerView.Adapter<BatchSalesBodyAd
             discount=itemView.findViewById(R.id.discount_batch);
             add_charges=itemView.findViewById(R.id.add_charges_batch);
 
-//            batch=itemView.findViewById(R.id.batch);
-//            mfDate=itemView.findViewById(R.id.mfDate);
-//            expDate=itemView.findViewById(R.id.expDate);
+
 
             linearTag=itemView.findViewById(R.id.linear_tags_batch);
             delete=itemView.findViewById(R.id.deleteImg_batch);

@@ -154,7 +154,8 @@ public class GetTransactionSettingService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        Log.d("transactionn","completed3");
+        Toast.makeText(this, "Trans Setting Synced", Toast.LENGTH_SHORT).show();
+
         return true;
     }
 }

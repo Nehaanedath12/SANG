@@ -14,6 +14,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Build;
@@ -81,7 +82,8 @@ public class Home extends AppCompatActivity {
     List<ExpandedMenuModel> listDataHeader;
     HashMap<ExpandedMenuModel, List<String>> listDataChild;
 
-
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
 
 
@@ -215,6 +217,9 @@ public class Home extends AppCompatActivity {
         TextView textHeader=headerView.findViewById(R.id.username);
         Cursor cursor=helper.getUserId();
 
+        preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
+        editor = preferences.edit();
+
         if(cursor!=null && cursor.moveToFirst()) {
             userName = helper.getUserName(cursor.getString(cursor.getColumnIndex("user_Id")));
             textHeader.setText(userName);
@@ -235,11 +240,10 @@ public class Home extends AppCompatActivity {
                 if(i==1){
                     switch (i1){
                         case 0:{
-                            tagCursor=helper.getTagDetails();
-                            if(tagCursor.getCount()>0) {
-                                    NavDirections  action=HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale History").setIDocType(20);
-                                    navController.navigate(R.id.homeFragment);
-                                    navController.navigate(action);
+                            if(checkingSyncDatas()) {
+                                NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Sale History").setIDocType(20);
+                                navController.navigate(R.id.homeFragment);
+                                navController.navigate(action);
                             }else {
                                 Toast.makeText(Home.this, "please sync  Data's", Toast.LENGTH_SHORT).show();
                             }
@@ -247,8 +251,7 @@ public class Home extends AppCompatActivity {
                         }break;
 
                         case 1:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                         NavDirections action = HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt History", 25);
                                         navController.navigate(R.id.homeFragment);
                                         navController.navigate(action);
@@ -259,8 +262,7 @@ public class Home extends AppCompatActivity {
                         break;
 
                         case 2:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Sales Return History", 21);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -271,8 +273,7 @@ public class Home extends AppCompatActivity {
                         }break;
 
                         case 3:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(22, "Sales Order History");
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -283,8 +284,7 @@ public class Home extends AppCompatActivity {
 
                         }break;
                         case 4:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToRequestHistoryFragment(23, "Enquiry History");
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -295,8 +295,7 @@ public class Home extends AppCompatActivity {
                         }break;
 
                         case 5:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections
                                         .actionHomeFragmentToQuotationHistoryFragment(24, "Sales Quotation History");
                                 navController.navigate(R.id.homeFragment);
@@ -307,8 +306,7 @@ public class Home extends AppCompatActivity {
                             }
                         }break;
                         case 6:{
-                            tagCursor=helper.getTagDetails();
-                            if(tagCursor.getCount()>0) {
+                            if(checkingSyncDatas()) {
 
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Advance Invoice History").setIDocType(16);
                                 navController.navigate(R.id.homeFragment);
@@ -323,8 +321,7 @@ public class Home extends AppCompatActivity {
                             }
                         }break;
                         case 7:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Receipt AdvanceInv History", 17);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -334,8 +331,7 @@ public class Home extends AppCompatActivity {
                         }
                         break;
                         case 8:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesBatchHistoryFragment(28);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -354,8 +350,7 @@ public class Home extends AppCompatActivity {
                 if(i==2){
                     switch (i1){
                         case 0:{
-                            tagCursor=helper.getTagDetails();
-                            if(tagCursor.moveToFirst() && tagCursor.getCount()>0) {
+                            if(checkingSyncDatas()) {
                                     NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Purchase History").setIDocType(10);
                                     navController.navigate(R.id.homeFragment);
                                     navController.navigate(action);
@@ -366,8 +361,7 @@ public class Home extends AppCompatActivity {
 
 
                         case 1:{
-                            tagCursor=helper.getTagDetails();
-                            if(tagCursor.getCount()>0) {
+                            if(checkingSyncDatas()) {
                                     NavDirections action=HomeFragmentDirections.actionHomeFragmentToPaymentReceiptHistoryFragment("Payment History",15);
                                     navController.navigate(R.id.homeFragment);
                                     navController.navigate(action);
@@ -378,8 +372,7 @@ public class Home extends AppCompatActivity {
                         }break;
 
                         case 2:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseReturnHistoryFragment("Purchase Return History", 11);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -389,8 +382,7 @@ public class Home extends AppCompatActivity {
                         }break;
 
                         case 3:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSPOrderHistoryFragment(12, "Purchase Order History");
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -400,8 +392,7 @@ public class Home extends AppCompatActivity {
                         }break;
 
                         case 4:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToRequestHistoryFragment(13, "Request History");
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -412,8 +403,7 @@ public class Home extends AppCompatActivity {
                         }break;
 
                         case  5:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections
                                         .actionHomeFragmentToQuotationHistoryFragment(14, "Purchase Quotation History");
                                 navController.navigate(R.id.homeFragment);
@@ -425,8 +415,7 @@ public class Home extends AppCompatActivity {
 
                         }break;
                         case  6:{
-                            tagCursor = helper.getTagDetails();
-                            if (tagCursor.getCount() > 0) {
+                            if(checkingSyncDatas()) {
                                 NavDirections action = HomeFragmentDirections
                                         .actionHomeFragmentToPurchaseBatchHistoryFragment(18);
                                 navController.navigate(R.id.homeFragment);
@@ -487,8 +476,7 @@ public class Home extends AppCompatActivity {
                         }
                     }break;
                     case 4:{
-                        tagCursor = helper.getTagDetails();
-                        if (tagCursor.getCount() > 0) {
+                        if(checkingSyncDatas()) {
                             NavDirections action = HomeFragmentDirections
                                     .actionHomeFragmentToStockCountHistoryFragment(40);
                             navController.navigate(R.id.homeFragment);
@@ -501,8 +489,7 @@ public class Home extends AppCompatActivity {
                         }
                     }break;
                     case 5:{
-                        tagCursor=helper.getTagDetails();
-                        if(tagCursor.getCount()>0) {
+                        if(checkingSyncDatas()) {
                                 NavDirections action= HomeFragmentDirections.actionHomeFragmentToReportSelectionFragment();
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
@@ -706,6 +693,8 @@ public class Home extends AppCompatActivity {
 //            });
             }
 
+
+
     private void prepareListData() {
         listDataHeader = new ArrayList<ExpandedMenuModel>();
         listDataChild = new HashMap<ExpandedMenuModel, List<String>>();
@@ -789,20 +778,52 @@ public class Home extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void syncData() {
 
+//        editor.putString(Commons.PRODUCT,"false").apply();
+//        editor.putString(Commons.ACCOUNTS,"false").apply();
+//        editor.putString(Commons.TRANSACTION_SETTINGS,"false").apply();
+//        editor.putString(Commons.TAG_DETAILS,"false").apply();
+//        editor.putString(Commons.MASTER_SETTINGS,"false").apply();
+//        editor.putString(Commons.BANK,"false").apply();
+
         Log.d("ipppp","new Tools().getIP(Login.this)");
 
 //        schedulerJob.SyncToken(this);
-        schedulerJob.SyncProduct(Home.this);
+
+
+
         schedulerJob.SyncAccounts(Home.this);
         schedulerJob.SyncTransSalePurchase(Home.this);
         schedulerJob.syncMasterTagDetails(Home.this);
         schedulerJob.SyncMasterSettings(Home.this);
+        schedulerJob.SyncProduct(Home.this);
         schedulerJob.SyncBank(Home.this);
 
 
-
         schedulerJob.SyncUser(Home.this);
+
+
         }
+    private boolean checkingSyncDatas() {
+        if (preferences.getString(Commons.PRODUCT, "false").equals("true")  &&
+                preferences.getString(Commons.ACCOUNTS, "false").equals("true")  &&
+                preferences.getString(Commons.TRANSACTION_SETTINGS, "false").equals("true")  &&
+                preferences.getString(Commons.TAG_DETAILS, "false").equals("true")  &&
+                preferences.getString(Commons.MASTER_SETTINGS, "false").equals("true")  &&
+                preferences.getString(Commons.BANK, "false").equals("true")  ){
+
+            Log.d("productsharedP",preferences.getString(Commons.PRODUCT, "false"));
+            Log.d("productsharedA",preferences.getString(Commons.ACCOUNTS, "false"));
+            Log.d("productsharedT",preferences.getString(Commons.TRANSACTION_SETTINGS, "false"));
+            Log.d("productsharedTa",preferences.getString(Commons.TAG_DETAILS, "false"));
+            Log.d("productsharedM",preferences.getString(Commons.MASTER_SETTINGS, "false"));
+            Log.d("productsharedB",preferences.getString(Commons.BANK, "false"));
+
+
+            return true;
+        }else {
+            return false;
+        }
+    }
 
 
     private void logoutAlert() {

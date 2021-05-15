@@ -190,6 +190,7 @@ public class StockCountFragment extends Fragment {
         orderBodyAdapter=new OrderBodyAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
+        binding.bottomBar.setVisibility(View.GONE);
 
 
         binding.date.setOnClickListener(new View.OnClickListener() {
@@ -748,6 +749,8 @@ public class StockCountFragment extends Fragment {
 
                 binding.boyPartRV.setAdapter(orderBodyAdapter);
 
+                settingBottomBar();
+
                 initialValueSettingBody();
                 binding.cardViewBody.setVisibility(View.GONE);
 
@@ -766,6 +769,20 @@ public class StockCountFragment extends Fragment {
         }else {binding.productName.setError("Enter proper Name");}
     }
 
+    private void settingBottomBar() {
+
+        if(bodyPartList.size()>0){
+            binding.bottomBar.setVisibility(View.VISIBLE);
+            int tQty=0;
+            for (int i=0;i<bodyPartList.size();i++) {
+                tQty=tQty+bodyPartList.get(i).getQty();
+            }
+            binding.TotalQtyBar.setText("Total Qty: "+tQty);
+        }else {
+            binding.bottomBar.setVisibility(View.GONE);
+        }
+    }
+
     private void deleteProductField(List<BodyPart> list, int position) {
         AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
         builder.setTitle("delete!")
@@ -776,6 +793,7 @@ public class StockCountFragment extends Fragment {
                         list.remove(position);
                         orderBodyAdapter.notifyDataSetChanged();
                         binding.boyPartRV.setAdapter(orderBodyAdapter);
+                        settingBottomBar();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1183,6 +1201,7 @@ public class StockCountFragment extends Fragment {
                 if(cursorEdit_B.getCount()==i+1){
                     binding.boyPartRV.setAdapter(orderBodyAdapter);
                     alertDialog.dismiss();
+                    settingBottomBar();
                     orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(BodyPart bodyPart, int position) {
@@ -1286,6 +1305,9 @@ public class StockCountFragment extends Fragment {
                     Log.d("Bodypartlistsize",bodyPartList.size()+" ");
                     binding.boyPartRV.setAdapter(orderBodyAdapter);
                     alertDialog.dismiss();
+
+                    settingBottomBar();
+
                     Log.d("Bodypartlistsize",bodyPartList.size()+" "+jsonObjectInner.getString("sProduct"));
                     orderBodyAdapter.setOnClickListener(new OrderBodyAdapter.OnClickListener() {
                         @Override

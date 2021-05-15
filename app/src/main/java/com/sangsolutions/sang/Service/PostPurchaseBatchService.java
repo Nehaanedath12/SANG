@@ -52,7 +52,7 @@ public class PostPurchaseBatchService extends JobService {
                     userIdS = cursor_userId.getString(cursor_userId.getColumnIndex("user_Id"));
 
                 }
-                Cursor cursorHeader=helper.getDataFrom_Batch_P_Header();
+                Cursor cursorHeader=helper.getDataFrom_Batch_P_Header_Post();
                 Log.d("responsePostBatchP", cursorHeader.getCount()+"mmmm");
                 if(cursorHeader.moveToFirst() && cursorHeader.getCount()>0) {
                     for (int i = 0; i < cursorHeader.getCount(); i++) {
@@ -62,7 +62,6 @@ public class PostPurchaseBatchService extends JobService {
                         JSONObject jsonObjectMain = new JSONObject();
                         try {
                             if (docNo.contains("L")) {
-
                                 jsonObjectMain.put("iTransId", 0);
                             }else {
                                 jsonObjectMain.put("iTransId", iTransId);
@@ -137,12 +136,9 @@ public class PostPurchaseBatchService extends JobService {
                             e.printStackTrace();
                         }
 
-
                         cursorHeader.moveToNext();
                     }
                 }
-
-
 
                 return null;
             }

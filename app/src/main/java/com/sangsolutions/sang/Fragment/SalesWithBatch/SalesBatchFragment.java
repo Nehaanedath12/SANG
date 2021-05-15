@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -46,6 +47,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.sangsolutions.sang.Adapter.BankAdapter.Bank;
 import com.sangsolutions.sang.Adapter.BatchPurchaseAdapter.BatchPurchase;
 import com.sangsolutions.sang.Adapter.BatchPurchaseBodyAdapter.BatchPurchaseBody;
 import com.sangsolutions.sang.Adapter.BatchPurchaseBodyAdapter.BatchPurchaseBodyAdapter;
@@ -56,7 +58,6 @@ import com.sangsolutions.sang.Adapter.BatchSalesBodyAdapter.BatchSalesBodyAdapte
 import com.sangsolutions.sang.Adapter.BatchSalesSelectedAdapter.BatchSalesSelectedAdapter;
 import com.sangsolutions.sang.Adapter.Customer.Customer;
 import com.sangsolutions.sang.Adapter.Customer.CustomerAdapter;
-import com.sangsolutions.sang.Adapter.InvoiceAdapter.InvoiceAdapter;
 import com.sangsolutions.sang.Adapter.MasterSettings.MasterSettings;
 import com.sangsolutions.sang.Adapter.Products.Products;
 import com.sangsolutions.sang.Adapter.Products.ProductsAdapter;
@@ -65,7 +66,9 @@ import com.sangsolutions.sang.Adapter.TagDetailsAdapter.TagDetailsAdapter;
 import com.sangsolutions.sang.Adapter.TransSalePurchase.TransSetting;
 import com.sangsolutions.sang.Adapter.UnitAdapter;
 import com.sangsolutions.sang.Adapter.User;
+import com.sangsolutions.sang.Database.BatchPurchaseClass;
 import com.sangsolutions.sang.Database.DatabaseHelper;
+import com.sangsolutions.sang.Database.Sales_purchase_Class;
 import com.sangsolutions.sang.Fragment.PurchaseWithBatch.PurchaseBatchFragmentDirections;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
@@ -128,6 +131,7 @@ public class SalesBatchFragment extends Fragment {
 
     BatchSalesBodyAdapter bodyAdapter;
     List<BatchSalesBody>bodyList;
+//    List<BatchSalesBody>bodyListTemp;
     List<BatchSalesBody>bodyListCopy;
 
 
@@ -139,7 +143,7 @@ public class SalesBatchFragment extends Fragment {
 
 
     boolean EditModeProduct =false;
-    int position_body_Edit;
+    int position_body_Edit=-1;
 
     Animation slideUp, slideDown;
 
@@ -160,7 +164,8 @@ public class SalesBatchFragment extends Fragment {
     BatchSalesSelectedAdapter batchSalesSelectedAdapter;
 
     boolean selectionActive = false;
-
+    boolean saveProduct=true;
+    List<BatchSales>batchMainList;
 
     @Nullable
     @Override
@@ -225,6 +230,7 @@ public class SalesBatchFragment extends Fragment {
         }
 
         bodyList=new ArrayList<>();
+//        bodyListTemp=new ArrayList<>();
         bodyListCopy=new ArrayList<>();
         bodyAdapter=new BatchSalesBodyAdapter(requireActivity(),bodyList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
@@ -360,6 +366,39 @@ public class SalesBatchFragment extends Fragment {
             }
         });
 
+        binding.deleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(EditMode) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+                    builder.setTitle("delete!")
+                            .setMessage("Do you want to delete ?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(Tools.isConnected(requireContext())) {
+                                        deleteAllFromAPI();
+                                    }else {
+                                        deleteAllFromDB();
+                                    }
+
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).create().show();
+                }else {
+                    Toast.makeText(requireActivity(), "Only existing document can delete", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+        });
+
+
         binding.bottomArrowUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -383,6 +422,41 @@ public class SalesBatchFragment extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    private void deleteAllFromDB() {
+        if(helper.delete_Batch_P_Header(iTransId,iDocType,docNo)){
+            if(helper.delete_Batch_P_Body(iDocType,iTransId)){
+                if(helper.delete_Batch_P_Body_batch(iDocType,iTransId)) {
+                    Log.d("responsePost ", "successfully");
+                    NavDirections actions = SalesBatchFragmentDirections.actionSalesBatchFragmentToSalesBatchHistoryFragment(iDocType);
+                    navController.navigate(actions);
+                    Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    private void deleteAllFromAPI() {
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteTransWithBatch)
+                .addQueryParameter("iTransId", String.valueOf(iTransId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("response_delete",response);
+                        NavDirections actions = SalesBatchFragmentDirections.actionSalesBatchFragmentToSalesBatchHistoryFragment(iDocType);
+                        navController.navigate(actions);
+                        Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("response_delete",anError.toString()+ anError.getErrorDetail()+anError.getErrorBody());
+
+                    }
+                });
     }
 
     private void SaveMainTest() {
@@ -488,7 +562,144 @@ public class SalesBatchFragment extends Fragment {
                 e.printStackTrace();
             }
         }else {
-//            saveLocally();
+            saveLocally();
+        }
+    }
+
+    private void saveLocally() {
+
+        BatchPurchaseClass batchP_class=new BatchPurchaseClass();
+        Cursor cursor1=helper.getDataFrom_Batch_P_Header();
+        if(!EditMode) {
+            if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
+                iTransId = Tools.getNewDocNoLocally(cursor1);
+            }
+        }
+
+        batchP_class.setiTransId(iTransId);
+        batchP_class.setsDocNo(docNo);
+        batchP_class.setsDate(binding.date.getText().toString());
+        batchP_class.setiDocType(iDocType);
+        batchP_class.setiAccount1(iCustomer);
+        batchP_class.setiAccount2(0);
+        batchP_class.setsNarration(binding.description.getText().toString());
+        batchP_class.setProcessTime(DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date())+"");
+        batchP_class.setStatus(0);
+        Log.d("responsePost", batchP_class.getStatus()+"");
+        if(helper.delete_Batch_P_Header(iTransId,iDocType,docNo)) {
+            if (helper.insert_Batch_P_Header(batchP_class)) {
+                InsertBodyPart_DB();
+            }
+        }
+
+
+    }
+
+    private void InsertBodyPart_DB() {
+        if(helper.delete_Batch_P_Body(iDocType,iTransId)) {
+            if (helper.delete_Batch_P_Body_batch(iDocType, iTransId)) {
+                for (int i = 0; i < bodyList.size(); i++) {
+                    BatchPurchaseClass batchP_classBody = new BatchPurchaseClass();
+                    for (int j = 1; j <= tagTotalNumber; j++) {
+                        if (hashMapHeader.containsKey(j)) {
+                            loadDataTags(batchP_classBody, j, hashMapHeader.get(j));
+                        } else if (bodyList.get(i).hashMapBody.containsKey(j)) {
+                            loadDataTags(batchP_classBody, j, bodyList.get(i).hashMapBody.get(j));
+                        } else {
+                            loadDataTags(batchP_classBody, j, 0);
+                        }
+                    }
+
+                    batchP_classBody.setiProduct(bodyList.get(i).getiProduct());
+                    batchP_classBody.setTotalQty(bodyList.get(i).getTotalQty());
+                    batchP_classBody.setfRate(bodyList.get(i).getRate());
+                    batchP_classBody.setfDiscount(bodyList.get(i).getDiscount());
+                    batchP_classBody.setfAddCharges(bodyList.get(i).getAddCharges());
+                    batchP_classBody.setFvatPer(bodyList.get(i).getVatPer());
+                    batchP_classBody.setfVat(bodyList.get(i).getVat());
+                    batchP_classBody.setsRemarks(bodyList.get(i).getRemarks());
+                    batchP_classBody.setUnit(bodyList.get(i).getUnit());
+                    batchP_classBody.setNet(bodyList.get(i).getNet());
+                    batchP_classBody.setsDocNo(docNo);
+                    batchP_classBody.setiDocType(iDocType);
+                    batchP_classBody.setiTransId(iTransId);
+                    Log.d("DataBodyInsert", "deleted");
+
+                    long cursorBodyInsert = helper.insert_Batch_P_Body(batchP_classBody);
+
+                    if (cursorBodyInsert != -1) {
+                        Log.d("DataBodyInsert", "SUCCESS");
+                        Log.d("DataBodyInsert", "SUCCESS" + cursorBodyInsert);
+                        InsertBatchBodyPart_DB(bodyList.get(i).getiProduct(), bodyList.get(i).batchList, cursorBodyInsert);
+
+                        if (i + 1 == bodyList.size()) {
+                            Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
+                            NavDirections actions = SalesBatchFragmentDirections.actionSalesBatchFragmentToSalesBatchHistoryFragment(iDocType);
+                            navController.navigate(actions);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void InsertBatchBodyPart_DB(int iProduct, List<BatchSales> batchList, long rawId) {
+
+        for (int i = 0; i < batchList.size(); i++) {
+            BatchPurchaseClass batchP_classBody=new BatchPurchaseClass();
+            batchP_classBody.setBatchName(batchList.get(i).getBatch());
+            batchP_classBody.setMfDate(batchList.get(i).getMfDate());
+            batchP_classBody.setExpDate(batchList.get(i).getExpDate());
+            batchP_classBody.setBatchQty(batchList.get(i).getEnterQty());
+
+            batchP_classBody.setiProduct(iProduct);
+            batchP_classBody.setiDocType(iDocType);
+            batchP_classBody.setiTransId(iTransId);
+            batchP_classBody.setsDocNo(docNo);
+            batchP_classBody.setRawId((int) rawId);
+
+            if (helper.insert_Batch_P_Body_batch(batchP_classBody)) {
+                Log.d("batchAdded3","SuccessFully");
+            }
+
+        }
+    }
+
+    private void loadDataTags(BatchPurchaseClass b_P_class, int j, Integer iTag) {
+        switch (j){
+            case 1:{
+                b_P_class.setiTag1(iTag);
+                break;
+            }
+            case 2:{
+                b_P_class.setiTag2(iTag);
+                break;
+            }
+            case 3:{
+                b_P_class.setiTag3(iTag);
+                break;
+            }
+            case 4:{
+                b_P_class.setiTag4(iTag);
+                break;
+            }
+            case 5:{
+                b_P_class.setiTag5(iTag);
+                break;
+            }
+            case 6:{
+                b_P_class.setiTag6(iTag);
+                break;
+            } case 7:{
+                b_P_class.setiTag7(iTag);
+                break;
+            }
+            case 8:{
+                b_P_class.setiTag8(iTag);
+                break;
+            }
+
         }
     }
 
@@ -543,15 +754,17 @@ public class SalesBatchFragment extends Fragment {
         mainAlertBatch.show();
         mainAlertBatch.setCancelable(false);
         batchBinding.batchRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
+        //        batchSalesSelectedList=new ArrayList<>();
 
-//        batchSalesSelectedList=new ArrayList<>();
-
+//        bodyListTemp.addAll(bodyList);
+//        Log.d("bodyListTemp",bodyListTemp.size()+" "+bodyList.size());
 
 
         batchBinding.close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mainAlertBatch.dismiss();
+//                bodyListTemp.clear();
             }
         });
 
@@ -595,7 +808,9 @@ public class SalesBatchFragment extends Fragment {
                     {
                     if(!batchBinding.qtyProduct.getText().toString().equals("") &&
                     Integer.parseInt(batchBinding.qtyProduct.getText().toString())!=0) {
+
                         loadBatchFromAPI();
+
                     }else {batchBinding.qtyProduct.setError("please select qty");}
                 }else { batchBinding.productName.setError("select Valid product"); }
                 } else { Toast.makeText(requireActivity(), "You are offline!!", Toast.LENGTH_SHORT).show(); }
@@ -607,6 +822,10 @@ public class SalesBatchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(batchSalesSelectedList.size()>0) {
+
+//                    bodyList.clear();
+//                    bodyList.addAll(bodyListTemp);
+
                     saveProduct();
                 }else {
                     Toast.makeText(requireContext(), "Batch fields are empty", Toast.LENGTH_SHORT).show();
@@ -702,22 +921,26 @@ public class SalesBatchFragment extends Fragment {
                                     bodyList.add(batchSalesBody);
                                 }else {
                                     bodyList.set(position_body_Edit,batchSalesBody);
+                                    position_body_Edit=-1;
                                 }
                                 binding.boyPartRV.setAdapter(bodyAdapter);
                                 settingBottomBar();
                                 bodyAdapter.notifyDataSetChanged();
                                 initialValueSettingBody();
+//                                bodyListTemp.clear();
+//                                bodyListTemp.addAll(bodyList);
 
                                 bodyAdapter.setOnClickListener(new BatchSalesBodyAdapter.OnClickListener() {
                                     @Override
                                     public void onItemClick(BatchSalesBody salesBody, int position) {
+                                        saveProduct=true;
+
                                         bodyAdapterOnItemClick(salesBody,position);
                                     }
 
                                     @Override
                                     public void onDeleteClick(List<BatchSalesBody> list, int position) {
                                         bodyAdapterDelete(list,position);
-
                                     }
 
 
@@ -931,28 +1154,10 @@ public class SalesBatchFragment extends Fragment {
     }
 
     private void loadSelectedInvoice() {
-//        List<Integer> listSelectedItem = batchSalesAdapter.getSelectedItems();
-//        for (int i=0;i<listSelectedItem.size();i++) {
-//            for (int j = 0; j < batchSalesList.size(); j++) {
-//                if (listSelectedItem.get(i) == j) {
-//                    BatchSales batchSales=new BatchSales(
-//                            batchSalesList.get(j).getBatch(),
-//                            batchSalesList.get(j).getMfDate(),
-//                            batchSalesList.get(j).getExpDate(),
-//                            batchSalesList.get(j).getQty(),0
-//                    );
-//                    Log.d("batchData", batchSalesList.get(j).getBatch());
-//                    Log.d("batchData", batchSalesList.get(j).getMfDate());
-//                    batchSalesSelectedList.add(batchSales);
-//                    batchSalesSelectedAdapter.notifyDataSetChanged();
-//
-//                }
-//            }
-//        }
 
         batchSalesSelectedList.clear();
         for (int i=0;i<batchSalesList.size();i++){
-            Log.d("batChSIze",batchSalesList.size()+"  "+  batchSalesList.get(i).enterQty);
+            Log.d("batChSIze",batchSalesList.size()+"  "+  batchSalesList.get(i).enterQty+" "+ batchSalesList.get(i).qty);
             if(batchSalesList.get(i).enterQty!=0){
                 batchSalesSelectedList.add(new BatchSales(
                         batchSalesList.get(i).batch,
@@ -1019,111 +1224,157 @@ public class SalesBatchFragment extends Fragment {
 
             JSONArray jsonArray = new JSONArray(response.toString());
             Log.d("batchhhselcetededit", batchSalesSelectedList.size() + "");
-
-            for (int i=0;i<bodyList.size();i++){
-                for (int j=0;j<bodyList.get(i).batchList.size();j++){
-                    Log.d("batchhhelecetedit", bodyList.get(i).batchList.get(j).batch + " "+
-                            bodyList.get(i).batchList.get(j).getEnterQty());
-
+            if(!EditModeProduct){
+                if(jsonArray.length()==0){
+                    Toast.makeText(requireContext(),"No Batch Found!!", Toast.LENGTH_SHORT).show();
+                    alertDialog_batch.dismiss();
                 }
             }
-
-            for (int j=0;j<batchSalesSelectedList.size();j++){
-                Log.d("batchhhleetedit", batchSalesSelectedList.get(j).batch + " "+
-                        batchSalesSelectedList.get(j).getEnterQty());
-
-            }
-
-            if(EditMode) {
+            if (EditMode) {
                 for (int k = 0; k < bodyListCopy.size(); k++) {
-                    if (bodyListCopy.get(k).iProduct== iProduct) {
+                    if (bodyListCopy.get(k).iProduct == iProduct) {
                         for (int j = 0; j < bodyListCopy.get(k).batchList.size(); j++) {
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 if (bodyListCopy.get(k).batchList.get(j).batch.equals(jsonObject.getString(BatchSales.S_BATCH))) {
-                                    int qty=jsonObject.getInt(BatchSales.F_QTY) +
+                                    int qty = jsonObject.getInt(BatchSales.F_QTY) +
                                             bodyListCopy.get(k).batchList.get(j).getEnterQty();
                                     jsonObject.put(BatchSales.F_QTY, qty);
                                 }
-                                Log.d("jsonObjectt", jsonObject.getInt(BatchSales.F_QTY) + ""+jsonObject.getString(BatchSales.S_BATCH));
-                        }
+                                Log.d("jsonObjectt", jsonObject.getInt(BatchSales.F_QTY) + "" + jsonObject.getString(BatchSales.S_BATCH));
+                            }
                         }
                     }
                 }
             }
 
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    boolean flag = false;
-                    BatchSales batchSales = new BatchSales();
-                    batchSales = new BatchSales(
-                            jsonObject.getString(BatchSales.S_BATCH),
-                            jsonObject.getString(BatchSales.MF_DATE),
-                            jsonObject.getString(BatchSales.EXP_DATE),
-                            jsonObject.getInt(BatchSales.F_QTY),
-                            0,
-                            jsonObject.getInt(BatchSales.I_ID),
-                            jsonObject.getInt(BatchSales.I_PRODUCT)
-                    );
-                    if (batchSalesSelectedList.size() > 0) {
-                        for (int j = 0; j < batchSalesSelectedList.size(); j++) {
-                            if (jsonObject.getInt(BatchSales.F_QTY) != 0)
-                                if (batchSalesSelectedList.get(j).iProduct == (jsonObject.getInt(BatchSales.I_PRODUCT))) {
-                                    if (batchSalesSelectedList.get(j).batch.equals(jsonObject.getString(BatchSales.S_BATCH))) {
-                                        batchSales.setEnterQty(batchSalesSelectedList.get(j).enterQty);
-                                        flag = true;
-                                    }
-                                }
-                        }
-                    }
-                    if (!flag) {
-                        batchSales = new BatchSales(
-                                jsonObject.getString(BatchSales.S_BATCH),
-                                jsonObject.getString(BatchSales.MF_DATE),
-                                jsonObject.getString(BatchSales.EXP_DATE),
-                                jsonObject.getInt(BatchSales.F_QTY),
-                                0,
-                                jsonObject.getInt(BatchSales.I_ID),
-                                jsonObject.getInt(BatchSales.I_PRODUCT)
-                        );
-                    }
 
-                    if (bodyList.size() > 0) {
-                        int balQty = jsonObject.getInt(BatchSales.F_QTY);
-                        for (int k = 0; k < bodyList.size(); k++) {
-                                for (int k1 = 0; k1 < bodyList.get(k).batchList.size(); k1++) {
-                                    Log.d("position_body_Edit",position_body_Edit+" "+batchEditPosition);
-                                            Log.d("batchhhedit"+k+"_"+k1, bodyList.get(k).batchList.get(k1).batch + " "+
-                                            bodyList.get(k).batchList.get(k1).getEnterQty());
-                                    if (jsonObject.getInt(BatchSales.I_PRODUCT) == (bodyList.get(k).batchList.get(k1).iProduct)) {
-                                    if (jsonObject.getString(BatchSales.S_BATCH).equals(bodyList.get(k).batchList.get(k1).batch)) {
-//                                        if (jsonObject.getInt(BatchSales.F_QTY) != 0) {
-                                                balQty -= bodyList.get(k).batchList.get(k1).enterQty;
-                                                batchSales.setQty(balQty);
+//            if (EditModeProduct) {
+                loadBatchForEditProduct(jsonArray);
+//            } else {
+//                for (int i = 0; i < jsonArray.length(); i++) {
+//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                    boolean flag = false;
+//                    BatchSales batchSales = new BatchSales();
+//                    batchSales = new BatchSales(
+//                            jsonObject.getString(BatchSales.S_BATCH),
+//                            jsonObject.getString(BatchSales.MF_DATE),
+//                            jsonObject.getString(BatchSales.EXP_DATE),
+//                            jsonObject.getInt(BatchSales.F_QTY),
+//                            0,
+//                            jsonObject.getInt(BatchSales.I_ID),
+//                            jsonObject.getInt(BatchSales.I_PRODUCT)
+//                    );
+//
+//                    if (batchSalesSelectedList.size() > 0) {
+//                        Log.d("batchSalesSelectedList",batchSalesSelectedList.size()+"");
+//                        for (int j = 0; j < batchSalesSelectedList.size(); j++) {
+//                            if (jsonObject.getInt(BatchSales.F_QTY) != 0)
+//                                if (batchSalesSelectedList.get(j).iProduct == (jsonObject.getInt(BatchSales.I_PRODUCT))) {
+//                                    if (batchSalesSelectedList.get(j).batch.equals(jsonObject.getString(BatchSales.S_BATCH))) {
+//                                        batchSales.setEnterQty(batchSalesSelectedList.get(j).enterQty);
+//                                        flag = true;
+//                                    }
+//                                }
+//                        }
+//                    }
+//                    if (!flag) {
+//                        batchSales = new BatchSales(
+//                                jsonObject.getString(BatchSales.S_BATCH),
+//                                jsonObject.getString(BatchSales.MF_DATE),
+//                                jsonObject.getString(BatchSales.EXP_DATE),
+//                                jsonObject.getInt(BatchSales.F_QTY),
+//                                0,
+//                                jsonObject.getInt(BatchSales.I_ID),
+//                                jsonObject.getInt(BatchSales.I_PRODUCT)
+//                        );
+//                    }
+//                    if (bodyListTemp.size() > 0) {
+//                        int balQty = jsonObject.getInt(BatchSales.F_QTY);
+//                        for (int k = 0; k < bodyListTemp.size(); k++) {
+//                            for (int k1 = 0; k1 < bodyListTemp.get(k).batchList.size(); k1++) {
+//
+//                                if (jsonObject.getInt(BatchSales.I_PRODUCT) == (bodyListTemp.get(k).batchList.get(k1).iProduct)) {
+//                                    if (jsonObject.getString(BatchSales.S_BATCH).equals(bodyListTemp.get(k).batchList.get(k1).batch)) {
+////                                        if (jsonObject. getInt(BatchSales.F_QTY) != 0) {
+//                                        balQty -= bodyListTemp.get(k).batchList.get(k1).enterQty;
+//                                        batchSales.setQty(balQty);
+//                                        Log.d("position_body_Edit", +position_body_Edit+batchSales.getQty() + " " + batchEditPosition);
+//
+//
+////                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                        if (EditModeProduct) {
+//                            batchSales.setQty(batchSales.getEnterQty() + batchSales.getQty());
+//                        }
+//                    }
+//                    if (batchSales.qty != 0) {
+//                        batchSalesList.add(batchSales);
+//                    }
+//                    batchSalesAdapter.notifyDataSetChanged();
+//                }
+//            }
+                Log.d("saveProduct",saveProduct+"");
+            saveProduct=false;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
-//                                        }
-                                    }
+    private void loadBatchForEditProduct(JSONArray jsonArray) {
+        for (int i=0;i<jsonArray.length();i++){
+            try {
+                JSONObject jsonObject=jsonArray.getJSONObject(i);
+                Log.d("jsonObjectw",jsonObject.toString());
+
+                for (int k=0;k<bodyList.size();k++){
+                    if(iProduct==bodyList.get(k).iProduct) {
+                        if (k != position_body_Edit) {
+                            for (int k1 = 0; k1 < bodyList.get(k).batchList.size(); k1++) {
+                                if (jsonObject.getString(BatchSales.S_BATCH).equals(bodyList.get(k).batchList.get(k1).batch)) {
+                                    jsonObject.put(BatchSales.F_QTY, jsonObject.getInt(BatchSales.F_QTY) - bodyList.get(k).batchList.get(k1).enterQty + "");
                                 }
                             }
                         }
-                        if (EditModeProduct) {
-                            batchSales.setQty(batchSales.getEnterQty() + batchSales.getQty());
-                        }
                     }
-                    Log.d("llllll",jsonObject.getInt(BatchSales.F_QTY)+"");
-                    Log.d("llllll",batchSales.getQty()+"c");
-
-
-
-                    if (batchSales.qty != 0) {
-                        batchSalesList.add(batchSales);
-
-                    }
-                    batchSalesAdapter.notifyDataSetChanged();
-
                 }
-        } catch (JSONException e) {
-            e.printStackTrace();
+                for (int i1=0;i1<batchSalesSelectedList.size();i1++){
+                    if (jsonObject.getString(BatchSales.S_BATCH).equals(batchSalesSelectedList.get(i1).batch)) {
+                        jsonObject.put(BatchSales.F_QTY, jsonObject.getInt(BatchSales.F_QTY) - batchSalesSelectedList.get(i1).enterQty + "");
+
+                    }
+                }
+
+                BatchSales batchSales = new BatchSales(
+                        jsonObject.getString(BatchSales.S_BATCH),
+                        jsonObject.getString(BatchSales.MF_DATE),
+                        jsonObject.getString(BatchSales.EXP_DATE),
+                        jsonObject.getInt(BatchSales.F_QTY),
+                        0,
+                        jsonObject.getInt(BatchSales.I_ID),
+                        jsonObject.getInt(BatchSales.I_PRODUCT)
+                );
+                for (int j=0;j<batchSalesSelectedList.size();j++) {
+                    Log.d("jbatchSales"+i, batchSalesSelectedList.get(j).batch+" "+
+                            batchSalesSelectedList.get(j).enterQty);
+                    if(jsonObject.getString(BatchSales.S_BATCH).equals(batchSalesSelectedList.get(j).batch)){
+                        batchSales.setEnterQty(batchSalesSelectedList.get(j).enterQty);
+                        batchSales.setQty(batchSales.getQty()+batchSalesSelectedList.get(j).enterQty);
+                    }
+                }
+
+                batchSalesList.add(batchSales);
+                batchSalesAdapter.notifyDataSetChanged();
+                batchSalesSelectedAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d("errorr",e.getMessage()+e.getLocalizedMessage());
+            }
+
         }
     }
 
@@ -1386,6 +1637,7 @@ public class SalesBatchFragment extends Fragment {
                                     alertDialog.dismiss();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
+                                    alertDialog.dismiss();
                                 }
                             }
 
@@ -1399,24 +1651,131 @@ public class SalesBatchFragment extends Fragment {
                         });
             }
         }else {
-//            alertDialog.dismiss();
-//            Toast.makeText(requireActivity(),"Offline", Toast.LENGTH_SHORT).show();
-//            if(EditMode){
-//                editfromlocaldb();
-//            }else {
-//                Cursor cursor1=helper.getDataFrom_Batch_P_Header();
-//                if(cursor1.getCount()>0) {
-//                    int count= Tools.getNewDocNoLocally(cursor1);
-//                    Log.d("status",count+"");
-//                    docNo = "L-"+userCode + "-" + DateFormat.format("MM", new Date()) + "-"  + count;
-//                }else {
-//                    docNo ="L-"+ userCode + "-" + DateFormat.format("MM", new Date() )+ "-"  + 1;
-//
-//                }
-//            }
-//
-//            binding.docNo.setText(docNo);
+            alertDialog.dismiss();
+            Toast.makeText(requireActivity(),"Offline", Toast.LENGTH_SHORT).show();
+            if(EditMode){
+                editfromlocaldb();
+            }
+
         }
+    }
+
+    private void editfromlocaldb() {
+        initialBatchSetting();
+        Cursor cursorEdit_H = helper.getEditValuesHeaderBatchP(iTransId, iDocType);
+        if (cursorEdit_H.moveToFirst() && cursorEdit_H.getCount() > 0) {
+            iTransId = cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(BatchPurchaseClass.I_TRANS_ID));
+            docNo = cursorEdit_H.getString(cursorEdit_H.getColumnIndex(BatchPurchaseClass.S_DOC_NO));
+            binding.docNo.setText(docNo);
+            binding.date.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(BatchPurchaseClass.S_DATE)));
+            binding.description.setText(cursorEdit_H.getString(cursorEdit_H.getColumnIndex(BatchPurchaseClass.S_NARRATION)));
+            iCustomer = cursorEdit_H.getInt(cursorEdit_H.getColumnIndex(BatchPurchaseClass.I_ACCOUNT_1));
+            binding.customer.setText(helper.getCustomerUsingId(iCustomer));
+            changeStatus(iTransId, docNo, 1);
+        }
+        Cursor cursorEdit_B = helper.getEditValuesBody_BatchP(iTransId, iDocType);
+        Log.d("cursorEdit_B", cursorEdit_B.getCount() + "");
+        if (cursorEdit_B.moveToFirst() && cursorEdit_B.getCount() > 0) {
+
+            batchSalesSelectedList1.clear();
+            for (int i = 0; i < cursorEdit_B.getCount(); i++) {
+                for (int k = 0; k < headerListTags.size(); k++) {
+                    int tagDetails = cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + headerListTags.get(k)));
+                    hashMapHeader.put(headerListTags.get(k), tagDetails);
+                    Cursor tagNameCursor = helper.getTagName(headerListTags.get(k), tagDetails);
+                    if (tagDetails != 0) {
+                        autoText_H_list.get(k).setText(tagNameCursor.getString(tagNameCursor.getColumnIndex(TagDetails.S_NAME)));
+
+                    } else {
+                        autoText_H_list.get(k).setText("");
+                    }
+                }
+                for (int k = 0; k < bodyListTags.size(); k++) {
+                    hashMapBody.put(bodyListTags.get(k), cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag" + bodyListTags.get(k))));
+                }
+
+                float gross = cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_QTY)) * cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(Sales_purchase_Class.F_RATE));
+
+                BatchSalesBody bodyPart = new BatchSalesBody();
+                bodyPart.setiProduct(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(BatchPurchaseClass.I_PRODUCT)));
+
+                String productName = helper.getProductNameById(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(BatchPurchaseClass.I_PRODUCT)));
+
+                bodyPart.setProductName(productName);
+                bodyPart.setTotalQty(cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_QTY)));
+                bodyPart.setGross(gross);
+                bodyPart.setNet(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_NET)));
+                bodyPart.setRate(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_RATE)));
+                bodyPart.setDiscount(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_DISCOUNT)));
+                bodyPart.setAddCharges(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_ADD_CHARGES)));
+                bodyPart.setVatPer(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_VAT_PER)));
+                bodyPart.setVat(cursorEdit_B.getFloat(cursorEdit_B.getColumnIndex(BatchPurchaseClass.F_VAT)));
+                bodyPart.setRemarks(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(BatchPurchaseClass.S_REMARKS)));
+                bodyPart.setUnit(cursorEdit_B.getString(cursorEdit_B.getColumnIndex(BatchPurchaseClass.S_UNITS)));
+                bodyPart.setHashMapBody(hashMapBody);
+                int iRawId=cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(BatchPurchaseClass.I_ROW_ID));
+                Log.d("rawIddd",iRawId+"");
+
+
+                Cursor cursorBatchBody = helper.getDataFrom_Batch_P_Batch(iTransId, iDocType,iRawId);
+                if (cursorBatchBody.moveToFirst() && cursorBatchBody.getCount() > 0) {
+                    for (int k = 0; k < cursorBatchBody.getCount(); k++) {
+                        int iProduct = cursorBatchBody.getInt(cursorBatchBody.getColumnIndex(BatchPurchaseClass.I_PRODUCT));
+                        if (iProduct == cursorEdit_B.getInt(cursorEdit_B.getColumnIndex(BatchPurchaseClass.I_PRODUCT))) {
+
+                            BatchSales batchSales = new BatchSales();
+                            batchSales.setBatch(  cursorBatchBody.getString(cursorBatchBody.getColumnIndex(BatchPurchaseClass.BATCH_NAME)));
+                            batchSales.setMfDate(  cursorBatchBody.getString(cursorBatchBody.getColumnIndex(BatchPurchaseClass.MF_DATE)));
+                            batchSales.setExpDate(  cursorBatchBody.getString(cursorBatchBody.getColumnIndex(BatchPurchaseClass.EXP_DATE)));
+                            batchSales.setEnterQty(  cursorBatchBody.getInt(cursorBatchBody.getColumnIndex(BatchPurchaseClass.BATCH_QTY)));
+
+
+
+                            batchSalesSelectedList.add(batchSales);
+                            batchSalesSelectedAdapter.notifyDataSetChanged();
+                        }
+                        cursorBatchBody.moveToNext();
+                    }
+                }
+
+                batchSalesSelectedList1.addAll(batchSalesSelectedList);
+                bodyPart.setBatchList(batchSalesSelectedList1);
+                Log.d("headertags", hashMapBody.toString()+ " "+i);
+                bodyList.add(bodyPart);
+                bodyAdapter.notifyDataSetChanged();
+                hashMapBody = new HashMap<>();
+                batchSalesSelectedList.clear();
+                batchSalesSelectedList1=new ArrayList<>();
+
+                if (cursorEdit_B.getCount() == i + 1) {
+                    binding.boyPartRV.setAdapter(bodyAdapter);
+                    settingBottomBar();
+                    alertDialog.dismiss();
+
+                }
+                bodyAdapter.setOnClickListener(new BatchSalesBodyAdapter.OnClickListener() {
+                    @Override
+                    public void onItemClick(BatchSalesBody batchSalesBody, int position) {
+                        Toast.makeText(requireContext(), "can't edit product", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onDeleteClick(List<BatchSalesBody> list, int position) {
+                        bodyAdapterDelete(list,position);
+                    }
+                });
+                cursorEdit_B.moveToNext();
+            }
+        }
+
+    }
+
+    private void changeStatus(int transId, String docNo, int iStatus) {
+
+        if(helper.changeStatus_Batch_P(transId,iDocType,iStatus)){
+            Log.d("statusChange","successfully");
+        }
+
     }
 
     private void EditValueFromAPI() {
@@ -1537,6 +1896,8 @@ public class SalesBatchFragment extends Fragment {
                     bodyAdapter.setOnClickListener(new BatchSalesBodyAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(BatchSalesBody batchSalesBody, int position) {
+                            saveProduct=true;
+
                             bodyAdapterOnItemClick(batchSalesBody,position);
 
                         }

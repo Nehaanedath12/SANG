@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.CursorJoiner;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,7 +65,6 @@ import com.sangsolutions.sang.Adapter.User;
 import com.sangsolutions.sang.Database.BatchPurchaseClass;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Database.Sales_purchase_Class;
-import com.sangsolutions.sang.Fragment.SalesPurchaseFragment.Sale_Purchase_FragmentDirections;
 import com.sangsolutions.sang.Home;
 import com.sangsolutions.sang.R;
 import com.sangsolutions.sang.Tools;
@@ -79,7 +77,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -682,12 +679,13 @@ public class PurchaseBatchFragment extends Fragment {
                     batchP_classBody.setiDocType(iDocType);
                     batchP_classBody.setiTransId(iTransId);
                     Log.d("DataBodyInsert", "deleted");
+
                     long cursorBodyInsert = helper.insert_Batch_P_Body(batchP_classBody);
+
                     if (cursorBodyInsert != -1) {
                         Log.d("DataBodyInsert", "SUCCESS");
-                        long rawId = cursorBodyInsert;
-                        Log.d("DataBodyInsert", "SUCCESS" + rawId);
-                        InsertBatchBodyPart_DB(bodyList.get(i).getiProduct(), bodyList.get(i).batchList, rawId);
+                        Log.d("DataBodyInsert", "SUCCESS" + cursorBodyInsert);
+                        InsertBatchBodyPart_DB(bodyList.get(i).getiProduct(), bodyList.get(i).batchList, cursorBodyInsert);
 
                         if (i + 1 == bodyList.size()) {
                             Toast.makeText(requireActivity(), "Data Added Locally", Toast.LENGTH_SHORT).show();
@@ -1183,13 +1181,13 @@ public class PurchaseBatchFragment extends Fragment {
                                 @Override
                                 public void onItemClick(BatchPurchaseBody purchaseBody, int position) {
 
-                                    bodyAdapterOnItemClick(purchaseBody,position);
+                                    editingProductField(purchaseBody,position);
 
                                 }
 
                                 @Override
                                 public void onDeleteClick(List<BatchPurchaseBody> list, int position) {
-                                    bodyAdapterDelete(list,position);
+                                    deleteProductField(list,position);
                                 }
                             });
 
@@ -1213,7 +1211,7 @@ public class PurchaseBatchFragment extends Fragment {
 
     }
 
-    private void bodyAdapterDelete(List<BatchPurchaseBody> list, int position) {
+    private void deleteProductField(List<BatchPurchaseBody> list, int position) {
         Log.d("clickedd","deleted") ;
         AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
         builder.setTitle("delete!")
@@ -1235,7 +1233,7 @@ public class PurchaseBatchFragment extends Fragment {
                 }).create().show();
     }
 
-    private void bodyAdapterOnItemClick(BatchPurchaseBody purchaseBody, int position) {
+    private void editingProductField(BatchPurchaseBody purchaseBody, int position) {
         EditModeProduct =true;
         position_body_Edit=position;
         Toast.makeText(requireContext(), "click", Toast.LENGTH_SHORT).show();
@@ -1576,12 +1574,12 @@ public class PurchaseBatchFragment extends Fragment {
                     bodyAdapter.setOnClickListener(new BatchPurchaseBodyAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(BatchPurchaseBody purchaseBody, int position) {
-                            bodyAdapterOnItemClick(purchaseBody,position);
+                            editingProductField(purchaseBody,position);
                         }
 
                         @Override
                         public void onDeleteClick(List<BatchPurchaseBody> list, int position) {
-                            bodyAdapterDelete(list,position);
+                            deleteProductField(list,position);
                         }
                     });
                 }
@@ -1593,7 +1591,7 @@ public class PurchaseBatchFragment extends Fragment {
 
 
     private void changeStatus(int transId, String docNo, int iStatus) {
-        if(helper.changeStatus_Batch_P(transId,docNo,iStatus)){
+        if(helper.changeStatus_Batch_P(transId,iDocType,iStatus)){
             Log.d("statusChange","successfully");
         }
     }
@@ -1714,12 +1712,12 @@ public class PurchaseBatchFragment extends Fragment {
                     bodyAdapter.setOnClickListener(new BatchPurchaseBodyAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(BatchPurchaseBody purchaseBody, int position) {
-                            bodyAdapterOnItemClick(purchaseBody,position);
+                            editingProductField(purchaseBody,position);
                         }
 
                         @Override
                         public void onDeleteClick(List<BatchPurchaseBody> list, int position) {
-                            bodyAdapterDelete(list,position);
+                            deleteProductField(list,position);
                         }
                     });
                 }

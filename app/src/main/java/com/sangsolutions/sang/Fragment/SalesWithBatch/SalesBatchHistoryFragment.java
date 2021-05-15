@@ -2,6 +2,7 @@ package com.sangsolutions.sang.Fragment.SalesWithBatch;
 
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -27,8 +28,10 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
 import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
+import com.sangsolutions.sang.Database.BatchPurchaseClass;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
 import com.sangsolutions.sang.Fragment.PurchaseWithBatch.PurchaseBatchHistoryFragmentArgs;
@@ -116,9 +119,16 @@ public class SalesBatchHistoryFragment extends Fragment {
         binding.fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavDirections action= SalesBatchHistoryFragmentDirections
-                        .actionSalesBatchHistoryFragmentToSalesBatchFragment().setIDocType(28).setEditMode(false).setITransId(0);
-                navController.navigate(action);
+                if(Tools.isConnected(requireContext())) {
+                    NavDirections action = SalesBatchHistoryFragmentDirections
+                            .actionSalesBatchHistoryFragmentToSalesBatchFragment().setIDocType(28).setEditMode(false).setITransId(0);
+                    navController.navigate(action);
+                }else {
+                    Snackbar snackbar=Snackbar.make(v,"Offline",Snackbar.LENGTH_LONG);
+                    snackbar.setTextColor(Color.WHITE);
+                    snackbar.setBackgroundTint(Color.RED);
+                    snackbar.show();
+                }
             }
         });
         binding.fabClose.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +176,7 @@ public class SalesBatchHistoryFragment extends Fragment {
                     if(Tools.isConnected(requireContext())) {
                         deleteFromAPI(historyList.get(j).getiTransId());
                     }else {
-//                        deleteFromDB(historyList.get(j).getiTransId(),historyList.get(j).getsDocNo());
+                        deleteFromDB(historyList.get(j).getiTransId(),historyList.get(j).getsDocNo());
                     }
                 }
             }
@@ -204,8 +214,74 @@ public class SalesBatchHistoryFragment extends Fragment {
                         }
                     });
         }else {
-//            loadDatasFromDB();
+
+            loadDatasFromDB();
         }
+    }
+
+    private void loadDatasFromDB() {
+        historyList.clear();
+        historyAdapter.notifyDataSetChanged();
+        alertDialog.dismiss();
+        Cursor cursor=helper.getDataFromBatch_P_by_Itype(iDocType);
+
+        if(cursor.moveToFirst() && cursor!=null) {
+            Log.d("doctypee", cursor.getCount() + "");
+            for (int i = 0; i < cursor.getCount(); i++) {
+                SalesPurchaseHistory history=new SalesPurchaseHistory();
+                Log.d("historyList",cursor.getString(cursor.getColumnIndex(BatchPurchaseClass.S_DATE))+"");
+
+                history.setsDate(cursor.getString(cursor.getColumnIndex(BatchPurchaseClass.S_DATE)));
+                history.setsDocNo(cursor.getString(cursor.getColumnIndex(BatchPurchaseClass.S_DOC_NO)));
+                history.setiTransId(cursor.getInt(cursor.getColumnIndex(BatchPurchaseClass.I_TRANS_ID)));
+
+                int iCustomer=cursor.getInt(cursor.getColumnIndex(BatchPurchaseClass.I_ACCOUNT_1));
+                String customerName=helper.getCustomerUsingId(iCustomer);
+                history.setsAccount1(customerName);
+
+                historyList.add(history);
+                historyAdapter.notifyDataSetChanged();
+
+                Log.d("historyList",history.getsDate()+"");
+
+                historyAdapter.setOnClickListener(new SalesPurchaseHistoryAdapter.OnClickListener() {
+                    @Override
+                    public void onItemClick(int iTransId, int position) {
+                        if(!Tools.isConnected(requireContext())) {
+                            adapterOnItemClick(iTransId,position);
+                        }else {
+                            Toast.makeText(requireContext(), "Please Refresh", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onItemLongClick(int position) {
+                        enableActionMode(position);
+                        selectionActive = true;
+                    }
+
+                    @Override
+                    public void onDeleteClick(int iTransId, String sDocNo) {
+                        deleteFromDB(iTransId,sDocNo);
+                        loadDatasFromDB();
+                    }
+                });
+                cursor.moveToNext();
+
+            }
+        }
+    }
+
+    private void deleteFromDB(int iTransId, String sDocNo) {
+        if(helper.delete_Batch_P_Header(iTransId,iDocType,sDocNo)){
+            if(helper.delete_Batch_P_Body(iDocType,iTransId)){
+                if(helper.delete_Batch_P_Body_batch(iDocType,iTransId))
+                    Toast.makeText(requireContext(), " Deleted from Device", Toast.LENGTH_SHORT).show();
+                historyAdapter.notifyDataSetChanged();
+
+            }
+        }
+
     }
 
     private void loadDatas(JSONArray response) {

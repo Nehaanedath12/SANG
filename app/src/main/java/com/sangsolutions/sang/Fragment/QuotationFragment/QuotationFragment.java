@@ -203,7 +203,7 @@ public class QuotationFragment extends Fragment {
         bodyPartAdapter=new QuotationAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-
+        binding.bottomBar.setVisibility(View.GONE);
 
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -814,6 +814,8 @@ public class QuotationFragment extends Fragment {
 
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
 
+                    settingBottomBar();
+
                     initialValueSettingBody();
                     binding.cardViewBody.setVisibility(View.GONE);
 
@@ -840,6 +842,23 @@ public class QuotationFragment extends Fragment {
 
     }
 
+    private void settingBottomBar() {
+
+        if(bodyPartList.size()>0){
+            binding.bottomBar.setVisibility(View.VISIBLE);
+            int tQty=0;
+            float rate=0.0f;
+            for (int i=0;i<bodyPartList.size();i++) {
+                tQty=tQty+bodyPartList.get(i).getQty();
+                rate=rate+bodyPartList.get(i).getRate();
+            }
+            binding.TotalQtyBar.setText("Total Qty: "+tQty);
+            binding.TotalRateBar.setText("Total Rate: "+rate);
+        }else {
+            binding.bottomBar.setVisibility(View.GONE);
+        }
+    }
+
     private void deleteProductField(List<QuotationClass> list, int position) {
         AlertDialog.Builder builder=new AlertDialog.Builder(requireContext());
         builder.setTitle("delete!")
@@ -850,6 +869,7 @@ public class QuotationFragment extends Fragment {
                         list.remove(position);
                         bodyPartAdapter.notifyDataSetChanged();
                         binding.boyPartRV.setAdapter(bodyPartAdapter);
+                        settingBottomBar();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1274,6 +1294,7 @@ public class QuotationFragment extends Fragment {
                 if(cursorEdit_B.getCount()==i+1){
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
                     alertDialog.dismiss();
+                    settingBottomBar();
 
                     bodyPartAdapter.setOnClickListener(new QuotationAdapter.OnClickListener() {
                         @Override
@@ -1381,6 +1402,7 @@ public class QuotationFragment extends Fragment {
                     Log.d("Bodypartlistsize",bodyPartList.size()+" ");
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
                     alertDialog.dismiss();
+                    settingBottomBar();
                     Log.d("Bodypartlistsize",bodyPartList.size()+" "+jsonObjectInner.getString("sProduct"));
 
 

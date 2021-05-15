@@ -191,7 +191,7 @@ public class RequestFragment extends Fragment {
         bodyPartAdapter=new RequestBodyAdapter(requireActivity(),bodyPartList,tagTotalNumber,iDocType);
         binding.boyPartRV.setLayoutManager(new LinearLayoutManager(requireActivity()));
 
-
+        binding.bottomBar.setVisibility(View.GONE);
 
         binding.date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -738,6 +738,7 @@ public class RequestFragment extends Fragment {
                     bodyPartAdapter.notifyDataSetChanged();
 
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    settingBottomBar();
 
                     initialValueSettingBody();
                     binding.cardViewBody.setVisibility(View.GONE);
@@ -764,6 +765,20 @@ public class RequestFragment extends Fragment {
         }else {binding.productName.setError("enter valid product");}
     }
 
+    private void settingBottomBar() {
+
+        if(bodyPartList.size()>0){
+            binding.bottomBar.setVisibility(View.VISIBLE);
+            int tQty=0;
+            for (int i=0;i<bodyPartList.size();i++) {
+                tQty=tQty+bodyPartList.get(i).getQty();
+            }
+            binding.TotalQtyBar.setText("Total Qty: "+tQty);
+        }else {
+            binding.bottomBar.setVisibility(View.GONE);
+        }
+    }
+
     private void deleteProductField(List<RequestClass> list, int position) {
 
 
@@ -776,6 +791,7 @@ public class RequestFragment extends Fragment {
                         list.remove(position);
                         bodyPartAdapter.notifyDataSetChanged();
                         binding.boyPartRV.setAdapter(bodyPartAdapter);
+                        settingBottomBar();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1165,6 +1181,7 @@ public class RequestFragment extends Fragment {
                 if(cursorEdit_B.getCount()==i+1){
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
                     alertDialog.dismiss();
+                    settingBottomBar();
 
                     bodyPartAdapter.setOnClickListener(new RequestBodyAdapter.OnClickListener() {
                         @Override
@@ -1267,6 +1284,7 @@ public class RequestFragment extends Fragment {
                     Log.d("Bodypartlistsize",bodyPartList.size()+" ");
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
                     alertDialog.dismiss();
+                    settingBottomBar();
                     Log.d("Bodypartlistsize",bodyPartList.size()+" "+jsonObjectInner.getString("sProduct"));
 
                     bodyPartAdapter.setOnClickListener(new RequestBodyAdapter.OnClickListener() {

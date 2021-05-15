@@ -124,17 +124,4 @@ public class Login extends AppCompatActivity {
 
                                 }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void syncData() {
-        Log.d("ipppp","new Tools().getIP(Login.this)");
-
-        schedulerJob.SyncMasterSettings(Login.this);
-//        schedulerJob.SyncToken(this);
-        schedulerJob.SyncProduct(Login.this);
-        schedulerJob.SyncTransSalePurchase(Login.this);
-        schedulerJob.SyncUser(Login.this);
-        schedulerJob.SyncAccounts(Login.this);
-        schedulerJob.SyncBank(Login.this);
-        schedulerJob.syncMasterTagDetails(Login.this);
-    }
 }

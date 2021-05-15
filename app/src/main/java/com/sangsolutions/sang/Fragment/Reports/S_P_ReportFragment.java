@@ -77,6 +77,7 @@ public class S_P_ReportFragment extends Fragment {
 
         assert getArguments() != null;
         iType= S_P_ReportFragmentArgs.fromBundle(getArguments()).getIDocType();
+        Log.d("iTypee",iType);
 
         Cursor cursor_userId=helper.getUserId();
         if(cursor_userId!=null && cursor_userId.moveToFirst()){
@@ -169,7 +170,11 @@ public class S_P_ReportFragment extends Fragment {
 
             if(!binding.product.getText().toString().equals("")) {
                 if (!binding.customer.getText().toString().equals("")) {
-                    loadingFromAPI();
+                    if(iType.equals("20") || iType.equals("10")) {
+                        loadingFromAPI();
+                    }else if(iType.equals("18") || iType.equals("28")){
+                        loadingFromAPIBatch();
+                    }
 
                 } else {
                     binding.customer.setError("enter Customer");
@@ -179,6 +184,41 @@ public class S_P_ReportFragment extends Fragment {
                 binding.product.setError("enter Product");
             }
 
+    }
+
+    private void loadingFromAPIBatch() {
+        AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+        View view=LayoutInflater.from(requireActivity()).inflate(R.layout.progress_bar,null,false);
+        builder.setView(view);
+        builder.setCancelable(false);
+        alertDialog = builder.create();
+        alertDialog.show();
+
+        String fromDate=Tools.dateFormat(binding.fromDate.getText().toString().trim());
+        String toDate=Tools.dateFormat(binding.toDate.getText().toString().trim());
+
+        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+ URLs.GetTransWithBatchReport)
+                .addQueryParameter("UserId",userId)
+                .addQueryParameter("FromDate",fromDate)
+                .addQueryParameter("ToDate",toDate)
+                .addQueryParameter("iProduct",String.valueOf(iProduct))
+                .addQueryParameter("iCustomer",String.valueOf(iCustomer))
+                .addQueryParameter("iType",iType)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONArray(new JSONArrayRequestListener() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("responseReport",response.toString());
+                        loadingToClass(response);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("responseReport",anError.toString());
+                        alertDialog.dismiss();
+                    }
+                });
     }
 
     private void loadingFromAPI() {

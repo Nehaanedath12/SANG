@@ -19,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
@@ -137,6 +139,7 @@ public class Sale_Purchase_Fragment extends Fragment {
     List<Integer> headerListTags;
     List<Integer>bodyListTags;
 
+    Animation slideUp, slideDown;
 
 
     @Nullable
@@ -188,6 +191,11 @@ public class Sale_Purchase_Fragment extends Fragment {
 
         productsList=new ArrayList<>();
         productsAdapter=new ProductsAdapter(requireActivity(),productsList);
+
+        slideDown = AnimationUtils.loadAnimation(getContext(), R.anim.move_down);
+        slideUp = AnimationUtils.loadAnimation(getContext(), R.anim.move_up);
+        binding.bottomBar.setVisibility(View.GONE);
+        binding.bottomMoreDetails.setVisibility(View.GONE);
 
         Cursor cursor_userId=helper.getUserId();
         if(cursor_userId!=null &&cursor_userId.moveToFirst()) {
@@ -505,6 +513,28 @@ public class Sale_Purchase_Fragment extends Fragment {
             }
         });
 
+        binding.bottomArrowUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(bodyPartList.size()>0){
+                    binding.bottomMoreDetails.startAnimation(slideUp);
+                    binding.bottomMoreDetails.setVisibility(View.VISIBLE);
+                    binding.bottomArrowUp.setVisibility(View.GONE);
+                    binding.bottomArrowDown.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        binding.bottomArrowDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.bottomMoreDetails.startAnimation(slideDown);
+                binding.bottomMoreDetails.setVisibility(View.GONE);
+                binding.bottomArrowUp.setVisibility(View.VISIBLE);
+                binding.bottomArrowDown.setVisibility(View.GONE);
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -690,6 +720,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
                 if(jsonArray1.length()==j+1){
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
+                    settingBottomBar();
                     alertDialog.dismiss();
                     bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
                         @Override
@@ -726,6 +757,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                         list.remove(position);
                         bodyPartAdapter.notifyDataSetChanged();
                         binding.boyPartRV.setAdapter(bodyPartAdapter);
+                        settingBottomBar();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -797,6 +829,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                 if(cursorEdit_B.getCount()==i+1){
                     binding.boyPartRV.setAdapter(bodyPartAdapter);
                     alertDialog.dismiss();
+                    settingBottomBar();
                     bodyPartAdapter.setOnClickListener(new BodyPartAdapter.OnClickListener() {
                         @Override
                         public void onItemClick(BodyPart bodyPart, int position) {
@@ -1154,6 +1187,7 @@ public class Sale_Purchase_Fragment extends Fragment {
                         bodyPartAdapter.notifyDataSetChanged();
 
                         binding.boyPartRV.setAdapter(bodyPartAdapter);
+                        settingBottomBar();
 
                         initialValueSettingBody();
                         binding.cardViewBody.setVisibility(View.GONE);
@@ -1180,6 +1214,42 @@ public class Sale_Purchase_Fragment extends Fragment {
             }else {binding.qtyProduct.setError("Enter qty");}
         }else {binding.productName.setError("enter valid product");}
 
+
+    }
+
+    private void settingBottomBar() {
+        if(bodyPartList.size()>0){
+            binding.bottomBar.setVisibility(View.VISIBLE);
+            float totalNet=0.0f;
+
+            int tQty=0;
+            float gross=0.0f;
+            float vat=0.0f;
+            float discount=0.0f;
+            float addCharges=0.0f;
+            float rate=0.0f;
+            for (int i=0;i<bodyPartList.size();i++) {
+                totalNet=totalNet+bodyPartList.get(i).getNet();
+
+                tQty=tQty+bodyPartList.get(i).getQty();
+                gross=gross+bodyPartList.get(i).getGross();
+                vat=vat+bodyPartList.get(i).getVat();
+                discount=discount+bodyPartList.get(i).getDiscount();
+                addCharges=addCharges+bodyPartList.get(i).getAddCharges();
+                rate=rate+bodyPartList.get(i).getRate();
+            }
+            binding.totalNet.setText("Total Net: "+totalNet);
+
+            binding.TotalQtyBar.setText("Total Qty: "+tQty);
+            binding.TotalGrossBar.setText("Total Gross: "+gross);
+            binding.TotalVatBar.setText("Total Vat: "+vat);
+            binding.TotalDisBar.setText("Total Discount: "+discount);
+            binding.TotalAddBar.setText("Total AddCharges: "+addCharges);
+            binding.TotalRateBar.setText("Total Rate: "+rate);
+            Log.d("totalNet",totalNet+"");
+        }else {
+            binding.bottomBar.setVisibility(View.GONE);
+        }
 
     }
 
