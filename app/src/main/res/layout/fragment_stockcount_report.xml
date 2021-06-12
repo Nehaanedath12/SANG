@@ -20,6 +20,7 @@
             <AutoCompleteTextView
                 android:layout_marginTop="10dp"
                 android:id="@+id/product"
+                android:inputType="text"
                 android:hint="Select Product"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>

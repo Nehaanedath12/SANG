@@ -189,7 +189,6 @@ public class GetMasterSettingsService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        Toast.makeText(this, "MasterSetting Synced", Toast.LENGTH_SHORT).show();
 
         JobScheduler js =
                 (JobScheduler) getApplicationContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);

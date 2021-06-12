@@ -55,7 +55,6 @@ public class PostCustomerMasterService extends JobService {
                 }
 
                 Cursor cursorHeader=helper.getDataFromCustomerMasterPost();
-                Log.d("responsePostMastr", cursorHeader.getCount()+"mmmm");
                 if(cursorHeader.moveToFirst() && cursorHeader.getCount()>0) {
                     for (int i = 0; i < cursorHeader.getCount(); i++) {
 

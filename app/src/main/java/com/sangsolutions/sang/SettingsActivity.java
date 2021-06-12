@@ -16,7 +16,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     ActivitySettingsBinding binding;
     Tools tools;
-    SchedulerJob schedulerJob;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +23,6 @@ public class SettingsActivity extends AppCompatActivity {
         binding=ActivitySettingsBinding.inflate(getLayoutInflater());
         View view=binding.getRoot();
         setContentView(view);
-        schedulerJob=new SchedulerJob();
         tools=new Tools();
 
         if(!tools.getIP(SettingsActivity.this).isEmpty()){

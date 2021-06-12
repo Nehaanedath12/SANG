@@ -140,7 +140,6 @@ public class PaymentReceiptFragment extends Fragment {
 
     DecimalFormat decimalFormat ;
 
-    String Api_invoice_response;
     List<String> imageList;
     CheckImageAdapter imageAdapter;
 
@@ -929,7 +928,6 @@ public class PaymentReceiptFragment extends Fragment {
             bindingInvoice.recyclerViewInvoice.setAdapter(invoiceAdapter);
 
             alertDialog_invoice.show();
-
             alertDialogProgress.show();
 
             API_Invoice();

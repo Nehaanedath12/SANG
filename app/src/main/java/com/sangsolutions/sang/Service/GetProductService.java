@@ -200,7 +200,6 @@ public class GetProductService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
 
-        Toast.makeText(this, "Product Synced", Toast.LENGTH_SHORT).show();
         return false;
     }
 }

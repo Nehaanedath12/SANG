@@ -200,8 +200,6 @@ public class GetAccountsService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        Toast.makeText(this, "Accounts Synced", Toast.LENGTH_SHORT).show();
-
         return false;
     }
 }

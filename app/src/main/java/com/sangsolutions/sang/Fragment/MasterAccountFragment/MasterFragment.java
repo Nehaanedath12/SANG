@@ -86,13 +86,12 @@ public class MasterFragment extends Fragment {
         binding.save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
-                builder.setTitle("save!")
+                        AlertDialog.Builder builder=new AlertDialog.Builder(requireActivity());
+                        builder.setTitle("save!")
                         .setMessage("Do you want to save ?")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
                                 SAVEmain();
                             }
                         })
@@ -142,14 +141,13 @@ public class MasterFragment extends Fragment {
         binding.spinner.setAdapter(unitAdapter);
 
         if(EditMode){
-            alertDialog.show();
-            if(Tools.isConnected(requireContext())){
+                alertDialog.show();
+                if(Tools.isConnected(requireContext())){
                 EditValueFromAPI();
-            }else {
+                }else {
                 alertDialog.dismiss();
                 editfromlocaldb();
-
-            }
+                }
         }
 
 
@@ -163,7 +161,6 @@ public class MasterFragment extends Fragment {
                 local=true;
             }
 
-            Log.d("iidd",cursorEdit.getInt(cursorEdit.getColumnIndex(CustomerMasterClass.ID))+"");
             binding.Name.setText(cursorEdit.getString(cursorEdit.getColumnIndex(CustomerMasterClass.NAME)));
             binding.code.setText(cursorEdit.getString(cursorEdit.getColumnIndex(CustomerMasterClass.CODE)));
             binding.altName.setText(cursorEdit.getString(cursorEdit.getColumnIndex(CustomerMasterClass.ALT_NAME)));
@@ -203,10 +200,10 @@ public class MasterFragment extends Fragment {
 
     private void EditValueFromAPI() {
         AndroidNetworking.get("http://" + new Tools().getIP(requireActivity())+ URLs.GetCustomerDetails)
-                .addQueryParameter("iId",String.valueOf(iId))
-                .setPriority(Priority.MEDIUM)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
+                    .addQueryParameter("iId",String.valueOf(iId))
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("ResponseEditMaster",response.toString());
@@ -228,7 +225,6 @@ public class MasterFragment extends Fragment {
     private void loadAPIValue_for_Edit(JSONObject response) {
 
         try {
-            Log.d("iIdiId","jsonArray.length()"+"");
             JSONArray jsonArray=new JSONArray(response.getString("Table"));
             Log.d("iIdiId",jsonArray.length()+"");
             for (int i=0;i<jsonArray.length();i++) {
@@ -301,7 +297,6 @@ public class MasterFragment extends Fragment {
             }else {
                 jsonObjectMain.put("iId", iId);
             }
-            Log.d("locall","success "+local);
             jsonObjectMain.put("sName",    binding.Name.getText().toString());
             jsonObjectMain.put("sCode",    binding.code.getText().toString());
             jsonObjectMain.put("sAltName",    binding.altName.getText().toString());
@@ -322,11 +317,8 @@ public class MasterFragment extends Fragment {
             jsonObjectMain.put("sContactPersonNo",  binding.contactPerson.getText().toString());
             jsonObjectMain.put("iType",iType);
             jsonObjectMain.put("iUser", userId);
-
-            Log.d("MasterCustomer","success"+jsonObjectMain.toString());
             uploadToAPI(jsonObjectMain);
         } catch (JSONException e) {
-
             Log.d("MasterCustomer",e.getMessage());
 
         }
@@ -366,17 +358,13 @@ public class MasterFragment extends Fragment {
     private void saveLocally() {
 
         Cursor cursor1=helper.getDataFromCustomerMaster();
-        Log.d("legnthh",cursor1.getCount()+"");
-
         if(!EditMode) {
             local=true;
             if (cursor1.moveToFirst() && cursor1.getCount() > 0) {
                 iId = cursor1.getCount();
-                Log.d("legntghhiId",iId+"");
 
             }
         }
-        Log.d("legntghhiId",iId+"");
         CustomerMasterClass masterClass=new CustomerMasterClass(
                 binding.Name.getText().toString(),
                 binding.code.getText().toString(),

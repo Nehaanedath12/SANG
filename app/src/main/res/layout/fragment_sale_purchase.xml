@@ -171,10 +171,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/spinnerUnit"/>
-
                         <EditText
                             android:id="@+id/qtyProduct"
                             android:hint="Qty"
+                            android:maxLength="9"
                             android:inputType="number"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"/>
@@ -183,6 +183,7 @@
                     <EditText
                     android:id="@+id/rate_product"
                     android:hint="Rate"
+                        android:ems="10"
                     android:inputType="numberDecimal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

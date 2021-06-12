@@ -311,9 +311,6 @@ public class Home extends AppCompatActivity {
                                 NavDirections action = HomeFragmentDirections.actionHomeFragmentToSalesPurchaseHistoryFragment("Advance Invoice History").setIDocType(16);
                                 navController.navigate(R.id.homeFragment);
                                 navController.navigate(action);
-//                            NavDirections action= HomeFragmentDirections.actionHomeFragmentToAdvanceInvoiceHistoryFragment();
-//                            navController.navigate(R.id.homeFragment);
-//                            navController.navigate(action);
                                 drawer.closeDrawer(GravityCompat.START);
                                 return true;
                             }else {

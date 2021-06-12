@@ -784,8 +784,9 @@ public class Sale_Purchase_Fragment extends Fragment {
         }
         Cursor cursorEdit_B=helper.getEditValuesBodyS_P(iTransId,iDocType);
 
-        Log.d("cursorEdit_B",cursorEdit_B.getCount()+"");
+
     if(cursorEdit_B.moveToFirst() && cursorEdit_B.getCount()>0) {
+        Log.d("cursorEdit_B",cursorEdit_B.getCount()+"");
             for (int i = 0; i < cursorEdit_B.getCount(); i++) {
                 for (int k = 0; k < headerListTags.size(); k++) {
                     int tagDetails=cursorEdit_B.getInt(cursorEdit_B.getColumnIndex("iTag"+ headerListTags.get(k)));
@@ -901,15 +902,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                 assert userIdS != null;
                 jsonObjectMain.put("iUser", Integer.parseInt(userIdS));
 
-                Log.d("jsonObjecMain", jsonObjectMain.get("iTransId") + "");
-                Log.d("jsonObjecMain", jsonObjectMain.get("sDocNo") + "");
-                Log.d("jsonObjecMain", jsonObjectMain.get("iDocType") + "");
-                Log.d("jsonObjecMain", jsonObjectMain.get("iAccount1") + "");
-                Log.d("jsonObjecMain", jsonObjectMain.get("iAccount2") + "");
-                Log.d("jsonObjecMain", jsonObjectMain.get("sNarration") + "");
-                Log.d("jsonObjecMain", jsonObjectMain.get("iUser") + "");
-
-
                 JSONArray jsonArray = new JSONArray();
                 for (int i = 0; i < bodyPartList.size(); i++) {
                     JSONObject jsonObject = new JSONObject();
@@ -942,16 +934,6 @@ public class Sale_Purchase_Fragment extends Fragment {
                     }
                     jsonObject.put("sUnits", bodyPartList.get(i).getUnit());
                     jsonObject.put("fNet", bodyPartList.get(i).getNet());
-
-
-                    Log.d("jsonObjecttIproduct", jsonObject.get("iProduct") + "");
-                    Log.d("jsonObjecttQty", jsonObject.get("fQty") + "");
-                    Log.d("jsonObjecttrate", jsonObject.get("fRate") + "");
-                    Log.d("jsonObjecttdis", jsonObject.get("fDiscount") + "");
-                    Log.d("jsonObjecttaddcha", jsonObject.get("fAddCharges") + "");
-                    Log.d("jsonObjecttvarper", jsonObject.get("fVatPer") + "");
-                    Log.d("jsonObjecttvat", jsonObject.get("fVAT") + "");
-                    Log.d("jsonObjecttrema", jsonObject.get("sRemarks") + "");
 
 
                     jsonArray.put(jsonObject);
@@ -1131,7 +1113,8 @@ public class Sale_Purchase_Fragment extends Fragment {
         DecimalFormat df = new DecimalFormat("#.00");
         if(!binding.productName.getText().toString().equals("")  && helper.getProductNameValid(binding.productName.getText().toString().trim())) {
             if(!binding.qtyProduct.getText().toString().equals("") ){
-                if(!binding.rateProduct.getText().toString().equals("") && ! binding.rateProduct.getText().toString().equals(".")){
+                if(!binding.rateProduct.getText().toString().equals("") && ! binding.rateProduct.getText().toString().equals("."))
+                {
 
                     BodyPart bodyPart=new BodyPart();
 
@@ -1154,8 +1137,8 @@ public class Sale_Purchase_Fragment extends Fragment {
                             vatPer=Float.parseFloat(binding.vatPerProduct.getText().toString());
                         }
 
-                        net=gross-discount+addCharges+vat;
                         vat=((vatPer/100)*(gross-discount+addCharges));
+                        net=gross-discount+addCharges+vat;
 
                         bodyPart.setGross(gross);
                         bodyPart.setNet(Float.parseFloat(df.format(net)));
@@ -1268,7 +1251,9 @@ public class Sale_Purchase_Fragment extends Fragment {
         binding.disProduct.setText(String.valueOf(bodyPart.getDiscount()));
         binding.addChargesProduct.setText(String.valueOf(bodyPart.getAddCharges()));
         binding.remarksProduct.setText(bodyPart.getRemarks());
-        setUnit(helper.getProductUnitById(iProduct),position);
+        if(!helper.getProductUnitById(iProduct).equals("")) {
+            setUnit(helper.getProductUnitById(iProduct), position);
+        }
 
         try {
             for (int i = 0; i < autoText_B_list.size(); i++) {
@@ -1371,6 +1356,7 @@ public class Sale_Purchase_Fragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
+                Log.d("tagDetailss",editable.toString());
                 GetTagDetails(editable.toString(),iTag,autocompleteView,iTagPosition);
 
             }
@@ -1381,9 +1367,13 @@ public class Sale_Purchase_Fragment extends Fragment {
                     tagList.clear();
                     Cursor cursor=helper.getTagbyKeyword(s,iTag);
                     if(cursor!=null && !s.equals("")) {
-                    cursor.moveToFirst();
+                        Log.d("tagDetails1",cursor.toString()+iTag);
+
+                        cursor.moveToFirst();
                     if (cursor.getCount() > 0) {
-                    for (int i = 0; i < cursor.getCount(); i++) {
+                        Log.d("tagDetails1",cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
+
+                        for (int i = 0; i < cursor.getCount(); i++) {
                     TagDetails details=new TagDetails();
                     details.setsName(cursor.getString(cursor.getColumnIndex(TagDetails.S_NAME)));
                     details.setiId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(TagDetails.I_ID))));

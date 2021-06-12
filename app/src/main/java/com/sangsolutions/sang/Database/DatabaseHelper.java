@@ -596,16 +596,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-//            db.execSQL("DROP TABLE IF EXISTS "+TABLE_USER);
-//            db.execSQL("DROP TABLE IF EXISTS "+TABLE_PRODUCT);
-//            onCreate(db);
-
         for (int i = oldVersion; i < newVersion; ++i) {
             String migrationName = String.format("from_%d_to_%d.sql", i, (i + 1));
             Log.d("databasehelper", "Looking for migration file: " + migrationName);
             readAndExecuteSQLScript(db, context, migrationName);
         }
-//        db.delete(TABLE_CURRENT_LOGIN,null,null);
         onCreate(db);
 
 }
@@ -2220,10 +2215,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public int getTagDetailsCount() {
+    public int getTagDetailsCount(int i) {
 
         this.db=getReadableDatabase();
-        Cursor cursor=db.rawQuery("select * from "+TABLE_TAG_DETAILS,null);
+        Cursor cursor=db.rawQuery("select * from "+TABLE_TAG_DETAILS+" where "+TagDetails.I_TYPE+"="+i,null);
         cursor.moveToFirst();
         return cursor.getCount();
     }

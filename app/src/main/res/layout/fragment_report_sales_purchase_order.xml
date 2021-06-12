@@ -18,12 +18,14 @@
             android:padding="10dp"
             >
             <AutoCompleteTextView
+                android:inputType="text"
                 android:layout_marginTop="10dp"
                 android:id="@+id/product"
                 android:hint="Select Product"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <AutoCompleteTextView
+                android:inputType="text"
                 android:layout_marginTop="10dp"
                 android:id="@+id/customer"
                 android:hint="Select Customer"

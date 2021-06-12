@@ -4,21 +4,18 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
-import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Database.CustomerMasterClass;
 import com.sangsolutions.sang.R;
 
@@ -33,6 +30,7 @@ public class CustomerMasterAdapter extends RecyclerView.Adapter<CustomerMasterAd
 
     private SparseBooleanArray selected_items;
     private int current_selected_idx = -1;
+    int ITEM_TYPE_ONE;
 
     private void resetCurrentIndex() {
         current_selected_idx = -1;
@@ -91,15 +89,23 @@ public class CustomerMasterAdapter extends RecyclerView.Adapter<CustomerMasterAd
         void onItemLongClick(int iId, int position);
     }
 
-    public CustomerMasterAdapter(Context context, List<CustomerMasterClass> list) {
+    public CustomerMasterAdapter(Context context, List<CustomerMasterClass> list, int ITEM_TYPE_ONE) {
         this.context=context;
         this.list=list;
+        this.ITEM_TYPE_ONE=ITEM_TYPE_ONE;
     }
 
     @NonNull
     @Override
     public CustomerMasterAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(context).inflate(R.layout.customer_master_history_adapter,parent,false);
+
+        Log.d("ITEM_TYPE_ONE",ITEM_TYPE_ONE+"");
+        View view;
+        if(ITEM_TYPE_ONE==0) {
+            view = LayoutInflater.from(context).inflate(R.layout.customer_master_history_adapter, parent, false);
+        }else {
+            view = LayoutInflater.from(context).inflate(R.layout.customer_master_history_2_adapter, parent, false);
+        }
         return new ViewHolder(view);
     }
 
@@ -108,6 +114,7 @@ public class CustomerMasterAdapter extends RecyclerView.Adapter<CustomerMasterAd
         holder.customerName.setText(list.get(position).name);
         holder.id.setText(String.valueOf(list.get(position).iId));
         holder.customerCode.setText(list.get(position).code);
+
         if (position % 2 == 0) {
             holder.parentCard.setBackgroundColor(Color.rgb(234, 234, 234));
         } else {

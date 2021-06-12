@@ -47,7 +47,7 @@ import java.util.Date;
 import java.util.List;
 
 public class S_P_Order_ReportFragment extends Fragment {
-  FragmentReportSalesPurchaseOrderBinding binding;
+    FragmentReportSalesPurchaseOrderBinding binding;
     String StringDate,iType;
     SimpleDateFormat df;
     List<Products> productsList;

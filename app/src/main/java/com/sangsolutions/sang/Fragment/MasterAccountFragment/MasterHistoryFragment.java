@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,8 +29,6 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
 import com.sangsolutions.sang.Adapter.CustomerMasterAdapter.CustomerMasterAdapter;
-import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistory;
-import com.sangsolutions.sang.Adapter.SalesPurchaseHistoryAdapter.SalesPurchaseHistoryAdapter;
 import com.sangsolutions.sang.Database.CustomerMasterClass;
 import com.sangsolutions.sang.Database.DatabaseHelper;
 import com.sangsolutions.sang.Fragment.HomeFragmentDirections;
@@ -55,6 +54,7 @@ public class MasterHistoryFragment extends Fragment {
     List<CustomerMasterClass> historyList;
     CustomerMasterAdapter historyAdapter;
     boolean selectionActive = false;
+    int  ITEM_TYPE_ONE=0;
 
     @Nullable
     @Override
@@ -68,10 +68,6 @@ public class MasterHistoryFragment extends Fragment {
         binding.fabAdd.setVisibility(View.VISIBLE);
         helper = new DatabaseHelper(requireContext());
 
-        historyList=new ArrayList<>();
-        historyAdapter=new CustomerMasterAdapter(requireActivity(),historyList);
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.recyclerView.setAdapter(historyAdapter);
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
@@ -79,6 +75,16 @@ public class MasterHistoryFragment extends Fragment {
         builder.setView(view);
         builder.setCancelable(false);
         alertDialog = builder.create();
+
+        ITEM_TYPE_ONE= MasterHistoryFragmentArgs.fromBundle(getArguments()).getMode();
+        if(ITEM_TYPE_ONE==1){
+            binding.switchButton.setChecked(true);
+        }
+
+        historyList=new ArrayList<>();
+        historyAdapter = new CustomerMasterAdapter(requireActivity(), historyList,ITEM_TYPE_ONE);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerView.setAdapter(historyAdapter);
 
         Cursor cursor_userId = helper.getUserId();
         if (cursor_userId != null && cursor_userId.moveToFirst()) {
@@ -100,7 +106,8 @@ public class MasterHistoryFragment extends Fragment {
                     Toast.makeText(requireContext(), "No Internet!!", Toast.LENGTH_SHORT).show();
                 }
                 navController.navigate(R.id.homeFragment);
-                NavDirections action = HomeFragmentDirections.actionHomeFragmentToMasterHistoryFragment();
+                NavDirections action = HomeFragmentDirections.actionHomeFragmentToMasterHistoryFragment()
+                        .setMode(ITEM_TYPE_ONE);
                 navController.navigate(action);
                 binding.refresh.setRefreshing(false);
 
@@ -122,45 +129,61 @@ public class MasterHistoryFragment extends Fragment {
             }
         });
 
+        binding.switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if(isChecked){
+                    ITEM_TYPE_ONE=1;
+                }else {
+                    ITEM_TYPE_ONE=0;
+                }
+                navController.navigate(R.id.homeFragment);
+                NavDirections action = HomeFragmentDirections.actionHomeFragmentToMasterHistoryFragment().setMode(ITEM_TYPE_ONE);
+                navController.navigate(action);
+
+                Log.d("checkedd",isChecked+" "+ITEM_TYPE_ONE);
+            }
+        });
+
         return binding.getRoot();
     }
 
     private void deleteAlert() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Delete?")
-                .setMessage("Do you want to Delete " + historyAdapter.getSelectedItemCount() + " items?")
-                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                    builder.setTitle("Delete?")
+                    .setMessage("Do you want to Delete " + historyAdapter.getSelectedItemCount() + " items?")
+                    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         DeleteItems();
 
                     }
-                })
-                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    })
+                    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                })
-                .create()
-                .show();
+                    })
+                    .create()
+                    .show();
     }
 
     private void DeleteItems() {
-        List<Integer> listSelectedItem = historyAdapter.getSelectedItems();
-        for (int i =0;i<listSelectedItem.size();i++) {
-            for (int j =0;j<historyList.size();j++) {
-                if (listSelectedItem.get(i) == j) {
-                    if(Tools.isConnected(requireContext())) {
+                    List<Integer> listSelectedItem = historyAdapter.getSelectedItems();
+                    for (int i =0;i<listSelectedItem.size();i++) {
+                    for (int j =0;j<historyList.size();j++) {
+                        if (listSelectedItem.get(i) == j) {
+                        if(Tools.isConnected(requireContext())) {
                         deleteFromAPI(historyList.get(j).getiId());
-                    }else {
-                        deleteFromDB(historyList.get(j).getiId());
+                        }else {
+                            deleteFromDB(historyList.get(j).getiId());
+                        }
                     }
-                }
-            }
+                    }
 
-            if (i + 1 == listSelectedItem.size()) {
+                if (i + 1 == listSelectedItem.size()) {
                 getHistoryDatas();
                 historyAdapter.notifyDataSetChanged();
                 closeSelection();
@@ -169,9 +192,9 @@ public class MasterHistoryFragment extends Fragment {
     }
 
     private void getHistoryDatas() {
-        alertDialog.show();
-        if (Tools.isConnected(requireContext())) {
-            AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetCustomerSummary)
+                    alertDialog.show();
+                    if (Tools.isConnected(requireContext())) {
+                    AndroidNetworking.get("http://" + new Tools().getIP(requireActivity()) + URLs.GetCustomerSummary)
                     .addQueryParameter("iUser", userIdS)
                     .setPriority(Priority.MEDIUM)
                     .build()
@@ -180,7 +203,6 @@ public class MasterHistoryFragment extends Fragment {
                         public void onResponse(JSONArray response) {
                             Log.d("responseHistoryMaster", response.toString());
                             loadDatas(response);
-
                         }
 
                         @Override
@@ -270,20 +292,19 @@ public class MasterHistoryFragment extends Fragment {
                     alertDialog.dismiss();
 
                     historyAdapter.setOnClickListener(new CustomerMasterAdapter.OnClickListener() {
-                        @Override
-                        public void onItemClick(int iId, int position) {
-                            if(Tools.isConnected(requireContext())) {
+                                @Override
+                                public void onItemClick(int iId, int position) {
+                                if(Tools.isConnected(requireContext())) {
                                 adapterOnItemClick(iId, position);
-                            }else {
-                                Toast.makeText(requireContext(), "Please Refresh", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                                }else {
+                                    Toast.makeText(requireContext(), "Please Refresh", Toast.LENGTH_SHORT).show();
+                                }
+                                }
 
                         @Override
                         public void onDeleteClick(int iId, int position) {
-
                             deleteFromAPI(iId);
-                        }
+                            }
 
                         @Override
                         public void onItemLongClick(int iId, int position) {
@@ -302,7 +323,7 @@ public class MasterHistoryFragment extends Fragment {
     }
 
     private void deleteFromAPI(int iId) {
-        AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteCustomer)
+                AndroidNetworking.get("http://"+ new Tools().getIP(requireActivity())+  URLs.DeleteCustomer)
                 .addQueryParameter("iId", String.valueOf(iId))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -325,7 +346,6 @@ public class MasterHistoryFragment extends Fragment {
             NavDirections action = MasterHistoryFragmentDirections.actionMasterHistoryFragmentToMasterFragment()
                     .setEditMode(true).setId(iId);
                     navController.navigate(action);
-
         }
         else {
             enableActionMode(position);
@@ -337,14 +357,13 @@ public class MasterHistoryFragment extends Fragment {
     }
 
     private void toggleSelection(int position) {
-        historyAdapter.toggleSelection(position);
-        int count = historyAdapter.getSelectedItemCount();
-
-        if (count == 1 && binding.fabDelete.getVisibility() != View.VISIBLE) {
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
+                    historyAdapter.toggleSelection(position);
+                    int count = historyAdapter.getSelectedItemCount();
+                    if (count == 1 && binding.fabDelete.getVisibility() != View.VISIBLE) {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
                     binding.fabAdd.startAnimation(slideDown);
                     binding.fabAdd.setVisibility(View.GONE);
 
@@ -352,13 +371,12 @@ public class MasterHistoryFragment extends Fragment {
                     binding.fabClose.startAnimation(slideUp);
                     binding.fabDelete.setVisibility(View.VISIBLE);
                     binding.fabClose.setVisibility(View.VISIBLE);
-                }
-            }, 300);
-        }
-
-        if (count == 0) {
-            closeSelection();
-        }
+                    }
+                    }, 300);
+                    }
+                    if (count == 0) {
+                        closeSelection();
+                    }
     }
 
     private void closeSelection() {

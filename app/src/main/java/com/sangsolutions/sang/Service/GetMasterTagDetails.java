@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -42,19 +41,27 @@ public class GetMasterTagDetails extends JobService {
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
         editor = preferences.edit();
 
-        if(helper.getTagDetailsCount()==0) {
-            GetAllTag();
-        }else {
-            UpdateTagAllDetails();
+        for (int i=1;i<=8;i++) {
+            if(helper.getTagDetailsCount(i)==0) {
+                GetAllTag(i);
+            }else {
+                UpdateTagAllDetails(i);
+            }
         }
+
+
+//        if(helper.getTagDetailsCount(i)==0) {
+//            GetAllTag(i);
+//        }else {
+//            UpdateTagAllDetails();
+//        }
         return true;
     }
 
-    private void UpdateTagAllDetails() {
-        for (int i=1;i<=8;i++) {
-            UpdateTag_Details(i);
-            Log.d("homeFragment","homeFragmentUp"+i);
-        }
+    private void UpdateTagAllDetails(int iType) {
+            UpdateTag_Details(iType);
+            Log.d("homeFragment","homeFragmentUp"+iType);
+
     }
 
     private void UpdateTag_Details(int iType) {
@@ -133,11 +140,8 @@ public class GetMasterTagDetails extends JobService {
 
         }
 
-    private void GetAllTag() {
-        for (int i=1;i<=8;i++) {
-            GetTag_Details(i);
-            Log.d("homeFragment","homeFragmentS"+i);
-        }
+    private void GetAllTag(int iType) {
+            GetTag_Details(iType);
     }
 
     private void GetTag_Details(int iType) {
@@ -202,7 +206,6 @@ public class GetMasterTagDetails extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        Toast.makeText(this, "Tag Details Synced", Toast.LENGTH_SHORT).show();
 
         return false;
     }

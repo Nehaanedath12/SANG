@@ -567,6 +567,10 @@
         android:name="com.sangsolutions.sang.Fragment.MasterAccountFragment.MasterHistoryFragment"
         android:label="Master History"
         tools:layout="@layout/fragment_master_history">
+        <argument
+            android:name="mode"
+            app:argType="integer"
+            android:defaultValue="0" />
 
         <action
             android:id="@+id/action_masterHistoryFragment_to_masterFragment"
