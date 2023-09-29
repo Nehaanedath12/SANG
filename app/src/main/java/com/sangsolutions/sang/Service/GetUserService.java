@@ -35,7 +35,7 @@ public class GetUserService extends JobService {
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
-        Log.d("Userr","User1");
+        Log.d("ZZZUserr","User1");
         GetUsers();
         AndroidNetworking.initialize(this);
         return true;

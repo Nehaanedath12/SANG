@@ -49,7 +49,7 @@ public class GetMasterSettingsService extends JobService {
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
         editor = preferences.edit();
 
-        Log.d("SyncMasterSettings1","SyncMasterSettings");
+        Log.d("ZZZSyncMasterSettings1","SyncMasterSettings");
         AndroidNetworking.initialize(this);
         GetMaster();
 

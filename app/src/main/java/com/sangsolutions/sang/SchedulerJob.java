@@ -20,6 +20,22 @@ import com.sangsolutions.sang.Service.GetUserService;
 
 public class SchedulerJob {
 
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void SyncUser(Context context) {
+        Log.d("user2","user");
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo job = new JobInfo.Builder(
+                0,
+                new ComponentName(context, GetUserService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+        assert js != null;
+        js.schedule(job);
+    }
+
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void SyncMasterSettings(Context context) {
         Log.d("SyncMasterSettings","SyncMasterSettings");
@@ -27,7 +43,7 @@ public class SchedulerJob {
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobInfo job = new JobInfo.Builder(
-                0,
+                1,
                 new ComponentName(context, GetMasterSettingsService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .build();
@@ -41,7 +57,7 @@ public class SchedulerJob {
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobInfo job = new JobInfo.Builder(
-                1,
+                2,
                 new ComponentName(context, GetAccountsService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .build();
@@ -55,7 +71,7 @@ public class SchedulerJob {
             JobScheduler js =
                     (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobInfo job = new JobInfo.Builder(
-                    2,
+                    3,
                     new ComponentName(context, GetProductService.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .build();
@@ -69,7 +85,7 @@ public class SchedulerJob {
             JobScheduler js =
                     (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobInfo job = new JobInfo.Builder(
-                    3,
+                    4,
                     new ComponentName(context, GetTransactionSettingService.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .build();
@@ -83,22 +99,8 @@ public class SchedulerJob {
         JobScheduler js =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobInfo job = new JobInfo.Builder(
-                4,
-                new ComponentName(context, GetBankService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .build();
-        assert js != null;
-        js.schedule(job);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void SyncUser(Context context) {
-        Log.d("user2","user");
-        JobScheduler js =
-                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        JobInfo job = new JobInfo.Builder(
                 5,
-                new ComponentName(context, GetUserService.class))
+                new ComponentName(context, GetBankService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .build();
         assert js != null;

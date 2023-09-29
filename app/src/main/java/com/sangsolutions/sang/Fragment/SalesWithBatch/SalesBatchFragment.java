@@ -759,7 +759,6 @@ public class SalesBatchFragment extends Fragment {
 //        bodyListTemp.addAll(bodyList);
 //        Log.d("bodyListTemp",bodyListTemp.size()+" "+bodyList.size());
 
-
         batchBinding.close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -767,6 +766,7 @@ public class SalesBatchFragment extends Fragment {
 //                bodyListTemp.clear();
             }
         });
+
 
 
         batchBinding.barcodeI.setOnClickListener(new View.OnClickListener() {
@@ -1248,76 +1248,8 @@ public class SalesBatchFragment extends Fragment {
                 }
             }
 
-
-//            if (EditModeProduct) {
                 loadBatchForEditProduct(jsonArray);
-//            } else {
-//                for (int i = 0; i < jsonArray.length(); i++) {
-//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                    boolean flag = false;
-//                    BatchSales batchSales = new BatchSales();
-//                    batchSales = new BatchSales(
-//                            jsonObject.getString(BatchSales.S_BATCH),
-//                            jsonObject.getString(BatchSales.MF_DATE),
-//                            jsonObject.getString(BatchSales.EXP_DATE),
-//                            jsonObject.getInt(BatchSales.F_QTY),
-//                            0,
-//                            jsonObject.getInt(BatchSales.I_ID),
-//                            jsonObject.getInt(BatchSales.I_PRODUCT)
-//                    );
-//
-//                    if (batchSalesSelectedList.size() > 0) {
-//                        Log.d("batchSalesSelectedList",batchSalesSelectedList.size()+"");
-//                        for (int j = 0; j < batchSalesSelectedList.size(); j++) {
-//                            if (jsonObject.getInt(BatchSales.F_QTY) != 0)
-//                                if (batchSalesSelectedList.get(j).iProduct == (jsonObject.getInt(BatchSales.I_PRODUCT))) {
-//                                    if (batchSalesSelectedList.get(j).batch.equals(jsonObject.getString(BatchSales.S_BATCH))) {
-//                                        batchSales.setEnterQty(batchSalesSelectedList.get(j).enterQty);
-//                                        flag = true;
-//                                    }
-//                                }
-//                        }
-//                    }
-//                    if (!flag) {
-//                        batchSales = new BatchSales(
-//                                jsonObject.getString(BatchSales.S_BATCH),
-//                                jsonObject.getString(BatchSales.MF_DATE),
-//                                jsonObject.getString(BatchSales.EXP_DATE),
-//                                jsonObject.getInt(BatchSales.F_QTY),
-//                                0,
-//                                jsonObject.getInt(BatchSales.I_ID),
-//                                jsonObject.getInt(BatchSales.I_PRODUCT)
-//                        );
-//                    }
-//                    if (bodyListTemp.size() > 0) {
-//                        int balQty = jsonObject.getInt(BatchSales.F_QTY);
-//                        for (int k = 0; k < bodyListTemp.size(); k++) {
-//                            for (int k1 = 0; k1 < bodyListTemp.get(k).batchList.size(); k1++) {
-//
-//                                if (jsonObject.getInt(BatchSales.I_PRODUCT) == (bodyListTemp.get(k).batchList.get(k1).iProduct)) {
-//                                    if (jsonObject.getString(BatchSales.S_BATCH).equals(bodyListTemp.get(k).batchList.get(k1).batch)) {
-////                                        if (jsonObject. getInt(BatchSales.F_QTY) != 0) {
-//                                        balQty -= bodyListTemp.get(k).batchList.get(k1).enterQty;
-//                                        batchSales.setQty(balQty);
-//                                        Log.d("position_body_Edit", +position_body_Edit+batchSales.getQty() + " " + batchEditPosition);
-//
-//
-////                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                        if (EditModeProduct) {
-//                            batchSales.setQty(batchSales.getEnterQty() + batchSales.getQty());
-//                        }
-//                    }
-//                    if (batchSales.qty != 0) {
-//                        batchSalesList.add(batchSales);
-//                    }
-//                    batchSalesAdapter.notifyDataSetChanged();
-//                }
-//            }
+
                 Log.d("saveProduct",saveProduct+"");
             saveProduct=false;
         } catch (JSONException e) {

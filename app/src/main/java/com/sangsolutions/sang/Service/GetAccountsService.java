@@ -41,7 +41,7 @@ public class GetAccountsService extends JobService {
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
-        Log.d("responseAccounts","response.toString()");
+        Log.d("ZZZresponseAccounts","response.toString()");
         AndroidNetworking.initialize(this);
 
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);

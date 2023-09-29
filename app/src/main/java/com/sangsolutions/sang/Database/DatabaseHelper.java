@@ -266,7 +266,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "" + Sales_purchase_order_class.S_DOC_NO + " TEXT(50) DEFAULT null, "  +
             "" + Sales_purchase_order_class.PROCESS_TIME + " TEXT(50) DEFAULT null, "  +
             "" + Sales_purchase_order_class.STATUS +  " INTEGER DEFAULT 0 " +
-
             ");";
 
 

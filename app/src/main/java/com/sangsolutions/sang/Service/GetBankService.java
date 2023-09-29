@@ -39,7 +39,7 @@ public class GetBankService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
-        Log.d("bankk","banks");
+        Log.d("ZZZbankk","banks");
         this.params=params;
 
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);

@@ -39,7 +39,7 @@ public class GetTransactionSettingService extends JobService {
     public boolean onStartJob(JobParameters params) {
         helper=new DatabaseHelper(this);
         this.params=params;
-        Log.d("TransSalePurchase1","TransSalePurchase");
+        Log.d("ZZZTransSalePurchase1","TransSalePurchase");
         AndroidNetworking.initialize(this);
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
         editor = preferences.edit();

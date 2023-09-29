@@ -71,11 +71,9 @@ public class Home extends AppCompatActivity {
     NavigationView navigationView;
     DrawerLayout drawer;
     String userName;
-    Cursor tagCursor;
     SchedulePost schedulepost;
     SchedulerJob schedulerJob;
     SchedulePost1 schedulepost1;
-    List<Integer>tagList;
     int lockmode;
     ExpandableListAdapter mMenuAdapter;
     ExpandableListView expandableList;
@@ -229,6 +227,7 @@ public class Home extends AppCompatActivity {
 
         mMenuAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild, binding.navigationmenu,0);
 
+        Log.d("listSize",listDataChild.size()+" "+"lmml;");
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);
 
@@ -775,28 +774,28 @@ public class Home extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void syncData() {
 
-//        editor.putString(Commons.PRODUCT,"false").apply();
-//        editor.putString(Commons.ACCOUNTS,"false").apply();
-//        editor.putString(Commons.TRANSACTION_SETTINGS,"false").apply();
-//        editor.putString(Commons.TAG_DETAILS,"false").apply();
-//        editor.putString(Commons.MASTER_SETTINGS,"false").apply();
-//        editor.putString(Commons.BANK,"false").apply();
+        editor.putString(Commons.PRODUCT,"false").apply();
+        editor.putString(Commons.ACCOUNTS,"false").apply();
+        editor.putString(Commons.TRANSACTION_SETTINGS,"false").apply();
+        editor.putString(Commons.TAG_DETAILS,"false").apply();
+        editor.putString(Commons.MASTER_SETTINGS,"false").apply();
+        editor.putString(Commons.BANK,"false").apply();
 
         Log.d("ipppp","new Tools().getIP(Login.this)");
 
 //        schedulerJob.SyncToken(this);
 
-
-
-        schedulerJob.SyncAccounts(Home.this);
-        schedulerJob.SyncTransSalePurchase(Home.this);
-        schedulerJob.syncMasterTagDetails(Home.this);
         schedulerJob.SyncMasterSettings(Home.this);
+        schedulerJob.SyncAccounts(Home.this);
         schedulerJob.SyncProduct(Home.this);
+        schedulerJob.SyncTransSalePurchase(Home.this);
         schedulerJob.SyncBank(Home.this);
+        schedulerJob.syncMasterTagDetails(Home.this);
 
 
-        schedulerJob.SyncUser(Home.this);
+
+
+//        schedulerJob.SyncUser(Home.this);
 
 
         }

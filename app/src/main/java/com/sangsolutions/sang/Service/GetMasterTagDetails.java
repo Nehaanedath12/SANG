@@ -37,7 +37,7 @@ public class GetMasterTagDetails extends JobService {
         helper=new DatabaseHelper(this);
         AndroidNetworking.initialize(this);
         this.params=params;
-        Log.d("homeFragment","homeFragmentS"+"initial");
+        Log.d("ZZZhomeFragment","homeFragmentS"+"initial");
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
         editor = preferences.edit();
 

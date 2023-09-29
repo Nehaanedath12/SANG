@@ -30,7 +30,7 @@ public class GetTokenService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        Log.d("Timingg","Tools.tokens");
+        Log.d("ZZZTimingg","Tools.tokens");
         GetToken();
 
         return true;

@@ -46,7 +46,7 @@ public class GetProductService extends JobService {
         preferences = getSharedPreferences(Commons.PREFERENCE_SYNC,MODE_PRIVATE);
         editor = preferences.edit();
 
-        Log.d("productss",helper.getProducts()+"");
+        Log.d("ZZZproductss",helper.getProducts()+"");
         if(helper.getProducts()==0) {
             GetProducts();
         }else {
